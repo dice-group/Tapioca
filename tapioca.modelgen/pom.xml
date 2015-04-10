@@ -22,60 +22,56 @@
 		<version>0.0.1-SNAPSHOT</version>
 		<relativePath>../tapioca.parent</relativePath>
 	</parent>
-	<artifactId>tapioca.core</artifactId>
+	<artifactId>tapioca.modelgen</artifactId>
+	<packaging>jar</packaging>
 
 	<dependencies>
-		<!-- High Performance Primitive Collections -->
-		<dependency>
-			<groupId>com.carrotsearch</groupId>
-			<artifactId>hppc</artifactId>
-			<version>${com.carrotsearch.hppc.version}</version>
-		</dependency>
-        <!-- Jena -->
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-core</artifactId>
-            <version>${org.apache.jena.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.jena</groupId>
-            <artifactId>jena-arq</artifactId>
-            <version>${org.apache.jena.version}</version>
-        </dependency>
-        <!-- Sesame -->
-        <dependency>
-            <groupId>org.openrdf.sesame</groupId>
-            <artifactId>sesame-rio-n3</artifactId>
-            <version>${org.openrdf.sesame.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.openrdf.sesame</groupId>
-            <artifactId>sesame-rio-nquads</artifactId>
-            <version>${org.openrdf.sesame.version}</version>
-        </dependency>
-		<!-- Topicmodeling Commons -->
+		<!-- Tapioca Core -->
 		<dependency>
 			<groupId>org.aksw.simba</groupId>
-			<artifactId>topicmodeling.commons</artifactId>
+			<artifactId>tapioca.core</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+
+		<!-- Topicmodeling MALLET -->
+		<dependency>
+			<groupId>org.aksw.simba</groupId>
+			<artifactId>topicmodeling.mallet</artifactId>
 			<version>${org.aksw.simba.topicmodeling.version}</version>
 		</dependency>
-		<!-- Topicmodeling Concurrent -->
+		<!-- Topicmodeling IO -->
 		<dependency>
 			<groupId>org.aksw.simba</groupId>
-			<artifactId>topicmodeling.concurrent</artifactId>
-			<version>${org.aksw.simba.topicmodeling.version}</version>
-		</dependency>
-		<!-- Topicmodeling Datatypes -->
-		<dependency>
-			<groupId>org.aksw.simba</groupId>
-			<artifactId>topicmodeling.datatypes</artifactId>
-			<version>${org.aksw.simba.topicmodeling.version}</version>
-		</dependency>
-		<!-- Topicmodeling Preprocessing -->
-		<dependency>
-			<groupId>org.aksw.simba</groupId>
-			<artifactId>topicmodeling.preprocessing</artifactId>
+			<artifactId>topicmodeling.io</artifactId>
 			<version>${org.aksw.simba.topicmodeling.version}</version>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptorRefs>
+						<descriptorRef>jar-with-dependencies</descriptorRef>
+					</descriptorRefs>
+					<archive>
+						<manifest>
+							<mainClass>org.aksw.simba.tapioca.gen.ModelGenerator</mainClass>
+							<addClasspath>true</addClasspath>
+						</manifest>
+					</archive>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

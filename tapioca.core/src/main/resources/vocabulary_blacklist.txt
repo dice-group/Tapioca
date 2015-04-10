@@ -1,0 +1,10 @@
+http://www.w3.org/2000/01/rdf-schema#
+http://www.w3.org/1999/02/22-rdf-syntax-ns#
+http://www.w3.org/2002/07/owl
+http://www.w3.org/2004/02/skos/core
+http://www.w3.org/2008/05/skos-xl#
+http://www.w3.org/2001/XMLSchema#
+http://www.w3.org/ns/sparql-service-description#
+http://www.w3.org/TR/2009/REC-skos-reference-20090818
+http://rdfs.org/ns/void#
+http://purl.org/net/vocab/2004/03/label

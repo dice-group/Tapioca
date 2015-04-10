@@ -1,0 +1,22 @@
+2015-04-10 14:53:26,324 [main] ERROR [org.aksw.simba.topicmodeling.io.CorpusObjectReader] - <Error while trying to read serialized corpus from file>
+java.lang.ClassNotFoundException: com.unister.semweb.topicmodeling.utils.corpus.DocumentListCorpus
+	at java.net.URLClassLoader$1.run(Unknown Source)
+	at java.net.URLClassLoader$1.run(Unknown Source)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.net.URLClassLoader.findClass(Unknown Source)
+	at java.lang.ClassLoader.loadClass(Unknown Source)
+	at sun.misc.Launcher$AppClassLoader.loadClass(Unknown Source)
+	at java.lang.ClassLoader.loadClass(Unknown Source)
+	at java.lang.Class.forName0(Native Method)
+	at java.lang.Class.forName(Unknown Source)
+	at java.io.ObjectInputStream.resolveClass(Unknown Source)
+	at java.io.ObjectInputStream.readNonProxyDesc(Unknown Source)
+	at java.io.ObjectInputStream.readClassDesc(Unknown Source)
+	at java.io.ObjectInputStream.readOrdinaryObject(Unknown Source)
+	at java.io.ObjectInputStream.readObject0(Unknown Source)
+	at java.io.ObjectInputStream.readObject(Unknown Source)
+	at org.aksw.simba.topicmodeling.io.CorpusObjectReader.readCorpus(CorpusObjectReader.java:38)
+	at org.aksw.simba.topicmodeling.io.CorpusObjectReader.readCorpus(CorpusObjectReader.java:26)
+	at org.aksw.simba.topicmodeling.io.AbstractCorpusReader.getCorpus(AbstractCorpusReader.java:31)
+	at org.aksw.simba.tapioca.gen.ModelGenerator.main(ModelGenerator.java:27)
+2015-04-10 14:53:26,383 [main] ERROR [org.aksw.simba.tapioca.gen.ModelGenerator] - <Couldn't load corpus from file. Aborting.>

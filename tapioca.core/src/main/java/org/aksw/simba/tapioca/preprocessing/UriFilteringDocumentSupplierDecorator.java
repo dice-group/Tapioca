@@ -1,0 +1,54 @@
+package org.aksw.simba.tapioca.preprocessing;
+
+import java.util.Set;
+
+import org.aksw.simba.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
+import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.AbstractPropertyEditingDocumentSupplierDecorator;
+import org.aksw.simba.topicmodeling.utils.doc.AbstractSimpleDocumentProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.carrotsearch.hppc.ObjectLongOpenHashMap;
+import com.carrotsearch.hppc.ObjectOpenHashSet;
+
+public class UriFilteringDocumentSupplierDecorator<T extends AbstractSimpleDocumentProperty<ObjectLongOpenHashMap<String>>>
+        extends AbstractPropertyEditingDocumentSupplierDecorator<T> {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UriFilteringDocumentSupplierDecorator.class);
+
+    private String blacklist[];
+
+    public UriFilteringDocumentSupplierDecorator(DocumentSupplier documentSource, Set<String> blacklist,
+            Class<T> propertyClass) {
+        super(documentSource, propertyClass);
+        // Set<String> blacklist = VoidExtractor.loadVocabBlacklist();
+        if (blacklist == null) {
+            LOGGER.error("Couldn't load blacklist. This filter will be unable to work as expected.");
+            this.blacklist = new String[0];
+        } else {
+            this.blacklist = blacklist.toArray(new String[blacklist.size()]);
+        }
+    }
+
+    @Override
+    protected void editDocumentProperty(T mapping) {
+        ObjectLongOpenHashMap<String> map = mapping.get();
+        ObjectOpenHashSet<String> removableURIs = new ObjectOpenHashSet<String>();
+        String uri;
+        int pos;
+        for (int i = 0; i < map.allocated.length; ++i) {
+            if (map.allocated[i]) {
+                uri = (String) ((Object[]) map.keys)[i];
+                pos = 0;
+                while ((pos < blacklist.length) && (!uri.startsWith(blacklist[pos]))) {
+                    ++pos;
+                }
+                // If this URI's vocabulary is on the blacklist
+                if (pos < blacklist.length) {
+                    removableURIs.add(uri);
+                }
+            }
+        }
+        map.removeAll(removableURIs);
+    }
+}
