@@ -23,32 +23,49 @@
 package org.aksw.simba.tapioca.server;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.Set;
 
 import org.aksw.simba.tapioca.data.Dataset;
 import org.aksw.simba.tapioca.data.DatasetClassInfo;
 import org.aksw.simba.tapioca.data.DatasetPropertyInfo;
 import org.aksw.simba.tapioca.data.DatasetSpecialClassesInfo;
+import org.aksw.simba.tapioca.data.SimpleTokenizedText;
 import org.aksw.simba.tapioca.data.VocabularyBlacklist;
 import org.aksw.simba.tapioca.preprocessing.JenaBasedVoidParsingSupplierDecorator;
 import org.aksw.simba.tapioca.preprocessing.SimpleBlankNodeRemovingDocumentSupplierDecorator;
+import org.aksw.simba.tapioca.preprocessing.SimpleTokenizedTextTermFilter;
+import org.aksw.simba.tapioca.preprocessing.SimpleWordIndexingSupplierDecorator;
+import org.aksw.simba.tapioca.preprocessing.StringCountToSimpleTokenizedTextConvertingDocumentSupplierDecorator;
+import org.aksw.simba.tapioca.preprocessing.StringCountToSimpleTokenizedTextConvertingDocumentSupplierDecorator.WordOccurence;
 import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSupplierDecorator;
 import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSupplierDecorator.UriUsage;
+import org.aksw.simba.tapioca.preprocessing.labelretrieving.WorkerBasedLabelRetrievingDocumentSupplierDecorator;
 import org.aksw.simba.tapioca.preprocessing.UriFilteringDocumentSupplierDecorator;
 import org.aksw.simba.tapioca.server.data.SimpleVector;
 import org.aksw.simba.tapioca.server.similarity.CosineSimilarity;
 import org.aksw.simba.tapioca.server.similarity.VectorSimilarity;
+import org.aksw.simba.topicmodeling.algorithms.ModelingAlgorithm;
 import org.aksw.simba.topicmodeling.algorithms.ProbTopicModelingAlgorithmStateSupplier;
 import org.aksw.simba.topicmodeling.algorithms.ProbabilisticWordTopicModel;
 import org.aksw.simba.topicmodeling.commons.collections.TopDoubleObjectCollection;
 import org.aksw.simba.topicmodeling.io.gzip.GZipCorpusObjectReader;
 import org.aksw.simba.topicmodeling.io.gzip.GZipProbTopicModelingAlgorithmStateReader;
+import org.aksw.simba.topicmodeling.lang.postagging.StandardEnglishPosTaggingTermFilter;
 import org.aksw.simba.topicmodeling.preprocessing.SingleDocumentPreprocessor;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
+import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.DocumentFilteringSupplierDecorator;
+import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.DocumentWordCountingSupplierDecorator;
+import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.filter.DocumentFilter;
 import org.aksw.simba.topicmodeling.utils.corpus.Corpus;
 import org.aksw.simba.topicmodeling.utils.doc.Document;
+import org.aksw.simba.topicmodeling.utils.doc.DocumentDescription;
+import org.aksw.simba.topicmodeling.utils.doc.DocumentName;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentText;
+import org.aksw.simba.topicmodeling.utils.doc.DocumentURI;
 import org.aksw.simba.topicmodeling.utils.doc.ProbabilisticClassificationResult;
+import org.aksw.simba.topicmodeling.utils.doc.StringContainingDocumentProperty;
+import org.aksw.simba.topicmodeling.utils.vocabulary.Vocabulary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,10 +76,11 @@ public class Engine {
     private static final Logger LOGGER = LoggerFactory.getLogger(Engine.class);
 
     private static final int DEFAULT_NUMBER_OF_RESULTS = 20;
-    public static final String MODEL_FILE_NAME = "model.object";
-    public static final String CORPUS_FILE_NAME = "corpus.object";
+    public static final String MODEL_FILE_NAME = "probAlgState.object";
+    public static final String CORPUS_FILE_NAME = "lodStats_final.corpus";
 
-    public static Engine createEngine(File inputFolder) {
+    public static Engine createEngine(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever,
+            File inputFolder) {
         LOGGER.info("Loading model from \"" + inputFolder.getAbsolutePath() + "\".");
         // read probabilistic word topic Model from file
         GZipProbTopicModelingAlgorithmStateReader modelReader = new GZipProbTopicModelingAlgorithmStateReader();
@@ -72,6 +90,7 @@ public class Engine {
             LOGGER.error("Couldn't read model. Returning null.");
             return null;
         }
+        ProbabilisticWordTopicModel probModel = (ProbabilisticWordTopicModel) ((ModelingAlgorithm) model).getModel();
         GZipCorpusObjectReader corpusReader = new GZipCorpusObjectReader(new File(inputFolder.getAbsolutePath()
                 + File.separator + CORPUS_FILE_NAME));
         Corpus corpus = corpusReader.getCorpus();
@@ -82,24 +101,44 @@ public class Engine {
         ObjectObjectOpenHashMap<Dataset, SimpleVector> knownDatasets = new ObjectObjectOpenHashMap<Dataset, SimpleVector>(
                 corpus.getNumberOfDocuments());
         // translate word topic assignment into topic vectors for each document
+        SingleDocumentPreprocessor tempPreProc = new SingleDocumentPreprocessor();
+        DocumentWordCountingSupplierDecorator decorator = new DocumentWordCountingSupplierDecorator(tempPreProc);
+        tempPreProc.setDocumentSupplier(decorator);
         for (int i = 0; i < corpus.getNumberOfDocuments(); ++i) {
-            knownDatasets.put(createDataset(corpus.getDocument(i)),
-                    createVector(model.getWordTopicAssignmentForDocument(i), model.getNumberOfTopics()));
+            // knownDatasets.put(createDataset(corpus.getDocument(i)),
+            // createVector(model.getWordTopicAssignmentForDocument(i),
+            // model.getNumberOfTopics()));
+            // let's use smoothing for this
+            knownDatasets.put(createDataset(corpus.getDocument(i)), new SimpleVector((double[]) probModel
+                    .getClassificationForDocument(tempPreProc.processDocument(corpus.getDocument(i))).getValue()));
         }
-        SingleDocumentPreprocessor preprocessor = createPreprocessing();
+        SingleDocumentPreprocessor preprocessor = createPreprocessing(cachingLabelRetriever, model.getVocabulary());
         if (preprocessor == null) {
             LOGGER.error("Couldn't create preprocessor. Returning null.");
             return null;
         }
-        return new Engine((ProbabilisticWordTopicModel) model, knownDatasets, preprocessor);
+        return new Engine(probModel, knownDatasets, preprocessor);
     }
 
-    private static Dataset createDataset(Document document) {
-        // TODO
-        return null;
+    protected static Dataset createDataset(Document document) {
+        StringContainingDocumentProperty property;
+        String name = null, uri = null, description = null;
+        property = document.getProperty(DocumentName.class);
+        if (property != null) {
+            name = property.getStringValue();
+        }
+        property = document.getProperty(DocumentURI.class);
+        if (property != null) {
+            uri = property.getStringValue();
+        }
+        property = document.getProperty(DocumentDescription.class);
+        if (property != null) {
+            description = property.getStringValue();
+        }
+        return new Dataset(name, uri, description);
     }
 
-    private static SimpleVector createVector(int[] wordTopicAssignments, int numberOfTopics) {
+    protected static SimpleVector createVector(int[] wordTopicAssignments, int numberOfTopics) {
         double vector[] = new double[numberOfTopics];
         for (int i = 0; i < wordTopicAssignments.length; ++i) {
             ++vector[wordTopicAssignments[i]];
@@ -107,7 +146,8 @@ public class Engine {
         return new SimpleVector(vector);
     }
 
-    private static SingleDocumentPreprocessor createPreprocessing() {
+    protected static SingleDocumentPreprocessor createPreprocessing(
+            WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever, Vocabulary vocabulary) {
         SingleDocumentPreprocessor preprocessor = new SingleDocumentPreprocessor();
         DocumentSupplier supplier = preprocessor;
         // parse VOID
@@ -128,9 +168,29 @@ public class Engine {
 
         // Count the URIs
         supplier = new UriCountMappingCreatingDocumentSupplierDecorator(supplier, UriUsage.CLASSES_AND_PROPERTIES);
+
         // retrieve labels
-        //
-        return null;
+        // Check whether there is a file containing labels
+        cachingLabelRetriever.setDecoratedDocumentSupplier(supplier);
+        supplier = cachingLabelRetriever;
+        // supplier = new ExceptionCatchingDocumentSupplierDecorator(supplier);
+        // Convert the counted tokens into tokenized text
+        supplier = new StringCountToSimpleTokenizedTextConvertingDocumentSupplierDecorator(supplier, WordOccurence.LOG);
+        // Filter the stop words
+        supplier = new SimpleTokenizedTextTermFilter(supplier, StandardEnglishPosTaggingTermFilter.getInstance());
+        // Filter empty documents
+        supplier = new DocumentFilteringSupplierDecorator(supplier, new DocumentFilter() {
+            public boolean isDocumentGood(Document document) {
+                SimpleTokenizedText text = document.getProperty(SimpleTokenizedText.class);
+                return (text != null) && (text.getTokens().length > 0);
+            }
+        });
+        supplier = new SimpleWordIndexingSupplierDecorator(supplier, vocabulary);
+        // Create DocumentWordCounts
+        supplier = new DocumentWordCountingSupplierDecorator(supplier);
+
+        preprocessor.setDocumentSupplier(supplier);
+        return preprocessor;
     }
 
     private ProbabilisticWordTopicModel model;
@@ -154,15 +214,22 @@ public class Engine {
 
     public TopDoubleObjectCollection<Dataset> retrieveSimilarDatasets(String voidString) {
         // preprocess given void string
+        LOGGER.info("Preprocessing void string...");
         Document document = preprocess(voidString);
+        if (document == null) {
+            throw new IllegalArgumentException("The given void string did not result in a valid document.");
+        }
         // infer topic vector
         // TODO check whether the inference is thread-safe
+        LOGGER.info("Infering topics...");
         ProbabilisticClassificationResult classification = (ProbabilisticClassificationResult) model
                 .getClassificationForDocument(document);
         // retrieve the most similar datasets
+        LOGGER.info("Retrieving similar datasets...");
         TopDoubleObjectCollection<Dataset> result = retrieveMostSimilarDataset(new SimpleVector(
                 classification.getTopicProbabilities()));
         // return a sorted list
+        LOGGER.info("Done.");
         return result;
     }
 
@@ -173,6 +240,15 @@ public class Engine {
             if (knownDatasets.allocated[i]) {
                 results.add(similarity.getSimilarity(vector, (SimpleVector) ((Object[]) knownDatasets.values)[i]),
                         (Dataset) ((Object[]) knownDatasets.keys)[i]);
+                if (((Dataset) ((Object[]) knownDatasets.keys)[i]).getName().equals("18636.ttl")) {
+                    System.out.println("********************* docVec:");
+                    System.out.println(Arrays.toString(vector.values));
+                    System.out.println("********************* datVec:");
+                    System.out.println(Arrays.toString(((SimpleVector) ((Object[]) knownDatasets.values)[i]).values));
+                    System.out.print("********************* sim=");
+                    System.out.println(similarity.getSimilarity(vector,
+                            (SimpleVector) ((Object[]) knownDatasets.values)[i]));
+                }
             }
         }
         return results;

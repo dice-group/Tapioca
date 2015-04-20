@@ -1,0 +1,21 @@
+@prefix void:  <http://rdfs.org/ns/void#> .
+@prefix ex: <http://example.org/> .
+@prefix xmls: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:dataset1         a           void:dataset ;
+        void:classPartition     [ void:class     ex:firstClass ;
+                                  void:entities  "1"^^xmls:int
+                                ] ;
+        void:classPartition     [ void:class     ex:secondClass ;
+                                  void:entities  "1"^^xmls:int
+                                ] ;
+        void:classPartition     [ void:class     ex:thirdClass ;
+                                  void:entities  "1"^^xmls:int
+                                ] ;
+        void:classes            "3"^^xmls:int ;
+        void:entities           "3"^^xmls:int ;
+        void:properties         "1"^^xmls:int ;
+        void:propertyPartition  [ void:property  ex:firstProperty ;
+                                  void:triples   "1"^^xmls:int
+                                ] ;
+        void:triples            "1"^^xmls:long .

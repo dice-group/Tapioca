@@ -21,6 +21,7 @@ public class RDFClientLabelRetriever extends AbstractTokenizedLabelRetriever {
     private static final Logger LOGGER = LoggerFactory.getLogger(RDFClientLabelRetriever.class);
 
     private RDFReader reader = new RDFReaderRIOT();
+    
     public static final String NAMING_PROPERTIES[] = { "http://www.w3.org/2000/01/rdf-schema#label",
             "http://xmlns.com/foaf/0.1/nick",
             "http://purl.org/dc/elements/1.1/title",

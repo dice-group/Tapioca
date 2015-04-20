@@ -1,0 +1,15 @@
+@prefix void:  <http://rdfs.org/ns/void#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix xmls: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:dataset1         a           void:dataset ;
+        void:classPartition     [ void:class     owl:Class ;
+                                  void:entities  "1"^^xmls:int
+                                ] ;
+        void:classes            "1"^^xmls:int ;
+        void:entities           "1"^^xmls:int ;
+        void:properties         "1"^^xmls:int ;
+        void:propertyPartition  [ void:property  owl:sameAs ;
+                                  void:triples   "1"^^xmls:int
+                                ] ;
+        void:triples            "1"^^xmls:long .

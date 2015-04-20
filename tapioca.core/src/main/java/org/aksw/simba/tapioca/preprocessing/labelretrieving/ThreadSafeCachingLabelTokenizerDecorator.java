@@ -77,6 +77,10 @@ public class ThreadSafeCachingLabelTokenizerDecorator implements TokenizedLabelR
 
     @Override
     public List<String> getTokenizedLabel(String uri, String namespace) {
+        return getTokenizedLabel( decoratedRetriever, uri, namespace);
+    }
+
+    public List<String> getTokenizedLabel(TokenizedLabelRetriever decoratedRetriever, String uri, String namespace) {
         List<String> result = null;
         try {
             cacheReadMutex.acquire();

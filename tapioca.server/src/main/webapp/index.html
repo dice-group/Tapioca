@@ -24,9 +24,10 @@
 -->
 <html>
 <head>
-<link rel='stylesheet' href='/tapioca/webjars/bootstrap/3.2.0/css/bootstrap.min.css'>
-<script	src="/tapioca/webjars/jquery/2.1.1/jquery.min.js"></script>
-<script src="/tapioca/webjars/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<link rel='stylesheet'
+	href='/tapioca/service/webjars/bootstrap/3.2.0/css/bootstrap.min.css'>
+<script src="/tapioca/service/webjars/jquery/2.1.1/jquery.min.js"></script>
+<script src="/tapioca/service/webjars/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 <!-- <link rel="icon" type="image/png" href="/gerbil/webResources/gerbilicon.png">  -->
 </head>
 <body class="container">
@@ -34,9 +35,45 @@
 		<div class="container">
 			<h1>Tapioca</h1>
 		</div>
-		
 		<div class="container">
-			
+			<p>Please insert your VOID information.</p>
+		</div>
+		<div class="container">
+			<textarea cols="80" rows="10" name="voidInput" id="voidInput"></textarea>
+		</div>
+		<div class="container">
+			<button name=search onclick="sendRequest();">search</button>
+		</div>
+		<div class="container" id="results">
 		</div>
 	</div>
-</body><html>
+	<script type="text/javascript">
+		function sendRequest() {
+			$('#results').html('');
+			$.ajax({
+				  dataType: 'json',
+				  method: 'POST',
+				  url: 'service/search',
+				  data: {voidString : $('#voidInput').val()},
+				  cache: false
+				}).done(function(data) {
+					showResults(data);
+				}).fail(function() {
+					    alert( "error" );
+					  });
+		}
+		function showResults(results) {
+			$.each(results.searchResultList, function (index, item) {
+				var resultNode = $('<p>');
+				resultNode.append('<b>' + item.dataset.name + '</b><br>');
+				resultNode.append(item.dataset.uri);
+				resultNode.append('<br>');
+				resultNode.append(item.dataset.description);
+				resultNode.append('<br>');
+				resultNode.append(item.similarity);
+				$('#results').append(resultNode)
+			});
+		}
+	</script>
+</body>
+<html>

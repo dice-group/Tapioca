@@ -132,6 +132,7 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator extends
         private FileBasedTokenizedLabelRetriever fileBasedLabelTokenizers[];
         private ThreadSafeCachingLabelTokenizerDecorator clientLabelTokenizer;
         private WorkerBasedLabelRetrievingDocumentSupplierDecorator observer;
+        private RDFClientLabelRetriever rdfClient = new RDFClientLabelRetriever();
 
         public Worker(String uri, long count, LocalLabelTokenizer localTokenizer,
                 FileBasedTokenizedLabelRetriever fileBasedLabelTokenizers[],
@@ -157,7 +158,7 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator extends
             }
             // If the label couldn't be retrieved
             if (tokens == null) {
-                tokens = clientLabelTokenizer.getTokenizedLabel(uri, namespace);
+                tokens = clientLabelTokenizer.getTokenizedLabel(rdfClient, uri, namespace);
             }
             // If the label couldn't be retrieved, create it based on the URI
             if (tokens == null) {

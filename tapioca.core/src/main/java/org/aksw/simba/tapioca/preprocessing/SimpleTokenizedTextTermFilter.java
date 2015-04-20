@@ -22,38 +22,39 @@ public class SimpleTokenizedTextTermFilter extends
     protected void editDocumentProperty(SimpleTokenizedText property) {
         String tokens[] = property.getTokens();
         ObjectArrayList<String> newTokens = new ObjectArrayList<String>(tokens.length);
-        OpenTerm term = new OpenTerm();
+        // OpenTerm term = new OpenTerm();
         for (int i = 0; i < tokens.length; ++i) {
-            term.setWordForm(tokens[i]);
-            if (filter.isTermGood(term)) {
+            // term.setWordForm(tokens[i]);
+            // if (filter.isTermGood(term)) {
+            if (filter.isTermGood(new Term(tokens[i]))) {
                 newTokens.add(tokens[i]);
             }
         }
         property.setTokens(newTokens.toArray(String.class));
     }
 
-    private static class OpenTerm extends Term {
-
-        private static final long serialVersionUID = 1L;
-
-        protected String term;
-
-        public OpenTerm() {
-            super("");
-        }
-
-        @Override
-        public String getWordForm() {
-            return term;
-        }
-
-        @Override
-        public String getLemma() {
-            return term;
-        }
-
-        public void setWordForm(String wordForm) {
-            this.term = wordForm;
-        }
-    }
+    // private static class OpenTerm extends Term {
+    //
+    // private static final long serialVersionUID = 1L;
+    //
+    // protected String term;
+    //
+    // public OpenTerm() {
+    // super("");
+    // }
+    //
+    // @Override
+    // public String getWordForm() {
+    // return term;
+    // }
+    // s
+    // @Override
+    // public String getLemma() {
+    // return term;
+    // }
+    //
+    // public void setWordForm(String wordForm) {
+    // this.term = wordForm;
+    // }
+    // }
 }

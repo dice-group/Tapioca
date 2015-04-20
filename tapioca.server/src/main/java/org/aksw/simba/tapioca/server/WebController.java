@@ -23,23 +23,39 @@
 package org.aksw.simba.tapioca.server;
 
 import org.aksw.simba.tapioca.data.Dataset;
+import org.aksw.simba.tapioca.server.data.SearchResult;
 import org.aksw.simba.topicmodeling.commons.collections.TopDoubleObjectCollection;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-@org.springframework.stereotype.Controller
-public class Controller {
+@Controller
+public class WebController {
 
     @Autowired
     private Engine engine;
+
+    public WebController() {
+        System.out.println("Controller created.");
+    }
 
     @RequestMapping("/search")
     public @ResponseBody
     ModelMap search(@RequestParam(value = "voidString") String voidString) {
         TopDoubleObjectCollection<Dataset> result = engine.retrieveSimilarDatasets(voidString);
-        return new ModelMap(result);
+        SearchResult results[] = new SearchResult[result.size()];
+        for (int i = 0; i < results.length; ++i) {
+            results[i] = new SearchResult((Dataset) result.objects[i], result.values[i]);
+        }
+        return new ModelMap(results);
     }
+
+    // @RequestMapping({ "/", "/index" })
+    // public ModelAndView index() {
+    // System.out.println("index called");
+    // return new ModelAndView("index");
+    // }
 }
