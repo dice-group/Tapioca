@@ -1,0 +1,26 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.aksw.simba</groupId>
+		<artifactId>topicmodeling.parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../topicmodeling.parent</relativePath>
+	</parent>
+	<artifactId>topicmodeling.datatypes</artifactId>
+
+	<dependencies>
+		<!-- High Performance Primitive Collections -->
+		<dependency>
+			<groupId>com.carrotsearch</groupId>
+			<artifactId>hppc</artifactId>
+			<version>${com.carrotsearch.hppc.version}</version>
+		</dependency>
+		<!-- Jackson datatype serialization (for HPPC datatypes) -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.datatype</groupId>
+			<artifactId>jackson-datatype-hppc</artifactId>
+			<version>2.5.1</version>
+		</dependency>
+	</dependencies>
+</project>

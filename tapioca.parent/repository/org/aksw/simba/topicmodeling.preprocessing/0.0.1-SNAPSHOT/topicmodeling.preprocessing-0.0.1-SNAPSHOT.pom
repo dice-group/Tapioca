@@ -1,0 +1,45 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.aksw.simba</groupId>
+		<artifactId>topicmodeling.parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../topicmodeling.parent</relativePath>
+	</parent>
+	<artifactId>topicmodeling.preprocessing</artifactId>
+
+	<!-- DEPENDENCIES -->
+	<dependencies>
+		<!-- Topicmodeling Datatypes -->
+		<dependency>
+			<groupId>org.aksw.simba</groupId>
+			<artifactId>topicmodeling.datatypes</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<!-- Topicmodeling lang -->
+		<dependency>
+			<groupId>org.aksw.simba</groupId>
+			<artifactId>topicmodeling.lang</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<!-- Apache Commons Lang 3 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${org.apache.commons.commons-lang3.version}</version>
+		</dependency>
+		<!-- Apache Commons IO -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${org.apache.commons.commons-io.version}</version>
+		</dependency>
+		<!-- International Component for Unicode for Java (ICU4J) -->
+		<dependency>
+			<groupId>com.ibm.icu</groupId>
+			<artifactId>icu4j</artifactId>
+			<version>54.1.1</version>
+		</dependency>
+	</dependencies>
+</project>
