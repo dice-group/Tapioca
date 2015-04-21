@@ -24,6 +24,7 @@ import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSuppl
 import org.aksw.simba.tapioca.preprocessing.UriFilteringDocumentSupplierDecorator;
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.WorkerBasedLabelRetrievingDocumentSupplierDecorator;
 import org.aksw.simba.topicmodeling.io.CorpusObjectWriter;
+import org.aksw.simba.topicmodeling.io.gzip.GZipCorpusObjectWriter;
 import org.aksw.simba.topicmodeling.io.xml.XmlWritingDocumentConsumer;
 import org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier;
 import org.aksw.simba.topicmodeling.lang.postagging.StandardEnglishPosTaggingTermFilter;
@@ -31,6 +32,7 @@ import org.aksw.simba.topicmodeling.preprocessing.ListCorpusCreator;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.DocumentConsumerAdaptingSupplierDecorator;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.DocumentFilteringSupplierDecorator;
+import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.DocumentWordCountingSupplierDecorator;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.PropertyRemovingSupplierDecorator;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.filter.DocumentFilter;
 import org.aksw.simba.topicmodeling.utils.corpus.Corpus;
@@ -49,12 +51,16 @@ public class LDACorpusCreation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LDACorpusCreation.class);
 
-//    public static final File CACHE_FILES[] = new File[] { new File("C:/Daten/tapioca/cache/uriToLabelCache_1.object"),
-//            new File("C:/Daten/tapioca/cache/uriToLabelCache_2.object"),
-//            new File("C:/Daten/tapioca/cache/uriToLabelCache_3.object") };
+    // public static final File CACHE_FILES[] = new File[] { new
+    // File("C:/Daten/tapioca/cache/uriToLabelCache_1.object"),
+    // new File("C:/Daten/tapioca/cache/uriToLabelCache_2.object"),
+    // new File("C:/Daten/tapioca/cache/uriToLabelCache_3.object") };
     public static final File CACHE_FILES[] = new File[] { new File("/home/mroeder/tapioca/uriToLabelCache_1.object"),
-        new File("/home/mroeder/tapioca/uriToLabelCache_2.object"),
-        new File("/home/mroeder/tapioca/uriToLabelCache_3.object") };
+            new File("/home/mroeder/tapioca/uriToLabelCache_2.object"),
+            new File("/home/mroeder/tapioca/uriToLabelCache_3.object") };
+
+    public static final String CORPUS_NAME = "lodStats";
+    public static final String CORPUS_FILE = "/Daten/tapioca/" + CORPUS_NAME + ".corpus";
 
     public static void main(String[] args) {
         // HttpClient client = HttpOp.getDefaultHttpClient();
@@ -69,11 +75,10 @@ public class LDACorpusCreation {
         UriUsage uriUsages[] = new UriUsage[] { UriUsage.CLASSES_AND_PROPERTIES };
         WordOccurence wordOccurences[] = new WordOccurence[] { WordOccurence.LOG };
 
-        String corpusName = InitialCorpusCreation.CORPUS_NAME;
+        String corpusName = CORPUS_NAME;
 
-        File labelsFiles[] = new File[] {
-                new File(InitialCorpusCreation.CORPUS_FILE.replace(".corpus", ".labels.object")),
-                new File(InitialCorpusCreation.CORPUS_FILE.replace(".corpus", ".ret_labels_1.object")) };
+        File labelsFiles[] = new File[] { new File(CORPUS_FILE.replace(".corpus", ".labels.object")),
+                new File(CORPUS_FILE.replace(".corpus", ".ret_labels_1.object")) };
         WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever;
         cachingLabelRetriever = new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, CACHE_FILES, labelsFiles);
         // LabelRetrievingDocumentSupplierDecorator cachingLabelRetriever;
@@ -85,7 +90,7 @@ public class LDACorpusCreation {
             for (int j = 0; j < wordOccurences.length; ++j) {
                 System.out.println("Starting corpus \"" + corpusName + "\" with " + uriUsages[i] + " and "
                         + wordOccurences[j]);
-                corpusCreation = new LDACorpusCreation(corpusName, uriUsages[i], wordOccurences[j]);
+                corpusCreation = new LDACorpusCreation(corpusName, CORPUS_FILE, uriUsages[i], wordOccurences[j]);
                 corpusCreation.run(cachingLabelRetriever);
             }
         }
@@ -93,11 +98,13 @@ public class LDACorpusCreation {
     }
 
     private final String corpusName;
+    private final String corpusFile;
     private final UriUsage uriUsage;
     private final WordOccurence wordOccurence;
 
-    public LDACorpusCreation(String corpusName, UriUsage uriUsage, WordOccurence wordOccurence) {
+    public LDACorpusCreation(String corpusName, String corpusFile, UriUsage uriUsage, WordOccurence wordOccurence) {
         this.corpusName = corpusName;
+        this.corpusFile = corpusFile;
         this.uriUsage = uriUsage;
         this.wordOccurence = wordOccurence;
     }
@@ -128,8 +135,7 @@ public class LDACorpusCreation {
         }
         corpusName += (wordOccurence == WordOccurence.UNIQUE) ? "unique.object" : "log.object";
 
-        DocumentSupplier supplier = StreamBasedXmlDocumentSupplier.createReader(new File(
-                InitialCorpusCreation.CORPUS_FILE), true);
+        DocumentSupplier supplier = StreamBasedXmlDocumentSupplier.createReader(new File(corpusFile), true);
         StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetClassInfo.class);
         StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetSpecialClassesInfo.class);
         StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetPropertyInfo.class);
@@ -142,7 +148,7 @@ public class LDACorpusCreation {
             }
         });
 
-        File whitelistFile = new File(InitialCorpusCreation.CORPUS_FILE.replace(".corpus", "_whitelist.txt"));
+        File whitelistFile = new File(corpusFile.replace(".corpus", "_whitelist.txt"));
         if (whitelistFile.exists()) {
             try {
                 final Set<String> whitelist = new HashSet<String>(FileUtils.readLines(whitelistFile));
@@ -230,6 +236,7 @@ public class LDACorpusCreation {
 
         Vocabulary vocabulary = new SimpleVocabulary();
         supplier = new SimpleWordIndexingSupplierDecorator(supplier, vocabulary);
+        supplier = new DocumentWordCountingSupplierDecorator(supplier);
 
         supplier = new DocumentConsumerAdaptingSupplierDecorator(supplier,
                 XmlWritingDocumentConsumer.createXmlWritingDocumentConsumer(new File("./export.xml")));
@@ -252,7 +259,7 @@ public class LDACorpusCreation {
 
         corpus.addProperty(new CorpusVocabulary(vocabulary));
 
-        CorpusObjectWriter writer = new CorpusObjectWriter(new File(corpusName));
+        CorpusObjectWriter writer = new GZipCorpusObjectWriter(new File(corpusName));
         writer.writeCorpus(corpus);
     }
 }

@@ -7,6 +7,7 @@ import org.aksw.simba.topicmodeling.algorithms.ModelingAlgorithm;
 import org.aksw.simba.topicmodeling.algorithms.ProbTopicModelingAlgorithmStateSupplier;
 import org.aksw.simba.topicmodeling.io.CorpusObjectReader;
 import org.aksw.simba.topicmodeling.io.CorpusReader;
+import org.aksw.simba.topicmodeling.io.gzip.GZipCorpusObjectReader;
 import org.aksw.simba.topicmodeling.io.gzip.GZipProbTopicModelingAlgorithmStateWriter;
 import org.aksw.simba.topicmodeling.utils.corpus.Corpus;
 import org.slf4j.Logger;
@@ -44,7 +45,7 @@ public class ModelGenerator {
     }
 
     public void run(String corpusFile, String modelFile) {
-        CorpusReader reader = new CorpusObjectReader(new File(corpusFile));
+        CorpusReader reader = new GZipCorpusObjectReader(new File(corpusFile));
         Corpus corpus = reader.getCorpus();
         if (corpus == null) {
             LOGGER.error("Couldn't load corpus from file. Aborting.");

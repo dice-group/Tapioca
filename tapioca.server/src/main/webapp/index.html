@@ -42,18 +42,19 @@
 			<textarea cols="80" rows="10" name="voidInput" id="voidInput"></textarea>
 		</div>
 		<div class="container">
-			<button name=search onclick="sendRequest();">search</button>
+			<button name=search onclick="sendRequest('service/search');">search</button>
+			<button name=search onclick="sendRequest('service/blsearch');">BL - search</button>
 		</div>
 		<div class="container" id="results">
 		</div>
 	</div>
 	<script type="text/javascript">
-		function sendRequest() {
+		function sendRequest(requestURL) {
 			$('#results').html('');
 			$.ajax({
 				  dataType: 'json',
 				  method: 'POST',
-				  url: 'service/search',
+				  url: requestURL,
 				  data: {voidString : $('#voidInput').val()},
 				  cache: false
 				}).done(function(data) {

@@ -47,7 +47,7 @@ public class PreprocessingTest {
     @Test
     public void test() throws IOException {
         Vocabulary vocabulary = new SimpleVocabulary();
-        SingleDocumentPreprocessor preprocessor = Engine.createPreprocessing(
+        SingleDocumentPreprocessor preprocessor = TMEngine.createPreprocessing(
                 new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, new File[] { File.createTempFile("test_",
                         "") }), vocabulary);
 

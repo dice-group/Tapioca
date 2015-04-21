@@ -71,15 +71,15 @@ import org.slf4j.LoggerFactory;
 
 import com.carrotsearch.hppc.ObjectObjectOpenHashMap;
 
-public class Engine {
+public class TMEngine {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(Engine.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TMEngine.class);
 
     private static final int DEFAULT_NUMBER_OF_RESULTS = 20;
     public static final String MODEL_FILE_NAME = "probAlgState.object";
     public static final String CORPUS_FILE_NAME = "lodStats_final.corpus";
 
-    public static Engine createEngine(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever,
+    public static TMEngine createEngine(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever,
             File inputFolder) {
         LOGGER.info("Loading model from \"" + inputFolder.getAbsolutePath() + "\".");
         // read probabilistic word topic Model from file
@@ -117,7 +117,7 @@ public class Engine {
             LOGGER.error("Couldn't create preprocessor. Returning null.");
             return null;
         }
-        return new Engine(probModel, knownDatasets, preprocessor);
+        return new TMEngine(probModel, knownDatasets, preprocessor);
     }
 
     protected static Dataset createDataset(Document document) {
@@ -199,12 +199,12 @@ public class Engine {
     private VectorSimilarity similarity;
     private int numberOfResults = DEFAULT_NUMBER_OF_RESULTS;
 
-    protected Engine(ProbabilisticWordTopicModel model, ObjectObjectOpenHashMap<Dataset, SimpleVector> knownDatasets,
+    protected TMEngine(ProbabilisticWordTopicModel model, ObjectObjectOpenHashMap<Dataset, SimpleVector> knownDatasets,
             SingleDocumentPreprocessor preprocessor) {
         this(model, knownDatasets, preprocessor, new CosineSimilarity());
     }
 
-    protected Engine(ProbabilisticWordTopicModel model, ObjectObjectOpenHashMap<Dataset, SimpleVector> knownDatasets,
+    protected TMEngine(ProbabilisticWordTopicModel model, ObjectObjectOpenHashMap<Dataset, SimpleVector> knownDatasets,
             SingleDocumentPreprocessor preprocessor, VectorSimilarity similarity) {
         this.knownDatasets = knownDatasets;
         this.model = model;

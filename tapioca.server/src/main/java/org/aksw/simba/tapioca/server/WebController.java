@@ -36,7 +36,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class WebController {
 
     @Autowired
-    private Engine engine;
+    private TMEngine engine;
+
+    @Autowired
+    private BLEngine blEngine;
 
     public WebController() {
         System.out.println("Controller created.");
@@ -46,6 +49,17 @@ public class WebController {
     public @ResponseBody
     ModelMap search(@RequestParam(value = "voidString") String voidString) {
         TopDoubleObjectCollection<Dataset> result = engine.retrieveSimilarDatasets(voidString);
+        SearchResult results[] = new SearchResult[result.size()];
+        for (int i = 0; i < results.length; ++i) {
+            results[i] = new SearchResult((Dataset) result.objects[i], result.values[i]);
+        }
+        return new ModelMap(results);
+    }
+
+    @RequestMapping("/blsearch")
+    public @ResponseBody
+    ModelMap searchBL(@RequestParam(value = "voidString") String voidString) {
+        TopDoubleObjectCollection<Dataset> result = blEngine.retrieveSimilarDatasets(voidString);
         SearchResult results[] = new SearchResult[result.size()];
         for (int i = 0; i < results.length; ++i) {
             results[i] = new SearchResult((Dataset) result.objects[i], result.values[i]);

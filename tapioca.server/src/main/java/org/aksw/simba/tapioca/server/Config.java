@@ -60,8 +60,13 @@ public class Config extends WebMvcConfigurerAdapter {
     }
 
     public static @Bean
-    Engine createEngine(Environment env, WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
-        return Engine.createEngine(cachingLabelRetriever, new File(env.getProperty(MODEL_FOLDER_PROPERTY_KEY)));
+    TMEngine createEngine(Environment env, WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
+        return TMEngine.createEngine(cachingLabelRetriever, new File(env.getProperty(MODEL_FOLDER_PROPERTY_KEY)));
+    }
+
+    public static @Bean
+    BLEngine createBLEngine(Environment env) {
+        return BLEngine.createEngine(new File(env.getProperty(MODEL_FOLDER_PROPERTY_KEY)));
     }
 
     @Override
@@ -69,12 +74,13 @@ public class Config extends WebMvcConfigurerAdapter {
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 
-//    @Bean
-//    public ViewResolver viewResolver() {
-//        System.out.println("Creating view resolver...");
-//        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
-//        viewResolver.setPrefix("/WEB-INF/views/");
-//        viewResolver.setSuffix(".jsp");
-//        return viewResolver;
-//    }
+    // @Bean
+    // public ViewResolver viewResolver() {
+    // System.out.println("Creating view resolver...");
+    // InternalResourceViewResolver viewResolver = new
+    // InternalResourceViewResolver();
+    // viewResolver.setPrefix("/WEB-INF/views/");
+    // viewResolver.setSuffix(".jsp");
+    // return viewResolver;
+    // }
 }

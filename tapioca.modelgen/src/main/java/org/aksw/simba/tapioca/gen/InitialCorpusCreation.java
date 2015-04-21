@@ -29,9 +29,7 @@ public class InitialCorpusCreation {
     // public static final String CORPUS_NAME = "CrawledRdfData";
     public static final String CORPUS_NAME = "lodStats";
     // public static final String CORPUS_NAME = "DataHub";
-    // public static final String CORPUS_FILE =
-    // "/data/m.roeder/workspace/topics4lod/" + CORPUS_NAME + ".corpus";
-    public static final String CORPUS_FILE = "/home/mroeder/tapioca/" + CORPUS_NAME + ".corpus";
+    public static final String CORPUS_FILE = "C:/Daten/tapioca/" + CORPUS_NAME + ".corpus";
 
     // public static final File INPUT_FOLDER = new File("pages");
     // public static final File INPUT_FOLDER = new File("void_Corpora/" +
@@ -40,12 +38,19 @@ public class InitialCorpusCreation {
     // File("/data/m.roeder/daten/CrawledRdfData/voidFiles");
     // public static final File INPUT_FOLDER = new File(
     // "F:/data/daten/CrawledRdfData/voidFiles");
-    public static final File INPUT_FOLDER = new File("C:/Daten/Dropbox/lodstats-rdf/23032015/void");
+    // public static final File INPUT_FOLDER = new
+    // File("C:/Daten/Dropbox/lodstats-rdf/23032015/void");
 
     // public static final boolean PARSE_FROM_LOD_STATS = false;
+    public static final File INPUT_FOLDER = new File("C:/Daten/Dropbox/lodstats-rdf/23032015/void");
 
     public static void main(String[] args) {
-        FolderReader reader = new FolderReader(INPUT_FOLDER);
+        InitialCorpusCreation creation = new InitialCorpusCreation();
+        creation.run(CORPUS_FILE, INPUT_FOLDER);
+    }
+
+    protected void run(String corpusFile, File inputFolder) {
+        FolderReader reader = new FolderReader(inputFolder);
         reader.setUseFolderNameAsCategory(true);
         DocumentSupplier supplier = reader;
         supplier = new DocumentTextCreatingSupplierDecorator(supplier);
@@ -57,7 +62,7 @@ public class InitialCorpusCreation {
                 DocumentText.class));
 
         XmlWritingDocumentConsumer consumer = XmlWritingDocumentConsumer.createXmlWritingDocumentConsumer((new File(
-                CORPUS_FILE)).getAbsoluteFile());
+                corpusFile)).getAbsoluteFile());
         XmlWritingDocumentConsumer.registerParseableDocumentProperty(DatasetClassInfo.class);
         XmlWritingDocumentConsumer.registerParseableDocumentProperty(DatasetSpecialClassesInfo.class);
         XmlWritingDocumentConsumer.registerParseableDocumentProperty(DatasetPropertyInfo.class);
