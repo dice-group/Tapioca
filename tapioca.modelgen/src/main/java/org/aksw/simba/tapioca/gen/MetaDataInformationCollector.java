@@ -1,6 +1,8 @@
 package org.aksw.simba.tapioca.gen;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +36,24 @@ import org.slf4j.LoggerFactory;
 
 import com.carrotsearch.hppc.IntObjectOpenHashMap;
 import com.carrotsearch.hppc.ObjectIntOpenHashMap;
+import com.hp.hpl.jena.n3.turtle.TurtleReader;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.RDFReader;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
+import com.hp.hpl.jena.vocabulary.OWL;
 
 public class MetaDataInformationCollector {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MetaDataInformationCollector.class);
 
     private static final String LOD_STATS_DOC_BASE_URI = "http://lodstats.aksw.org/rdfdocs/";
-    
+
+    private static final String LOD_STATS_DATASET_TITLE = "http://lodstats.aksw.org/ontology/extras/catalog-name";
+
     public static void main(String[] args) {
         MetaDataInformationCollector collector = new MetaDataInformationCollector();
         collector.run("/Daten/Dropbox/lodstats-rdf/23032015/datasets.nt", "/Daten/tapioca/lodStats_BL.object",
@@ -79,13 +92,13 @@ public class MetaDataInformationCollector {
         return mapping;
     }
 
-    private Corpus readCorpus(String corpusFileName) {
+    protected Corpus readCorpus(String corpusFileName) {
         CorpusReader reader = new GZipCorpusObjectReader(new File(corpusFileName));
         reader.readCorpus();
         return reader.getCorpus();
     }
 
-    private IntObjectOpenHashMap<DatasetDescription> readDescriptions(String metaFileName) {
+    protected IntObjectOpenHashMap<DatasetDescription> readDescriptions(String metaFileName) {
         RDFParser parser = new TurtleParser();
         OnlineLODStatsMetaDataHandler handler = new OnlineLODStatsMetaDataHandler();
         parser.setRDFHandler(handler);
@@ -103,7 +116,61 @@ public class MetaDataInformationCollector {
         return handler.descriptions;
     }
 
-    private void addDescriptionsToCorpus(IntObjectOpenHashMap<DatasetDescription> descriptions,
+    protected void enricheMetaData(String additionalMetaDataFile, IntObjectOpenHashMap<DatasetDescription> descriptions) {
+        // Read additional meta data
+        RDFReader reader = new TurtleReader();
+        Model model = ModelFactory.createDefaultModel();
+        FileInputStream fin = null;
+        try {
+            fin = new FileInputStream(additionalMetaDataFile);
+            reader.read(model, fin, LOD_STATS_DOC_BASE_URI);
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Couldn't read model with additional meta data from file. Ignoring this file.", e);
+            return;
+        } finally {
+            IOUtils.closeQuietly(fin);
+        }
+        DatasetDescription description;
+        Resource datasetResource;
+        com.hp.hpl.jena.rdf.model.Statement s;
+        for (int i = 0; i < descriptions.allocated.length; ++i) {
+            if (descriptions.allocated[i]) {
+                description = (DatasetDescription) ((Object[]) descriptions.values)[i];
+                datasetResource = new ResourceImpl(description.uri);
+                if (model.containsResource(datasetResource)) {
+                    updateDescription(description, datasetResource, model);
+                }
+                if (model.contains(datasetResource, OWL.sameAs, (RDFNode) null)) {
+                    s = model.listStatements(datasetResource, OWL.sameAs, (RDFNode) null).next();
+                    datasetResource = s.getObject().asResource();
+                    updateDescription(description, datasetResource, model);
+                }
+                if (model.contains(null, OWL.sameAs, datasetResource)) {
+                    s = model.listStatements(datasetResource, OWL.sameAs, (RDFNode) null).next();
+                    datasetResource = s.getSubject().asResource();
+                    updateDescription(description, datasetResource, model);
+                }
+            }
+        }
+    }
+
+    protected void updateDescription(DatasetDescription description, Resource datasetResource, Model model) {
+        // We prefer the "real" dataset URI
+        if (!datasetResource.getURI().startsWith(LOD_STATS_DOC_BASE_URI)) {
+            description.uri = datasetResource.getURI();
+        }
+        StmtIterator iterator = model.listStatements(datasetResource, null, (RDFNode) null);
+        com.hp.hpl.jena.rdf.model.Statement s;
+        String predicateURI;
+        while (iterator.hasNext()) {
+            predicateURI = s.getPredicate().getURI();
+            // if(predicateURI.equals(anObject)) {
+            // TODO
+            // }
+        }
+    }
+
+    protected void addDescriptionsToCorpus(IntObjectOpenHashMap<DatasetDescription> descriptions,
             IntObjectOpenHashMap<StatResult> statResults, String corpusFileName, String corpusOutFileName) {
         Corpus corpus1 = readCorpus(corpusFileName);
         DocumentSupplier supplier = new CorpusWrappingDocumentSupplier(corpus1);
@@ -115,31 +182,6 @@ public class MetaDataInformationCollector {
                 new DocumentListCorpus<List<Document>>(new ArrayList<Document>()));
         Corpus corpus2 = preprocessor.getCorpus();
         corpus2.setProperties(corpus1.getProperties());
-
-        // int id = 0;
-        // DatasetDescription description;
-        // for (Document document : corpus) {
-        // if (descriptions.containsKey(id)) {
-        // description = descriptions.lget();
-        // if (description.title != null) {
-        // document.addProperty(new DocumentName(description.title));
-        // }
-        // if (description.uri != null) {
-        // document.addProperty(new DocumentURI(description.uri));
-        // }
-        // if (description.description != null) {
-        // document.addProperty(new
-        // DocumentDescription(description.description));
-        // }
-        // } else {
-        // LOGGER.warn("Document #{} has no description.", id);
-        // if (document.getProperty(DocumentDescription.class) == null) {
-        // document.addProperty(new
-        // DocumentDescription("Couldn't get meta data for this dataset."));
-        // }
-        // }
-        // ++id;
-        // }
 
         GZipCorpusObjectWriter writer = new GZipCorpusObjectWriter(new File(corpusOutFileName));
         writer.writeCorpus(corpus2);

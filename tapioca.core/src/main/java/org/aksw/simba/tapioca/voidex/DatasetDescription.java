@@ -7,6 +7,7 @@ public class DatasetDescription {
     public String uri;
     public String title;
     public String description;
+    public List<String[]> keyValuePairs = new ArrayList<String[]>();
     public List<DatasetDescription> subsets;
     public long triples;
 
