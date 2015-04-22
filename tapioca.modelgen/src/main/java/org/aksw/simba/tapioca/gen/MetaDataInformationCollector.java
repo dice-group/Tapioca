@@ -42,7 +42,6 @@ import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.RDFReader;
 import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.StmtIterator;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import com.hp.hpl.jena.vocabulary.OWL;
 
@@ -57,13 +56,18 @@ public class MetaDataInformationCollector {
     public static void main(String[] args) {
         MetaDataInformationCollector collector = new MetaDataInformationCollector();
         collector.run("/Daten/Dropbox/lodstats-rdf/23032015/datasets.nt", "/Daten/tapioca/lodStats_BL.object",
-                "/Daten/Dropbox/lodstats-rdf/23032015/statresult.nt", "/Daten/tapioca/test.corpus");
+                "/Daten/Dropbox/lodstats-rdf/23032015/statresult.nt", "/Daten/tapioca/test.corpus",
+                "/Daten/tapioca/lodStats_model/lodstats.nt");
     }
 
-    public void run(String metaFileName, String corpusFileName, String statResultsFile, String corpusOutFileName) {
+    public void run(String metaFileName, String corpusFileName, String statResultsFile, String corpusOutFileName,
+            String additionalMetaDataFile) {
         StatResultsReader reader = new StatResultsReader();
         IntObjectOpenHashMap<StatResult> statResults = reader.read(statResultsFile);
         IntObjectOpenHashMap<DatasetDescription> descriptions = readDescriptions(metaFileName);
+        if (additionalMetaDataFile != null) {
+            enricheMetaData(additionalMetaDataFile, descriptions);
+        }
         addDescriptionsToCorpus(descriptions, statResults, corpusFileName, corpusOutFileName);
     }
 
@@ -146,7 +150,7 @@ public class MetaDataInformationCollector {
                     updateDescription(description, datasetResource, model);
                 }
                 if (model.contains(null, OWL.sameAs, datasetResource)) {
-                    s = model.listStatements(datasetResource, OWL.sameAs, (RDFNode) null).next();
+                    s = model.listStatements(null, OWL.sameAs, datasetResource).next();
                     datasetResource = s.getSubject().asResource();
                     updateDescription(description, datasetResource, model);
                 }
@@ -159,15 +163,17 @@ public class MetaDataInformationCollector {
         if (!datasetResource.getURI().startsWith(LOD_STATS_DOC_BASE_URI)) {
             description.uri = datasetResource.getURI();
         }
-        StmtIterator iterator = model.listStatements(datasetResource, null, (RDFNode) null);
-        com.hp.hpl.jena.rdf.model.Statement s;
-        String predicateURI;
-        while (iterator.hasNext()) {
-            predicateURI = s.getPredicate().getURI();
-            // if(predicateURI.equals(anObject)) {
-            // TODO
-            // }
-        }
+        // StmtIterator iterator = model.listStatements(datasetResource, null,
+        // (RDFNode) null);
+        // com.hp.hpl.jena.rdf.model.Statement s;
+        // String predicateURI;
+        // while (iterator.hasNext()) {
+        // s = iterator.next();
+        // predicateURI = s.getPredicate().getURI();
+        // // if(predicateURI.equals(anObject)) {
+        // // TODO
+        // // }
+        // }
     }
 
     protected void addDescriptionsToCorpus(IntObjectOpenHashMap<DatasetDescription> descriptions,

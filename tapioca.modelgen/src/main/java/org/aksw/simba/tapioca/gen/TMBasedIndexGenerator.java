@@ -12,7 +12,8 @@ public class TMBasedIndexGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TMBasedIndexGenerator.class);
 
-    public static final String TAPIOCA_FOLDER = "/home/mroeder/tapioca/";
+//    public static final String TAPIOCA_FOLDER = "/home/mroeder/tapioca/";
+    public static final String TAPIOCA_FOLDER = "/Daten/tapioca/";
 
     public static final String CORPUS_NAME = "lodStats";
     public static final String CORPUS_FILE = TAPIOCA_FOLDER + CORPUS_NAME + ".corpus";
@@ -28,6 +29,7 @@ public class TMBasedIndexGenerator {
     public static final String OUTPUT_FOLDER = TAPIOCA_FOLDER + CORPUS_NAME + "_model";
     public static final String FINAL_CORPUS_FILE = CORPUS_NAME + "_final.corpus";
     public static final String MODEL_FILE = "probAlgState.object";
+    public static final String MODEL_META_DATA_FILE = "lodstats.nt";
 
     public static void main(String[] args) {
         TMBasedIndexGenerator generator = new TMBasedIndexGenerator();
@@ -83,7 +85,7 @@ public class TMBasedIndexGenerator {
             MetaDataInformationCollector collector = new MetaDataInformationCollector();
             LOGGER.info("Generating final corpus file...");
             collector.run(META_DATA_FILE, LDA_CORPUS_FILE, STAT_RESULT_FILE, OUTPUT_FOLDER + File.separator
-                    + FINAL_CORPUS_FILE);
+                    + FINAL_CORPUS_FILE, OUTPUT_FOLDER + File.separator + MODEL_META_DATA_FILE);
         }
     }
 

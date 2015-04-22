@@ -47,6 +47,7 @@ public class Config extends WebMvcConfigurerAdapter {
 
     private static final String LABEL_CACHING_FILES_PROPERTY_KEY = "org.aksw.simba.tapioca.server.Config.CacheFiles";
     private static final String MODEL_FOLDER_PROPERTY_KEY = "org.aksw.simba.tapioca.server.Engine.ModelFolder";
+    private static final String META_DATA_FILE_PROEPRTY_KEY = "org.aksw.simba.tapioca.server.Engine.MetaDataFile";
 
     public static @Bean
     WorkerBasedLabelRetrievingDocumentSupplierDecorator createCachingLabelRetriever(Environment env) {
@@ -61,7 +62,8 @@ public class Config extends WebMvcConfigurerAdapter {
 
     public static @Bean
     TMEngine createEngine(Environment env, WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
-        return TMEngine.createEngine(cachingLabelRetriever, new File(env.getProperty(MODEL_FOLDER_PROPERTY_KEY)));
+        return TMEngine.createEngine(cachingLabelRetriever, new File(env.getProperty(MODEL_FOLDER_PROPERTY_KEY)),
+                new File(env.getProperty(META_DATA_FILE_PROEPRTY_KEY)));
     }
 
     public static @Bean
