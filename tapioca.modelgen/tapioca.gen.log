@@ -18352,3 +18352,114 @@ java.io.FileNotFoundException: \home\mroeder\tapioca\lodStats.corpus (Das System
 2015-04-21 16:52:35,554 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 2000 documents.>
 2015-04-21 16:52:35,583 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 3000 documents.>
 2015-04-21 16:52:35,593 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 3681 documents.>
+2015-04-22 17:16:33,947 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 1000 documents.>
+2015-04-22 17:16:34,111 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 2000 documents.>
+2015-04-22 17:16:34,127 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 3000 documents.>
+2015-04-22 17:16:34,142 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 3681 documents.>
+2015-04-22 17:45:23,293 [main] INFO [org.aksw.simba.tapioca.gen.URIBasedIndexGenerator] - <The final corpus file is already existing.>
+2015-04-22 17:45:47,769 [main] INFO [org.aksw.simba.tapioca.gen.URIBasedIndexGenerator] - <Generating final corpus file...>
+2015-04-22 17:45:48,170 [main] ERROR [org.aksw.simba.tapioca.gen.preprocessing.StatResultsReader] - <Error while parsing file "/Daten/tapioca/lodStats/statresult.nt". Aborting.>
+java.io.FileNotFoundException: \Daten\tapioca\lodStats\statresult.nt (Das System kann den angegebenen Pfad nicht finden)
+	at java.io.FileInputStream.open(Native Method)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileInputStream.<init>(Unknown Source)
+	at java.io.FileReader.<init>(Unknown Source)
+	at org.aksw.simba.tapioca.gen.preprocessing.StatResultsReader.readStatResults(StatResultsReader.java:40)
+	at org.aksw.simba.tapioca.gen.preprocessing.StatResultsReader.read(StatResultsReader.java:28)
+	at org.aksw.simba.tapioca.gen.MetaDataInformationCollector.run(MetaDataInformationCollector.java:66)
+	at org.aksw.simba.tapioca.gen.URIBasedIndexGenerator.generateFinalCorpusFile(URIBasedIndexGenerator.java:69)
+	at org.aksw.simba.tapioca.gen.URIBasedIndexGenerator.run(URIBasedIndexGenerator.java:61)
+	at org.aksw.simba.tapioca.gen.URIBasedIndexGenerator.main(URIBasedIndexGenerator.java:47)
+2015-04-22 17:47:31,355 [main] INFO [org.aksw.simba.tapioca.gen.URIBasedIndexGenerator] - <Generating final corpus file...>
+2015-04-22 17:47:59,623 [main] WARN [org.aksw.simba.tapioca.gen.URIBasedIndexGenerator] - <The BL corpus file is not existing. Trying to generate it...>
+2015-04-22 17:48:03,856 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 1000th document from XML file.>
+2015-04-22 17:48:11,174 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 2000th document from XML file.>
+2015-04-22 17:48:15,924 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 3000th document from XML file.>
+2015-04-22 17:48:16,048 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 4000th document from XML file.>
+2015-04-22 17:48:16,166 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 5000th document from XML file.>
+2015-04-22 17:48:16,330 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 6000th document from XML file.>
+2015-04-22 17:48:38,947 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 7000th document from XML file.>
+2015-04-22 17:48:41,555 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 8000th document from XML file.>
+2015-04-22 17:48:41,672 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 9000th document from XML file.>
+2015-04-22 17:48:41,815 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 10000th document from XML file.>
+2015-04-22 17:48:41,978 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 11000th document from XML file.>
+2015-04-22 17:48:42,141 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 0 documents.>
+2015-04-22 17:48:42,168 [main] INFO [org.aksw.simba.tapioca.gen.URIBasedIndexGenerator] - <Generating final corpus file...>
+2015-04-22 17:48:52,268 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 0 documents.>
+2015-04-22 17:50:10,320 [main] WARN [org.aksw.simba.tapioca.gen.URIBasedIndexGenerator] - <The BL corpus file is not existing. Trying to generate it...>
+2015-04-22 17:53:16,804 [main] WARN [org.aksw.simba.tapioca.gen.URIBasedIndexGenerator] - <The BL corpus file is not existing. Trying to generate it...>
+2015-04-22 17:53:17,020 [main] ERROR [org.aksw.simba.topicmodeling.io.CorpusObjectReader] - <Error while trying to read serialized corpus from file>
+java.util.zip.ZipException: Not in GZIP format
+	at java.util.zip.GZIPInputStream.readHeader(Unknown Source)
+	at java.util.zip.GZIPInputStream.<init>(Unknown Source)
+	at java.util.zip.GZIPInputStream.<init>(Unknown Source)
+	at org.aksw.simba.topicmodeling.io.gzip.GZipCorpusObjectReader.readCorpus(GZipCorpusObjectReader.java:21)
+	at org.aksw.simba.topicmodeling.io.CorpusObjectReader.readCorpus(CorpusObjectReader.java:26)
+	at org.aksw.simba.topicmodeling.io.AbstractCorpusReader.getCorpus(AbstractCorpusReader.java:31)
+	at org.aksw.simba.tapioca.gen.URIBasedIndexGenerator.generateDocumentNameWhiteList(URIBasedIndexGenerator.java:141)
+	at org.aksw.simba.tapioca.gen.URIBasedIndexGenerator.generateBLCorpusFile(URIBasedIndexGenerator.java:107)
+	at org.aksw.simba.tapioca.gen.URIBasedIndexGenerator.checkBLCorpusExistence(URIBasedIndexGenerator.java:79)
+	at org.aksw.simba.tapioca.gen.URIBasedIndexGenerator.generateFinalCorpusFile(URIBasedIndexGenerator.java:66)
+	at org.aksw.simba.tapioca.gen.URIBasedIndexGenerator.run(URIBasedIndexGenerator.java:61)
+	at org.aksw.simba.tapioca.gen.URIBasedIndexGenerator.main(URIBasedIndexGenerator.java:47)
+2015-04-22 17:54:25,758 [main] WARN [org.aksw.simba.tapioca.gen.URIBasedIndexGenerator] - <The BL corpus file is not existing. Trying to generate it...>
+2015-04-22 17:54:26,254 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 1000th document from XML file.>
+2015-04-22 17:54:32,694 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 2000th document from XML file.>
+2015-04-22 17:54:36,959 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 3000th document from XML file.>
+2015-04-22 17:54:37,073 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 4000th document from XML file.>
+2015-04-22 17:54:37,182 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 5000th document from XML file.>
+2015-04-22 17:54:37,324 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 6000th document from XML file.>
+2015-04-22 17:54:45,764 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 7000th document from XML file.>
+2015-04-22 17:54:48,098 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 8000th document from XML file.>
+2015-04-22 17:54:48,208 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 9000th document from XML file.>
+2015-04-22 17:54:48,344 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 10000th document from XML file.>
+2015-04-22 17:54:48,494 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 11000th document from XML file.>
+2015-04-22 17:54:48,886 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 1000th document from XML file.>
+2015-04-22 17:54:51,610 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 1000 documents.>
+2015-04-22 17:54:57,025 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 2000th document from XML file.>
+2015-04-22 17:55:02,572 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 3000th document from XML file.>
+2015-04-22 17:55:02,577 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 2000 documents.>
+2015-04-22 17:55:02,689 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 4000th document from XML file.>
+2015-04-22 17:55:02,697 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 3000 documents.>
+2015-04-22 17:55:02,801 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 5000th document from XML file.>
+2015-04-22 17:55:02,815 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 4000 documents.>
+2015-04-22 17:55:03,457 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 6000th document from XML file.>
+2015-04-22 17:55:03,493 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 5000 documents.>
+2015-04-22 17:59:27,866 [main] WARN [org.aksw.simba.tapioca.gen.URIBasedIndexGenerator] - <The BL corpus file is not existing. Trying to generate it...>
+2015-04-22 17:59:28,376 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 1000th document from XML file.>
+2015-04-22 17:59:34,824 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 2000th document from XML file.>
+2015-04-22 17:59:39,138 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 3000th document from XML file.>
+2015-04-22 17:59:39,266 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 4000th document from XML file.>
+2015-04-22 17:59:39,376 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 5000th document from XML file.>
+2015-04-22 17:59:39,543 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 6000th document from XML file.>
+2015-04-22 17:59:48,159 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 7000th document from XML file.>
+2015-04-22 17:59:50,524 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 8000th document from XML file.>
+2015-04-22 17:59:50,644 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 9000th document from XML file.>
+2015-04-22 17:59:50,819 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 10000th document from XML file.>
+2015-04-22 17:59:51,004 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 11000th document from XML file.>
+2015-04-22 17:59:51,426 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 1000th document from XML file.>
+2015-04-22 17:59:54,190 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 1000 documents.>
+2015-04-22 17:59:59,437 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 2000th document from XML file.>
+2015-04-22 18:00:04,816 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 3000th document from XML file.>
+2015-04-22 18:00:04,821 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 2000 documents.>
+2015-04-22 18:00:04,931 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 4000th document from XML file.>
+2015-04-22 18:00:04,939 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 3000 documents.>
+2015-04-22 18:00:05,075 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 5000th document from XML file.>
+2015-04-22 18:00:05,090 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 4000 documents.>
+2015-04-22 18:00:05,232 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 6000th document from XML file.>
+2015-04-22 18:00:05,268 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 5000 documents.>
+2015-04-22 18:00:20,702 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 7000th document from XML file.>
+2015-04-22 18:00:23,592 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 6000 documents.>
+2015-04-22 18:00:23,669 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 8000th document from XML file.>
+2015-04-22 18:00:23,713 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 7000 documents.>
+2015-04-22 18:00:23,883 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 9000th document from XML file.>
+2015-04-22 18:00:23,941 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 8000 documents.>
+2015-04-22 18:00:24,020 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 10000th document from XML file.>
+2015-04-22 18:00:24,177 [main] INFO [org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier] - <Read the 11000th document from XML file.>
+2015-04-22 18:00:24,232 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 9000 documents.>
+2015-04-22 18:00:24,445 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 9285 documents.>
+2015-04-22 18:00:34,410 [main] INFO [org.aksw.simba.tapioca.gen.URIBasedIndexGenerator] - <Generating final corpus file...>
+2015-04-22 18:01:01,621 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 1000 documents.>
+2015-04-22 18:01:01,629 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 2000 documents.>
+2015-04-22 18:01:01,637 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 3000 documents.>
+2015-04-22 18:01:01,645 [main] INFO [org.aksw.simba.topicmodeling.preprocessing.AbstractPreprocessor] - <Corpus has 3681 documents.>

@@ -53,6 +53,7 @@
 	<script type="text/javascript">
 		function sendRequest(requestURL) {
 			$('#resultAsJSONLD').html('');
+			$('#results').html('');
 			$.ajax({
 				dataType : 'json',
 				method : 'POST',
@@ -67,23 +68,14 @@
 				alert("error");
 			});
 		}
-		function showResults(results) {
-			//$.each(results.searchResultList, function(index, item) {
-			//	var resultNode = $('<p>');
-			//	resultNode.append('<b>' + item.dataset.name + '</b><br>');
-			//	resultNode.append(item.dataset.uri);
-			//	resultNode.append('<br>');
-			//	resultNode.append(item.dataset.description);
-			//	resultNode.append('<br>');
-			//	resultNode.append(item.similarity);
-			//	$('#results').append(resultNode)
-			//});
-			$('#resultAsJSONLD').html(results);
-			renderResults();
+		function showResults(jsonLdGraph) {
+			$('#resultAsJSONLD')
+					.append(JSON.stringify(jsonLdGraph, null, '\t'));
+			renderResults(jsonLdGraph);
 		}
-		function renderResults() {
-			$('#results').html('');
-			// TODO
+		function renderResults(jsonLdGraph) {
+			// TODO add a human readable form
+			$('#results').append(JSON.stringify(jsonLdGraph, null, '\t'));
 		}
 	</script>
 </body>
