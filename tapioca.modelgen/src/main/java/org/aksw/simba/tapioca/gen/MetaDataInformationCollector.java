@@ -163,6 +163,7 @@ public class MetaDataInformationCollector {
         com.hp.hpl.jena.rdf.model.Statement s;
         String predicateURI;
         while (iterator.hasNext()) {
+            s = iterator.next();
             predicateURI = s.getPredicate().getURI();
             // if(predicateURI.equals(anObject)) {
             // TODO

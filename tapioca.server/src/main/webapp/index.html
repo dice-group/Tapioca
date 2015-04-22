@@ -27,7 +27,8 @@
 <link rel='stylesheet'
 	href='/tapioca/service/webjars/bootstrap/3.2.0/css/bootstrap.min.css'>
 <script src="/tapioca/service/webjars/jquery/2.1.1/jquery.min.js"></script>
-<script src="/tapioca/service/webjars/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script
+	src="/tapioca/service/webjars/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 <!-- <link rel="icon" type="image/png" href="/gerbil/webResources/gerbilicon.png">  -->
 </head>
 <body class="container">
@@ -43,37 +44,46 @@
 		</div>
 		<div class="container">
 			<button name=search onclick="sendRequest('service/search');">search</button>
-			<button name=search onclick="sendRequest('service/blsearch');">BL - search</button>
+			<button name=search onclick="sendRequest('service/blsearch');">BL
+				- search</button>
 		</div>
-		<div class="container" id="results">
-		</div>
+		<div class="container" id="results"></div>
 	</div>
+	<script type="application/ld+json" id="resultAsJSONLD"></script>
 	<script type="text/javascript">
 		function sendRequest(requestURL) {
-			$('#results').html('');
+			$('#resultAsJSONLD').html('');
 			$.ajax({
-				  dataType: 'json',
-				  method: 'POST',
-				  url: requestURL,
-				  data: {voidString : $('#voidInput').val()},
-				  cache: false
-				}).done(function(data) {
-					showResults(data);
-				}).fail(function() {
-					    alert( "error" );
-					  });
+				dataType : 'json',
+				method : 'POST',
+				url : requestURL,
+				data : {
+					voidString : $('#voidInput').val()
+				},
+				cache : false
+			}).done(function(data) {
+				showResults(data);
+			}).fail(function() {
+				alert("error");
+			});
 		}
 		function showResults(results) {
-			$.each(results.searchResultList, function (index, item) {
-				var resultNode = $('<p>');
-				resultNode.append('<b>' + item.dataset.name + '</b><br>');
-				resultNode.append(item.dataset.uri);
-				resultNode.append('<br>');
-				resultNode.append(item.dataset.description);
-				resultNode.append('<br>');
-				resultNode.append(item.similarity);
-				$('#results').append(resultNode)
-			});
+			//$.each(results.searchResultList, function(index, item) {
+			//	var resultNode = $('<p>');
+			//	resultNode.append('<b>' + item.dataset.name + '</b><br>');
+			//	resultNode.append(item.dataset.uri);
+			//	resultNode.append('<br>');
+			//	resultNode.append(item.dataset.description);
+			//	resultNode.append('<br>');
+			//	resultNode.append(item.similarity);
+			//	$('#results').append(resultNode)
+			//});
+			$('#resultAsJSONLD').html(results);
+			renderResults();
+		}
+		function renderResults() {
+			$('#results').html('');
+			// TODO
 		}
 	</script>
 </body>

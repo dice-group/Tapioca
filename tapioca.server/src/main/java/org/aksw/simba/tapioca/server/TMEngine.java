@@ -23,7 +23,8 @@
 package org.aksw.simba.tapioca.server;
 
 import java.io.File;
-import java.util.Arrays;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.Set;
 
 import org.aksw.simba.tapioca.data.Dataset;
@@ -40,8 +41,8 @@ import org.aksw.simba.tapioca.preprocessing.StringCountToSimpleTokenizedTextConv
 import org.aksw.simba.tapioca.preprocessing.StringCountToSimpleTokenizedTextConvertingDocumentSupplierDecorator.WordOccurence;
 import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSupplierDecorator;
 import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSupplierDecorator.UriUsage;
-import org.aksw.simba.tapioca.preprocessing.labelretrieving.WorkerBasedLabelRetrievingDocumentSupplierDecorator;
 import org.aksw.simba.tapioca.preprocessing.UriFilteringDocumentSupplierDecorator;
+import org.aksw.simba.tapioca.preprocessing.labelretrieving.WorkerBasedLabelRetrievingDocumentSupplierDecorator;
 import org.aksw.simba.tapioca.server.data.SimpleVector;
 import org.aksw.simba.tapioca.server.similarity.CosineSimilarity;
 import org.aksw.simba.tapioca.server.similarity.VectorSimilarity;
@@ -61,17 +62,21 @@ import org.aksw.simba.topicmodeling.utils.corpus.Corpus;
 import org.aksw.simba.topicmodeling.utils.doc.Document;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentDescription;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentName;
-import org.aksw.simba.topicmodeling.utils.doc.DocumentText;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentURI;
 import org.aksw.simba.topicmodeling.utils.doc.ProbabilisticClassificationResult;
 import org.aksw.simba.topicmodeling.utils.doc.StringContainingDocumentProperty;
 import org.aksw.simba.topicmodeling.utils.vocabulary.Vocabulary;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.carrotsearch.hppc.ObjectObjectOpenHashMap;
+import com.hp.hpl.jena.n3.turtle.TurtleReader;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFReader;
 
-public class TMEngine {
+public class TMEngine extends AbstractEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TMEngine.class);
 
@@ -80,7 +85,7 @@ public class TMEngine {
     public static final String CORPUS_FILE_NAME = "lodStats_final.corpus";
 
     public static TMEngine createEngine(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever,
-            File inputFolder) {
+            File inputFolder, File metaDataFile) {
         LOGGER.info("Loading model from \"" + inputFolder.getAbsolutePath() + "\".");
         // read probabilistic word topic Model from file
         GZipProbTopicModelingAlgorithmStateReader modelReader = new GZipProbTopicModelingAlgorithmStateReader();
@@ -98,7 +103,7 @@ public class TMEngine {
             LOGGER.error("Couldn't read corpus. Returning null.");
             return null;
         }
-        ObjectObjectOpenHashMap<Dataset, SimpleVector> knownDatasets = new ObjectObjectOpenHashMap<Dataset, SimpleVector>(
+        ObjectObjectOpenHashMap<String, SimpleVector> knownDatasets = new ObjectObjectOpenHashMap<String, SimpleVector>(
                 corpus.getNumberOfDocuments());
         // translate word topic assignment into topic vectors for each document
         SingleDocumentPreprocessor tempPreProc = new SingleDocumentPreprocessor();
@@ -109,7 +114,7 @@ public class TMEngine {
             // createVector(model.getWordTopicAssignmentForDocument(i),
             // model.getNumberOfTopics()));
             // let's use smoothing for this
-            knownDatasets.put(createDataset(corpus.getDocument(i)), new SimpleVector((double[]) probModel
+            knownDatasets.put(getUri(corpus.getDocument(i)), new SimpleVector((double[]) probModel
                     .getClassificationForDocument(tempPreProc.processDocument(corpus.getDocument(i))).getValue()));
         }
         SingleDocumentPreprocessor preprocessor = createPreprocessing(cachingLabelRetriever, model.getVocabulary());
@@ -117,7 +122,31 @@ public class TMEngine {
             LOGGER.error("Couldn't create preprocessor. Returning null.");
             return null;
         }
-        return new TMEngine(probModel, knownDatasets, preprocessor);
+        // Read additional meta data
+        RDFReader reader = new TurtleReader();
+        Model metaDataModel = ModelFactory.createDefaultModel();
+        FileInputStream fin = null;
+        try {
+            fin = new FileInputStream(metaDataFile);
+            reader.read(metaDataModel, fin, "");
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Couldn't read meta data from file. Returning null.", e);
+            return null;
+        } finally {
+            IOUtils.closeQuietly(fin);
+        }
+
+        return new TMEngine(probModel, knownDatasets, preprocessor, metaDataModel);
+    }
+
+    protected static String getUri(Document document) {
+        DocumentURI docUri = document.getProperty(DocumentURI.class);
+        if (docUri != null) {
+            return docUri.get();
+        } else {
+            LOGGER.error("Got a document without the needed DocumentURI property. Ignoring this document.");
+        }
+        return null;
     }
 
     protected static Dataset createDataset(Document document) {
@@ -194,31 +223,25 @@ public class TMEngine {
     }
 
     private ProbabilisticWordTopicModel model;
-    private ObjectObjectOpenHashMap<Dataset, SimpleVector> knownDatasets;
-    private SingleDocumentPreprocessor preprocessor;
+    private ObjectObjectOpenHashMap<String, SimpleVector> knownDatasets;
     private VectorSimilarity similarity;
     private int numberOfResults = DEFAULT_NUMBER_OF_RESULTS;
 
-    protected TMEngine(ProbabilisticWordTopicModel model, ObjectObjectOpenHashMap<Dataset, SimpleVector> knownDatasets,
-            SingleDocumentPreprocessor preprocessor) {
-        this(model, knownDatasets, preprocessor, new CosineSimilarity());
+    protected TMEngine(ProbabilisticWordTopicModel model, ObjectObjectOpenHashMap<String, SimpleVector> knownDatasets,
+            SingleDocumentPreprocessor preprocessor, Model rdfMetaDataModel) {
+        this(model, knownDatasets, preprocessor, rdfMetaDataModel, new CosineSimilarity());
     }
 
-    protected TMEngine(ProbabilisticWordTopicModel model, ObjectObjectOpenHashMap<Dataset, SimpleVector> knownDatasets,
-            SingleDocumentPreprocessor preprocessor, VectorSimilarity similarity) {
+    protected TMEngine(ProbabilisticWordTopicModel model, ObjectObjectOpenHashMap<String, SimpleVector> knownDatasets,
+            SingleDocumentPreprocessor preprocessor, Model rdfMetaDataModel, VectorSimilarity similarity) {
+        super(preprocessor, rdfMetaDataModel);
         this.knownDatasets = knownDatasets;
         this.model = model;
-        this.preprocessor = preprocessor;
         this.similarity = similarity;
     }
 
-    public TopDoubleObjectCollection<Dataset> retrieveSimilarDatasets(String voidString) {
-        // preprocess given void string
-        LOGGER.info("Preprocessing void string...");
-        Document document = preprocess(voidString);
-        if (document == null) {
-            throw new IllegalArgumentException("The given void string did not result in a valid document.");
-        }
+    @Override
+    protected TopDoubleObjectCollection<String> retrieveSimilarDatasets(Document document) {
         // infer topic vector
         // TODO check whether the inference is thread-safe
         LOGGER.info("Infering topics...");
@@ -226,37 +249,22 @@ public class TMEngine {
                 .getClassificationForDocument(document);
         // retrieve the most similar datasets
         LOGGER.info("Retrieving similar datasets...");
-        TopDoubleObjectCollection<Dataset> result = retrieveMostSimilarDataset(new SimpleVector(
+        TopDoubleObjectCollection<String> result = retrieveMostSimilarDataset(new SimpleVector(
                 classification.getTopicProbabilities()));
         // return a sorted list
         LOGGER.info("Done.");
         return result;
     }
 
-    private TopDoubleObjectCollection<Dataset> retrieveMostSimilarDataset(SimpleVector vector) {
-        TopDoubleObjectCollection<Dataset> results = new TopDoubleObjectCollection<Dataset>(numberOfResults, false);
+    private TopDoubleObjectCollection<String> retrieveMostSimilarDataset(SimpleVector vector) {
+        TopDoubleObjectCollection<String> results = new TopDoubleObjectCollection<String>(numberOfResults, false);
         // simply go over all known datasets and calculate the similarities
         for (int i = 0; i < knownDatasets.allocated.length; ++i) {
             if (knownDatasets.allocated[i]) {
                 results.add(similarity.getSimilarity(vector, (SimpleVector) ((Object[]) knownDatasets.values)[i]),
-                        (Dataset) ((Object[]) knownDatasets.keys)[i]);
-                if (((Dataset) ((Object[]) knownDatasets.keys)[i]).getName().equals("18636.ttl")) {
-                    System.out.println("********************* docVec:");
-                    System.out.println(Arrays.toString(vector.values));
-                    System.out.println("********************* datVec:");
-                    System.out.println(Arrays.toString(((SimpleVector) ((Object[]) knownDatasets.values)[i]).values));
-                    System.out.print("********************* sim=");
-                    System.out.println(similarity.getSimilarity(vector,
-                            (SimpleVector) ((Object[]) knownDatasets.values)[i]));
-                }
+                        (String) ((Object[]) knownDatasets.keys)[i]);
             }
         }
         return results;
-    }
-
-    private synchronized Document preprocess(String voidString) {
-        Document document = new Document();
-        document.addProperty(new DocumentText(voidString));
-        return preprocessor.processDocument(document);
     }
 }

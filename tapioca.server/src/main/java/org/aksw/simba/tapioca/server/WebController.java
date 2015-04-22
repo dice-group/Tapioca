@@ -47,13 +47,14 @@ public class WebController {
 
     @RequestMapping("/search")
     public @ResponseBody
-    ModelMap search(@RequestParam(value = "voidString") String voidString) {
-        TopDoubleObjectCollection<Dataset> result = engine.retrieveSimilarDatasets(voidString);
-        SearchResult results[] = new SearchResult[result.size()];
-        for (int i = 0; i < results.length; ++i) {
-            results[i] = new SearchResult((Dataset) result.objects[i], result.values[i]);
-        }
-        return new ModelMap(results);
+    String search(@RequestParam(value = "voidString") String voidString) {
+        return engine.retrieveSimilarDatasets(voidString);
+        // SearchResult results[] = new SearchResult[result.size()];
+        // for (int i = 0; i < results.length; ++i) {
+        // results[i] = new SearchResult((Dataset) result.objects[i],
+        // result.values[i]);
+        // }
+        // return new ModelMap(results);
     }
 
     @RequestMapping("/blsearch")
