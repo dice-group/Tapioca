@@ -4,7 +4,6 @@
 target
 .settings
 # Package Files #
-*.jar
 *.war
 *.ear
-**.log
+*.log
