@@ -5,7 +5,6 @@ import java.io.File;
 import org.aksw.simba.topicmodeling.algorithm.mallet.MalletLdaWrapper;
 import org.aksw.simba.topicmodeling.algorithms.ModelingAlgorithm;
 import org.aksw.simba.topicmodeling.algorithms.ProbTopicModelingAlgorithmStateSupplier;
-import org.aksw.simba.topicmodeling.io.CorpusObjectReader;
 import org.aksw.simba.topicmodeling.io.CorpusReader;
 import org.aksw.simba.topicmodeling.io.gzip.GZipCorpusObjectReader;
 import org.aksw.simba.topicmodeling.io.gzip.GZipProbTopicModelingAlgorithmStateWriter;

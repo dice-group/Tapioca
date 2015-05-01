@@ -75,7 +75,7 @@
 		}
 		function renderResults(jsonLdGraph) {
 			// TODO add a human readable form
-			$('#results').append(JSON.stringify(jsonLdGraph, null, '\t'));
+			$('#results').append('<pre>' + JSON.stringify(jsonLdGraph, null, '\t') + '</pre>');
 		}
 	</script>
 </body>

@@ -66,6 +66,7 @@ public class MetaDataInformationCollector {
         IntObjectOpenHashMap<StatResult> statResults = reader.read(statResultsFile);
         IntObjectOpenHashMap<DatasetDescription> descriptions = readDescriptions(metaFileName);
         if (additionalMetaDataFile != null) {
+            // TODO filter documents
             enricheMetaData(additionalMetaDataFile, descriptions);
         }
         addDescriptionsToCorpus(descriptions, statResults, corpusFileName, corpusOutFileName);

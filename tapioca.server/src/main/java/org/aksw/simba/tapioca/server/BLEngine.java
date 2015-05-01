@@ -23,6 +23,8 @@
 package org.aksw.simba.tapioca.server;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 import org.aksw.simba.tapioca.data.Dataset;
 import org.aksw.simba.tapioca.data.StringCountMapping;
@@ -39,23 +41,27 @@ import org.aksw.simba.topicmodeling.utils.corpus.Corpus;
 import org.aksw.simba.topicmodeling.utils.doc.Document;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentDescription;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentName;
-import org.aksw.simba.topicmodeling.utils.doc.DocumentText;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentURI;
 import org.aksw.simba.topicmodeling.utils.doc.StringContainingDocumentProperty;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.carrotsearch.hppc.ObjectObjectOpenHashMap;
 import com.carrotsearch.hppc.ObjectOpenHashSet;
+import com.hp.hpl.jena.n3.turtle.TurtleReader;
+import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.ModelFactory;
+import com.hp.hpl.jena.rdf.model.RDFReader;
 
-public class BLEngine {
+public class BLEngine extends AbstractEngine {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BLEngine.class);
 
     private static final int DEFAULT_NUMBER_OF_RESULTS = 20;
     public static final String CORPUS_FILE_NAME = "lodStats_BL_final.corpus";
 
-    public static BLEngine createEngine(File inputFolder) {
+    public static BLEngine createEngine(File inputFolder, File metaDataFile) {
         GZipCorpusObjectReader corpusReader = new GZipCorpusObjectReader(new File(inputFolder.getAbsolutePath()
                 + File.separator + CORPUS_FILE_NAME));
         Corpus corpus = corpusReader.getCorpus();
@@ -63,7 +69,7 @@ public class BLEngine {
             LOGGER.error("Couldn't read corpus. Returning null.");
             return null;
         }
-        ObjectObjectOpenHashMap<Dataset, ObjectOpenHashSet<String>> knownDatasets = new ObjectObjectOpenHashMap<Dataset, ObjectOpenHashSet<String>>(
+        ObjectObjectOpenHashMap<String, ObjectOpenHashSet<String>> knownDatasets = new ObjectObjectOpenHashMap<String, ObjectOpenHashSet<String>>(
                 corpus.getNumberOfDocuments());
         // generate a URI set for each document
         DatasetURIs uris;
@@ -72,7 +78,7 @@ public class BLEngine {
             if (uris == null) {
                 LOGGER.warn("Got a document without DatasetURIs property. Ignoring this document.");
             } else {
-                knownDatasets.put(createDataset(document), uris.get());
+                knownDatasets.put(getUri(document), uris.get());
             }
         }
         SingleDocumentPreprocessor preprocessor = createPreprocessing();
@@ -80,7 +86,31 @@ public class BLEngine {
             LOGGER.error("Couldn't create preprocessor. Returning null.");
             return null;
         }
-        return new BLEngine(knownDatasets, preprocessor);
+        // Read additional meta data
+        RDFReader reader = new TurtleReader();
+        Model metaDataModel = ModelFactory.createDefaultModel();
+        FileInputStream fin = null;
+        try {
+            fin = new FileInputStream(metaDataFile);
+            reader.read(metaDataModel, fin, "");
+        } catch (FileNotFoundException e) {
+            LOGGER.error("Couldn't read meta data from file. Returning null.", e);
+            return null;
+        } finally {
+            IOUtils.closeQuietly(fin);
+        }
+        
+        return new BLEngine(knownDatasets, preprocessor, metaDataModel);
+    }
+
+    protected static String getUri(Document document) {
+        DocumentURI docUri = document.getProperty(DocumentURI.class);
+        if (docUri != null) {
+            return docUri.get();
+        } else {
+            LOGGER.error("Got a document without the needed DocumentURI property. Ignoring this document.");
+        }
+        return null;
     }
 
     protected static Dataset createDataset(Document document) {
@@ -122,26 +152,20 @@ public class BLEngine {
         return preprocessor;
     }
 
-    private ObjectObjectOpenHashMap<Dataset, ObjectOpenHashSet<String>> knownDatasets;
-    private SingleDocumentPreprocessor preprocessor;
+    private ObjectObjectOpenHashMap<String, ObjectOpenHashSet<String>> knownDatasets;
     private int numberOfResults = DEFAULT_NUMBER_OF_RESULTS;
 
-    protected BLEngine(ObjectObjectOpenHashMap<Dataset, ObjectOpenHashSet<String>> knownDatasets,
-            SingleDocumentPreprocessor preprocessor) {
+    protected BLEngine(ObjectObjectOpenHashMap<String, ObjectOpenHashSet<String>> knownDatasets,
+            SingleDocumentPreprocessor preprocessor, Model rdfMetaDataModel) {
+        super(preprocessor, rdfMetaDataModel);
         this.knownDatasets = knownDatasets;
-        this.preprocessor = preprocessor;
     }
 
-    public TopDoubleObjectCollection<Dataset> retrieveSimilarDatasets(String voidString) {
-        // preprocess given void string
-        LOGGER.info("Preprocessing void string...");
-        Document document = preprocess(voidString);
-        if (document == null) {
-            throw new IllegalArgumentException("The given void string did not result in a valid document.");
-        }
+    @Override
+    protected TopDoubleObjectCollection<String> retrieveSimilarDatasets(Document document) {
         // retrieve the most similar datasets
         LOGGER.info("Retrieving similar datasets...");
-        TopDoubleObjectCollection<Dataset> result = retrieveMostSimilarDataset(document
+        TopDoubleObjectCollection<String> result = retrieveMostSimilarDataset(document
                 .getProperty(StringCountMapping.class));
         // return a sorted list
         LOGGER.info("Done.");
@@ -149,15 +173,15 @@ public class BLEngine {
     }
 
     @SuppressWarnings("unchecked")
-    private TopDoubleObjectCollection<Dataset> retrieveMostSimilarDataset(StringCountMapping uriCounts) {
-        TopDoubleObjectCollection<Dataset> results = new TopDoubleObjectCollection<Dataset>(numberOfResults, false);
+    private TopDoubleObjectCollection<String> retrieveMostSimilarDataset(StringCountMapping uriCounts) {
+        TopDoubleObjectCollection<String> results = new TopDoubleObjectCollection<String>(numberOfResults, false);
         ObjectOpenHashSet<String> documentURIs = new ObjectOpenHashSet<String>(uriCounts.get().keys());
         // simply go over all known datasets and calculate the similarities
         for (int i = 0; i < knownDatasets.allocated.length; ++i) {
             if (knownDatasets.allocated[i]) {
                 results.add(
                         getSimilarity(documentURIs, (ObjectOpenHashSet<String>) ((Object[]) knownDatasets.values)[i]),
-                        (Dataset) ((Object[]) knownDatasets.keys)[i]);
+                        (String) ((Object[]) knownDatasets.keys)[i]);
             }
         }
         return results;
@@ -174,11 +198,5 @@ public class BLEngine {
         }
         double unionCount = documentURIs.assigned + knownDataset.assigned - overlapCount;
         return overlapCount / unionCount;
-    }
-
-    private synchronized Document preprocess(String voidString) {
-        Document document = new Document();
-        document.addProperty(new DocumentText(voidString));
-        return preprocessor.processDocument(document);
     }
 }

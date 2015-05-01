@@ -68,7 +68,8 @@ public class Config extends WebMvcConfigurerAdapter {
 
     public static @Bean
     BLEngine createBLEngine(Environment env) {
-        return BLEngine.createEngine(new File(env.getProperty(MODEL_FOLDER_PROPERTY_KEY)));
+        return BLEngine.createEngine(new File(env.getProperty(MODEL_FOLDER_PROPERTY_KEY)),
+                new File(env.getProperty(META_DATA_FILE_PROEPRTY_KEY)));
     }
 
     @Override
