@@ -1,34 +1,65 @@
-<!--
+<!-- The MIT License Copyright (c) 2015 Michael Röder (roeder@informatik.uni-leipzig.de) 
+	Permission is hereby granted, free of charge, to any person obtaining a copy 
+	of this software and associated documentation files (the "Software"), to 
+	deal in the Software without restriction, including without limitation the 
+	rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
+	sell copies of the Software, and to permit persons to whom the Software is 
+	furnished to do so, subject to the following conditions: The above copyright 
+	notice and this permission notice shall be included in all copies or substantial 
+	portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY 
+	OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
+	OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. 
+	IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, 
+	DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, 
+	ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+	DEALINGS IN THE SOFTWARE. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.aksw.simba</groupId>
+		<artifactId>tapioca.parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../tapioca.parent</relativePath>
+	</parent>
+	<artifactId>tapioca.analyzer</artifactId>
 
-    The MIT License
-    Copyright (c) 2015 Michael Röder (roeder@informatik.uni-leipzig.de)
+	<repositories>
+		<!-- Let's use a local repository for the local libraries of this project -->
+		<repository>
+			<id>local repository</id>
+			<url>${tapioca.local.repository}</url>
+		</repository>
+	</repositories>
 
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in
-    all copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-    THE SOFTWARE.
-
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.aksw.simba</groupId>
-    <artifactId>tapioca.parent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <relativePath>../tapioca.parent</relativePath>
-  </parent>
-  <artifactId>tapioca.analyzer</artifactId>
+	<dependencies>
+		<!-- Tapioca Core -->
+		<dependency>
+			<groupId>org.aksw.simba</groupId>
+			<artifactId>tapioca.core</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<!-- Jena SPARQL API -->
+        <dependency>
+            <groupId>org.aksw.jena-sparql-api</groupId>
+            <artifactId>jena-sparql-api-core</artifactId>
+            <version>${org.aksw.jena-sparql-api.version}</version>
+        </dependency>
+		<!-- Jena SPARQL API -->
+        <dependency>
+            <groupId>org.aksw.jena-sparql-api</groupId>
+            <artifactId>jena-sparql-api-cache-h2</artifactId>
+            <version>${org.aksw.jena-sparql-api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aksw.simba</groupId>
+            <artifactId>topicmodeling.concurrent</artifactId>
+            <version>${org.aksw.simba.topicmodeling.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.aksw.simba</groupId>
+            <artifactId>topicmodeling.io</artifactId>
+            <version>${org.aksw.simba.topicmodeling.version}</version>
+        </dependency>
+	</dependencies>
 </project>
