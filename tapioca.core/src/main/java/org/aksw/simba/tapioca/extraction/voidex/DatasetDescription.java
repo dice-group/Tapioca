@@ -1,4 +1,4 @@
-package org.aksw.simba.tapioca.voidex;
+package org.aksw.simba.tapioca.extraction.voidex;
 
 import java.util.ArrayList;
 import java.util.List;

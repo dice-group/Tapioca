@@ -1,13 +1,13 @@
-package org.aksw.simba.tapioca.voidex;
+package org.aksw.simba.tapioca.extraction.voidex;
 
 import com.carrotsearch.hppc.ObjectIntOpenHashMap;
 
-public class PropertyDescription  extends VoidInformation {
+public class ClassDescription extends VoidInformation {
     @Override
     public void addToCount(ObjectIntOpenHashMap<String> countedClasses,
             ObjectIntOpenHashMap<String> countedProperties) {
         if (this.isComplete()) {
-            countedProperties.putOrAdd(uri, count, count);
+            countedClasses.putOrAdd(uri, count, count);
         }
     }
 }
