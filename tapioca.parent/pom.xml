@@ -33,6 +33,20 @@
 	</parent>
 	<artifactId>tapioca.parent</artifactId>
 	<packaging>pom</packaging>
+	
+	<!-- REPOSITORIES -->
+	<repositories>
+		<repository>
+			<id>maven.aksw.internal</id>
+			<name>University Leipzig, AKSW Maven2 Repository</name>
+			<url>http://maven.aksw.org/repository/internal</url>
+		</repository>
+		<repository>
+			<id>maven.aksw.snapshots</id>
+			<name>University Leipzig, AKSW Maven2 Repository</name>
+			<url>http://maven.aksw.org/repository/snapshots</url>
+		</repository>
+	</repositories>
 
 	<!-- PROPERTIES -->
 	<properties>
@@ -44,10 +58,11 @@
 		<com.carrotsearch.hppc.version>0.6.1</com.carrotsearch.hppc.version>
 		<lucene.version>4.4.0</lucene.version>
 		<junit.version>4.8.2</junit.version>
-		<org.aksw.simba.topicmodeling.version>0.0.1-SNAPSHOT</org.aksw.simba.topicmodeling.version>
+		<org.aksw.simba.topicmodeling.version>0.0.2-SNAPSHOT</org.aksw.simba.topicmodeling.version>
 		<org.apache.commons.commons-lang3.version>3.3.2</org.apache.commons.commons-lang3.version>
 		<org.apache.commons.commons-io.version>2.4</org.apache.commons.commons-io.version>
 		<org.apache.jena.version>2.13.0</org.apache.jena.version>
+		<org.aksw.jena-sparql-api.version>${org.apache.jena.version}-1</org.aksw.jena-sparql-api.version>
 		<org.openrdf.sesame.version>2.7.0-beta1</org.openrdf.sesame.version>
 		<slf4j.version>1.7.10</slf4j.version>
 		<spring.version>3.2.10.RELEASE</spring.version>

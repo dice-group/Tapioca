@@ -1,0 +1,63 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.aksw.simba</groupId>
+		<artifactId>topicmodeling.parent</artifactId>
+		<version>0.0.2-SNAPSHOT</version>
+		<relativePath>../topicmodeling.parent</relativePath>
+	</parent>
+	<artifactId>topicmodeling.io</artifactId>
+
+	<!-- DEPENDENCIES -->
+	<dependencies>
+		<!-- Topicmodeling Commons -->
+		<dependency>
+			<groupId>org.aksw.simba</groupId>
+			<artifactId>topicmodeling.commons</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<!-- Topicmodeling Datatypes -->
+		<dependency>
+			<groupId>org.aksw.simba</groupId>
+			<artifactId>topicmodeling.datatypes</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<!-- Topicmodeling Automatons -->
+		<dependency>
+			<groupId>org.aksw.simba</groupId>
+			<artifactId>topicmodeling.automaton</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<!-- High Performance Primitive Collections -->
+		<dependency>
+			<groupId>com.carrotsearch</groupId>
+			<artifactId>hppc</artifactId>
+			<version>${com.carrotsearch.hppc.version}</version>
+		</dependency>
+		<!-- Apache Commons IO -->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${org.apache.commons.commons-io.version}</version>
+		</dependency>
+		<!-- Apache Commons Collections -->
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.0</version>
+		</dependency>
+		<!-- Apache Commons Lang 3 -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>${org.apache.commons.commons-lang3.version}</version>
+		</dependency>
+		<!-- CSV Filehandling -->
+		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>2.3</version>
+		</dependency>
+	</dependencies>
+</project>

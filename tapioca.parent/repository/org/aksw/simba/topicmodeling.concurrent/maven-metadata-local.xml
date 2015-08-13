@@ -4,8 +4,8 @@
   <artifactId>topicmodeling.concurrent</artifactId>
   <versioning>
     <versions>
-      <version>0.0.1-SNAPSHOT</version>
+      <version>0.0.2-SNAPSHOT</version>
     </versions>
-    <lastUpdated>20150421153115</lastUpdated>
+    <lastUpdated>20150813154733</lastUpdated>
   </versioning>
 </metadata>
