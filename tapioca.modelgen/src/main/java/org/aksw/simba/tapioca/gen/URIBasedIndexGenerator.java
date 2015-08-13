@@ -2,9 +2,7 @@ package org.aksw.simba.tapioca.gen;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.aksw.simba.tapioca.data.DatasetClassInfo;
 import org.aksw.simba.tapioca.data.DatasetPropertyInfo;
@@ -17,7 +15,6 @@ import org.aksw.simba.tapioca.gen.preprocessing.DatasetURIsSummarizingSupplierDe
 import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSupplierDecorator;
 import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSupplierDecorator.UriUsage;
 import org.aksw.simba.topicmodeling.io.CorpusObjectWriter;
-import org.aksw.simba.topicmodeling.io.gzip.GZipCorpusObjectReader;
 import org.aksw.simba.topicmodeling.io.gzip.GZipCorpusObjectWriter;
 import org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier;
 import org.aksw.simba.topicmodeling.preprocessing.ListCorpusCreator;
@@ -25,10 +22,8 @@ import org.aksw.simba.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.DocumentFilteringSupplierDecorator;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.PropertyRemovingSupplierDecorator;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.filter.DocumentFilter;
-import org.aksw.simba.topicmodeling.utils.corpus.Corpus;
 import org.aksw.simba.topicmodeling.utils.corpus.DocumentListCorpus;
 import org.aksw.simba.topicmodeling.utils.doc.Document;
-import org.aksw.simba.topicmodeling.utils.doc.DocumentName;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
