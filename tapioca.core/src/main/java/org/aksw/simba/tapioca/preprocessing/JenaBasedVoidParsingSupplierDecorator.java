@@ -34,8 +34,9 @@ import com.hp.hpl.jena.vocabulary.RDF;
 /**
  * Parses the {@link DocumentText} as RDF VOID information (in turtle). Adds
  * {@link DatasetClassInfo}, {@link DatasetPropertyInfo} and
- * {@link DatasetVocabularies}. Can add/replace {@link DocumentURI},
- * {@link DocumentName}, {@link DocumentDescription}.
+ * {@link DatasetVocabularies}. May add {@link DocumentURI},
+ * {@link DocumentName}, {@link DocumentDescription} if these information are
+ * found inside the VOID and the document does not already have the property.
  * 
  * @author Michael R&ouml;der (roeder@informatik.uni-leipzig.de)
  * 
@@ -224,11 +225,13 @@ public class JenaBasedVoidParsingSupplierDecorator extends AbstractDocumentSuppl
 						rootDataset = (DatasetDescription) ((Object[]) datasetDescriptions.values)[i];
 					}
 				}
-				document.addProperty(new DocumentURI(rootDataset.uri));
-				if (rootDataset.title != null) {
+				if (document.getProperty(DocumentURI.class) == null) {
+					document.addProperty(new DocumentURI(rootDataset.uri));
+				}
+				if ((rootDataset.title != null) && (document.getProperty(DocumentName.class) == null)) {
 					document.addProperty(new DocumentName(rootDataset.title));
 				}
-				if (rootDataset.description != null) {
+				if ((rootDataset.description != null) && (document.getProperty(DocumentDescription.class) == null)) {
 					document.addProperty(new DocumentDescription(rootDataset.description));
 				}
 				document.addProperty(new DatasetTriplesCount(rootDataset.triples));
@@ -242,38 +245,44 @@ public class JenaBasedVoidParsingSupplierDecorator extends AbstractDocumentSuppl
 						}
 					}
 				}
-				document.addProperty(new DocumentURI(rootDataset.uri));
-				if (rootDataset.title == null) {
-					StringBuilder builder = new StringBuilder();
-					builder.append("merged (");
-					boolean first = true;
-					for (DatasetDescription subset : rootDataset.subsets) {
-						if (first) {
-							first = !first;
-						} else {
-							builder.append(',');
-						}
-						builder.append(subset.title != null ? subset.title : subset.uri);
-					}
-					builder.append(')');
-					document.addProperty(new DocumentName(builder.toString()));
-				} else {
-					document.addProperty(new DocumentName(rootDataset.title));
+				if (document.getProperty(DocumentURI.class) == null) {
+					document.addProperty(new DocumentURI(rootDataset.uri));
 				}
-				if (rootDataset.description == null) {
-					StringBuilder builder = new StringBuilder();
-					builder.append("merged description (");
-					for (DatasetDescription subset : rootDataset.subsets) {
-						builder.append('\n');
-						builder.append(subset.title != null ? subset.title : subset.uri);
-						builder.append(":\"");
-						builder.append(subset.description);
-						builder.append('"');
+				if ((document.getProperty(DocumentName.class) == null)) {
+					if (rootDataset.title == null) {
+						StringBuilder builder = new StringBuilder();
+						builder.append("merged (");
+						boolean first = true;
+						for (DatasetDescription subset : rootDataset.subsets) {
+							if (first) {
+								first = !first;
+							} else {
+								builder.append(',');
+							}
+							builder.append(subset.title != null ? subset.title : subset.uri);
+						}
+						builder.append(')');
+						document.addProperty(new DocumentName(builder.toString()));
+					} else {
+						document.addProperty(new DocumentName(rootDataset.title));
 					}
-					builder.append(')');
-					document.addProperty(new DocumentDescription(builder.toString()));
-				} else {
-					document.addProperty(new DocumentDescription(rootDataset.description));
+				}
+				if (document.getProperty(DocumentDescription.class) == null) {
+					if (rootDataset.description == null) {
+						StringBuilder builder = new StringBuilder();
+						builder.append("merged description (");
+						for (DatasetDescription subset : rootDataset.subsets) {
+							builder.append('\n');
+							builder.append(subset.title != null ? subset.title : subset.uri);
+							builder.append(":\"");
+							builder.append(subset.description);
+							builder.append('"');
+						}
+						builder.append(')');
+						document.addProperty(new DocumentDescription(builder.toString()));
+					} else {
+						document.addProperty(new DocumentDescription(rootDataset.description));
+					}
 				}
 				long triples = 0;
 				if (rootDataset.triples == -1) {
@@ -290,5 +299,4 @@ public class JenaBasedVoidParsingSupplierDecorator extends AbstractDocumentSuppl
 			}
 		}
 	}
-
 }
