@@ -19,6 +19,7 @@ public class String2RDFStreamingTask implements Runnable {
 		this.rdfStream = rdfStream;
 		this.reader = reader;
 		this.baseUri = baseUri;
+		this.language = language;
 	}
 
 	@Override

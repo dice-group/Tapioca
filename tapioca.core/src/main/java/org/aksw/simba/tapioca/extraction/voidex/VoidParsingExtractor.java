@@ -15,6 +15,10 @@ public class VoidParsingExtractor extends AbstractExtractor {
 
 	private ObjectObjectOpenHashMap<String, VoidInformation> voidInformation;
 
+	public VoidParsingExtractor() {
+		this.voidInformation = new ObjectObjectOpenHashMap<String, VoidInformation>();
+	}
+
 	public VoidParsingExtractor(ObjectObjectOpenHashMap<String, VoidInformation> voidInformation) {
 		this.voidInformation = voidInformation;
 	}
@@ -25,8 +29,8 @@ public class VoidParsingExtractor extends AbstractExtractor {
 		Node object = triple.getObject();
 		if (predicate.getURI().startsWith(VOID.getURI())) {
 			// This predicate is part of the VOID vocabulary
-			String subjectURI = subject.getURI();
-			if (predicate.equals(VOID.clazz)) {
+			String subjectURI = subject.isBlank() ? subject.getBlankNodeLabel() : subject.getURI();
+			if (predicate.equals(VOID.clazz.asNode())) {
 				ClassDescription classDesc;
 				if (voidInformation.containsKey(subjectURI)) {
 					classDesc = (ClassDescription) voidInformation.get(subjectURI);
@@ -35,7 +39,7 @@ public class VoidParsingExtractor extends AbstractExtractor {
 					voidInformation.put(subjectURI, classDesc);
 				}
 				classDesc.uri = object.getURI();
-			} else if (predicate.equals(VOID.entities)) {
+			} else if (predicate.equals(VOID.entities.asNode()) && object.isLiteral()) {
 				ClassDescription classDesc;
 				if (voidInformation.containsKey(subjectURI)) {
 					classDesc = (ClassDescription) voidInformation.get(subjectURI);
@@ -43,12 +47,8 @@ public class VoidParsingExtractor extends AbstractExtractor {
 					classDesc = new ClassDescription();
 					voidInformation.put(subjectURI, classDesc);
 				}
-				try {
-					classDesc.count = Integer.parseInt(object.toString());
-				} catch (Exception e) {
-					LOGGER.error("Tried to parse the entities count from \"" + triple.toString() + "\".", e);
-				}
-			} else if (predicate.equals(VOID.property)) {
+				classDesc.count = parseInteger(object);
+			} else if (predicate.equals(VOID.property.asNode())) {
 				PropertyDescription propertyDesc;
 				if (voidInformation.containsKey(subjectURI)) {
 					propertyDesc = (PropertyDescription) voidInformation.get(subjectURI);
@@ -57,7 +57,7 @@ public class VoidParsingExtractor extends AbstractExtractor {
 					voidInformation.put(subjectURI, propertyDesc);
 				}
 				propertyDesc.uri = object.getURI();
-			} else if (predicate.equals(VOID.triples)) {
+			} else if (predicate.equals(VOID.triples.asNode())) {
 				PropertyDescription propertyDesc;
 				if (voidInformation.containsKey(subjectURI)) {
 					propertyDesc = (PropertyDescription) voidInformation.get(subjectURI);
@@ -65,13 +65,21 @@ public class VoidParsingExtractor extends AbstractExtractor {
 					propertyDesc = new PropertyDescription();
 					voidInformation.put(subjectURI, propertyDesc);
 				}
-				try {
-					propertyDesc.count = Integer.parseInt(object.toString());
-				} catch (Exception e) {
-					LOGGER.error("Tried to parse the entities count from \"" + triple.toString() + "\".", e);
-				}
+				propertyDesc.count = parseInteger(object);
 			}
 		}
+	}
+
+	protected int parseInteger(Node object) {
+		Object value = object.getLiteralValue();
+		if (value instanceof Integer) {
+			return (Integer) value;
+		} else if (value instanceof Long) {
+			return ((Long) value).intValue();
+		} else {
+			LOGGER.error("Got an unknown literal type \"" + value.getClass().toString() + "\".");
+		}
+		return 0;
 	}
 
 	public ObjectObjectOpenHashMap<String, VoidInformation> getVoidInformation() {

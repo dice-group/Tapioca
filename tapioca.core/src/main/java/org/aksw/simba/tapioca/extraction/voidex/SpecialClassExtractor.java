@@ -14,8 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.carrotsearch.hppc.ObjectIntOpenHashMap;
 import com.hp.hpl.jena.graph.Node;
 import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
+import com.hp.hpl.jena.rdf.model.ResourceFactory;
 import com.hp.hpl.jena.vocabulary.RDF;
 
 public class SpecialClassExtractor extends AbstractExtractor {
@@ -23,9 +22,13 @@ public class SpecialClassExtractor extends AbstractExtractor {
 	private static final Logger LOGGER = LoggerFactory.getLogger(SpecialClassExtractor.class);
 
 	private static final String SPECIAL_CLASSES_RESOURCE_NAME = "special_classes.txt";
-	private static final Set<Resource> SPECIAL_CLASSES = loadList(SPECIAL_CLASSES_RESOURCE_NAME);
+	private static final Set<Node> SPECIAL_CLASSES = loadList(SPECIAL_CLASSES_RESOURCE_NAME);
 
 	private ObjectIntOpenHashMap<String> countedSpecialClasses;
+
+	public SpecialClassExtractor() {
+		this.countedSpecialClasses = new ObjectIntOpenHashMap<String>();
+	}
 
 	public SpecialClassExtractor(ObjectIntOpenHashMap<String> countedSpecialClasses) {
 		this.countedSpecialClasses = countedSpecialClasses;
@@ -33,7 +36,7 @@ public class SpecialClassExtractor extends AbstractExtractor {
 
 	public void handleTriple(Triple triple) {
 		Node subject = triple.getSubject();
-		if (triple.getPredicate().equals(RDF.type) && !(subject.isBlank())) {
+		if (triple.getPredicate().equals(RDF.type.asNode()) && !(subject.isBlank())) {
 			if (SPECIAL_CLASSES.contains(triple.getObject())) {
 				countedSpecialClasses.putOrAdd(subject.getURI(), 0, 0);
 			}
@@ -48,22 +51,22 @@ public class SpecialClassExtractor extends AbstractExtractor {
 		this.countedSpecialClasses = countedSpecialClasses;
 	}
 
-	protected static Set<Resource> loadList(String listName) {
+	protected static Set<Node> loadList(String listName) {
 		InputStream is = SpecialClassExtractor.class.getClassLoader().getResourceAsStream(listName);
 		if (is == null) {
 			LOGGER.error("Couldn't load list " + listName + " from resources. Returning empty list.");
-			return new HashSet<Resource>();
+			return new HashSet<Node>();
 		}
 		List<String> lines;
 		try {
 			lines = IOUtils.readLines(is);
 		} catch (IOException e) {
 			LOGGER.error("Couldn't load list from resources. Returning empty list.", e);
-			return new HashSet<Resource>();
+			return new HashSet<Node>();
 		}
-		Set<Resource> resourceList = new HashSet<Resource>((int) 2 * lines.size());
+		Set<Node> resourceList = new HashSet<Node>((int) 2 * lines.size());
 		for (String line : lines) {
-			resourceList.add(new ResourceImpl(line.trim()));
+			resourceList.add(ResourceFactory.createResource(line.trim()).asNode());
 		}
 		return resourceList;
 	}

@@ -37,9 +37,8 @@ public class RDF2ExtractionStreamer {
 	public void runExtraction(String rdfData, String baseUri, Lang language, Extractor... extractors) {
 		PipedRDFIterator<Triple> iter = new PipedRDFIterator<Triple>();
 		PipedRDFStream<Triple> rdfStream = new PipedTriplesStream(iter);
-		String2RDFStreamingTask parserTask = new String2RDFStreamingTask(rdfStream, new StringReader(rdfData), baseUri,
-				language);
-		executor.execute(parserTask);
+		runExtraction(iter, new String2RDFStreamingTask(rdfStream, new StringReader(rdfData), baseUri, language),
+				extractors);
 	}
 
 	public void runExtraction(InputStream is, String baseUri, Lang language, Extractor... extractors) {

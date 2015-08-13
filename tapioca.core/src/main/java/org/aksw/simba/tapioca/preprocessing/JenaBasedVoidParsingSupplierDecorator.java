@@ -103,31 +103,31 @@ public class JenaBasedVoidParsingSupplierDecorator extends AbstractDocumentSuppl
 				Node subject = triple.getSubject();
 				Node predicate = triple.getPredicate();
 				Node object = triple.getObject();
-				if (object.equals(VOID.dataset) && (predicate.equals(RDF.type))) {
+				if (object.equals(VOID.Dataset.asNode()) && (predicate.equals(RDF.type.asNode()))) {
 					String datasetUri = subject.getURI();
 					if (!datasetDescriptions.containsKey(datasetUri)) {
 						datasetDescriptions.put(datasetUri, new DatasetDescription(datasetUri));
 					}
-				} else if (predicate.equals(VOID.clazz)) {
+				} else if (predicate.equals(VOID.clazz.asNode())) {
 					classes.put(subject.getURI(), object.getURI());
-				} else if (predicate.equals(VOID.entities)) {
-					classCounts.put(subject.getURI(), Long.parseLong(object.toString()));
-				} else if (predicate.equals(EVOID.specialClass)) {
+				} else if (predicate.equals(VOID.entities.asNode()) && object.isLiteral()) {
+					classCounts.put(subject.getURI(), parseLong(object));
+				} else if (predicate.equals(EVOID.specialClass.asNode())) {
 					specialClasses.put(subject.getURI(), object.getURI());
-				} else if (predicate.equals(EVOID.entities)) {
-					specialClassesCounts.put(subject.getURI(), Long.parseLong(object.toString()));
-				} else if (predicate.equals(VOID.property)) {
+				} else if (predicate.equals(EVOID.entities.asNode()) && object.isLiteral()) {
+					specialClassesCounts.put(subject.getURI(), parseLong(object));
+				} else if (predicate.equals(VOID.property.asNode())) {
 					properties.put(subject.getURI(), object.getURI());
-				} else if (predicate.equals(VOID.triples)) {
+				} else if (predicate.equals(VOID.triples.asNode()) && object.isLiteral()) {
 					String sub = subject.getURI();
 					if (datasetDescriptions.containsKey(sub)) {
-						datasetDescriptions.get(sub).triples = Long.parseLong(object.toString());
+						datasetDescriptions.get(sub).triples = parseLong(object);
 					} else {
-						propertyCounts.put(sub, Long.parseLong(object.toString()));
+						propertyCounts.put(sub, parseLong(object));
 					}
-				} else if (predicate.equals(VOID.vocabulary)) {
+				} else if (predicate.equals(VOID.vocabulary.asNode())) {
 					vocabularies.add(object.toString());
-				} else if (predicate.equals(DCTerms.title)) {
+				} else if (predicate.equals(DCTerms.title.asNode())) {
 					String datasetUri = subject.getURI();
 					DatasetDescription description;
 					if (!datasetDescriptions.containsKey(datasetUri)) {
@@ -137,7 +137,7 @@ public class JenaBasedVoidParsingSupplierDecorator extends AbstractDocumentSuppl
 						description = datasetDescriptions.get(datasetUri);
 					}
 					description.title = object.toString();
-				} else if (predicate.equals(VOID.subset)) {
+				} else if (predicate.equals(VOID.subset.asNode())) {
 					String dataset1Uri = subject.getURI();
 					String dataset2Uri = object.getURI();
 					DatasetDescription description1, description2;
@@ -154,7 +154,7 @@ public class JenaBasedVoidParsingSupplierDecorator extends AbstractDocumentSuppl
 						description2 = datasetDescriptions.get(dataset2Uri);
 					}
 					description1.addSubset(description2);
-				} else if (predicate.equals(DCTerms.description)) {
+				} else if (predicate.equals(DCTerms.description.asNode())) {
 					String datasetUri = subject.getURI();
 					DatasetDescription description;
 					if (!datasetDescriptions.containsKey(datasetUri)) {
@@ -297,6 +297,18 @@ public class JenaBasedVoidParsingSupplierDecorator extends AbstractDocumentSuppl
 				LOGGER.warn("Couldn't find a URI for the dataset in document " + document.getDocumentId()
 						+ ". Document:(name=" + document.getProperty(DocumentName.class) + ")");
 			}
+		}
+
+		protected long parseLong(Node object) {
+			Object value = object.getLiteralValue();
+			if (value instanceof Integer) {
+				return (Integer) value;
+			} else if (value instanceof Long) {
+				return (Long) value;
+			} else {
+				LOGGER.error("Got an unknown literal type \"" + value.getClass().toString() + "\".");
+			}
+			return 0;
 		}
 	}
 }
