@@ -18,7 +18,7 @@ import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.rdf.model.RDFNode;
 
-public class SPARQLEndpointLabelExtractor {
+public class SPARQLEndpointLabelExtractor extends AbstractSPARQLClient {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SPARQLEndpointLabelExtractor.class);
 
@@ -32,43 +32,17 @@ public class SPARQLEndpointLabelExtractor {
 	private static final String LIST_TRIPLES_QUERY = "SELECT ?" + PREDICATE + " ?" + OBJECT + " "
 			+ FROM_CLAUSE_REPLACEMENT + " WHERE { <" + URI_REPLACEMENT + "> ?" + PREDICATE + " ?" + OBJECT + " }";
 
-	// private static final String OUTPUT_FOLDER = "sparql_endpoints_labels";
-	// private static final String LABELS_FILE_ENDING = ".labels.object";
-	// private static final int MAX_NUMBER_OF_WORKERS = 4;
-	//
-	// public static void main(String[] args) throws IOException {
-	// String data[][] = VoidExtractor.readEndpointsFile(new
-	// File(VoidExtractor.ENDPOINTS_FILE));
-	// String endpoints[] = data[0];
-	// String names[] = data[1];
-	// String graphs[] = data[2];
-	//
-	// Map<EndpointConfig, String> filteredEndpoints =
-	// VoidExtractor.filterEndpoints(endpoints, names, graphs);
-	//
-	// Overseer overseer = new BlockingOverseer(MAX_NUMBER_OF_WORKERS);
-	// Reporter reporter = new LogReporter(overseer);
-	// reporter = new RegularReporter(reporter, 600000);
-	//
-	// File voidFile, outputFile;
-	// String endpointName;
-	// for (EndpointConfig endpointCfg : filteredEndpoints.keySet()) {
-	// endpointName = filteredEndpoints.get(endpointCfg);
-	// voidFile = new File(VoidExtractor.OUTPUT_FOLDER + File.separator
-	// + endpointName);
-	// outputFile = new File(OUTPUT_FOLDER + File.separator
-	// + endpointName + LABELS_FILE_ENDING);
-	// if ((voidFile.exists()) && (!outputFile.exists())) {
-	// overseer.startTask(new LabelExtractionTask(endpointCfg, voidFile,
-	// outputFile));
-	// }
-	// }
-	// }
+	public SPARQLEndpointLabelExtractor() {
+	}
 
-	public static String[][] requestLabels(Set<String> uris, EndpointConfig endpointCfg) {
+	public SPARQLEndpointLabelExtractor(String cacheDirectory) {
+		super(cacheDirectory);
+	}
+
+	public String[][] requestLabels(Set<String> uris, EndpointConfig endpointCfg) {
 		QueryExecutionFactory qef = null;
 		try {
-			qef = SPARQLEndpointAnalyzer.initQueryExecution(endpointCfg);
+			qef = initQueryExecution(endpointCfg);
 		} catch (Exception e) {
 			LOGGER.error("Couldn't create QueryExecutionFactory. Returning null. Exception: {}",
 					e.getLocalizedMessage());
@@ -105,7 +79,7 @@ public class SPARQLEndpointLabelExtractor {
 		return LabelExtractionUtils.generateArray(labels);
 	}
 
-	private static Set<String> queryLabels(QueryExecutionFactory qef, String query) throws IOException {
+	private Set<String> queryLabels(QueryExecutionFactory qef, String query) throws IOException {
 		QueryExecution exec = qef.createQueryExecution(query);
 		ResultSet resultSet = null;
 		try {

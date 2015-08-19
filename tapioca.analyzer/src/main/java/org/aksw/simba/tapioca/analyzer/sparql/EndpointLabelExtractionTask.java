@@ -12,11 +12,17 @@ public class EndpointLabelExtractionTask implements Task {
 	private EndpointConfig endpointCfg;
 	private File voidFile;
 	private File outputFile;
+	private String cacheDirectory;
 
 	public EndpointLabelExtractionTask(EndpointConfig endpointCfg, File voidFile, File outputFile) {
+		this(endpointCfg, voidFile, outputFile, null);
+	}
+
+	public EndpointLabelExtractionTask(EndpointConfig endpointCfg, File voidFile, File outputFile, String cacheDirectory) {
 		this.endpointCfg = endpointCfg;
 		this.voidFile = voidFile;
 		this.outputFile = outputFile;
+		this.cacheDirectory = cacheDirectory;
 	}
 
 	@Override
@@ -27,7 +33,8 @@ public class EndpointLabelExtractionTask implements Task {
 			return;
 		}
 
-		String labels[][] = SPARQLEndpointLabelExtractor.requestLabels(uris, endpointCfg);
+		SPARQLEndpointLabelExtractor extractor = new SPARQLEndpointLabelExtractor(cacheDirectory);
+		String labels[][] = extractor.requestLabels(uris, endpointCfg);
 		if (labels != null) {
 			StorageHelper.storeToFileSavely(labels, outputFile.getAbsolutePath());
 			labels = null;

@@ -109,21 +109,24 @@ public class JenaBasedVoidParsingSupplierDecorator extends AbstractDocumentSuppl
 						datasetDescriptions.put(datasetUri, new DatasetDescription(datasetUri));
 					}
 				} else if (predicate.equals(VOID.clazz.asNode())) {
-					classes.put(subject.getURI(), object.getURI());
+					classes.put(subject.getBlankNodeLabel(), object.isBlank() ? object.getBlankNodeLabel() : object.getURI());
 				} else if (predicate.equals(VOID.entities.asNode()) && object.isLiteral()) {
-					classCounts.put(subject.getURI(), parseLong(object));
+					if (subject.isBlank()) {
+						classCounts.put(subject.getBlankNodeLabel(), parseLong(object));
+					}
 				} else if (predicate.equals(EVOID.specialClass.asNode())) {
-					specialClasses.put(subject.getURI(), object.getURI());
+					specialClasses.put(subject.getBlankNodeLabel(), object.isBlank() ? object.getBlankNodeLabel() : object.getURI());
 				} else if (predicate.equals(EVOID.entities.asNode()) && object.isLiteral()) {
-					specialClassesCounts.put(subject.getURI(), parseLong(object));
+					specialClassesCounts.put(subject.getBlankNodeLabel(), parseLong(object));
 				} else if (predicate.equals(VOID.property.asNode())) {
-					properties.put(subject.getURI(), object.getURI());
+					properties.put(subject.getBlankNodeLabel(), object.isBlank() ? object.getBlankNodeLabel() : object.getURI());
 				} else if (predicate.equals(VOID.triples.asNode()) && object.isLiteral()) {
-					String sub = subject.getURI();
-					if (datasetDescriptions.containsKey(sub)) {
-						datasetDescriptions.get(sub).triples = parseLong(object);
+					if (subject.isURI()) {
+						if (datasetDescriptions.containsKey(subject.getURI())) {
+							datasetDescriptions.get(subject.getURI()).triples = parseLong(object);
+						}
 					} else {
-						propertyCounts.put(sub, parseLong(object));
+						propertyCounts.put(subject.getBlankNodeLabel(), parseLong(object));
 					}
 				} else if (predicate.equals(VOID.vocabulary.asNode())) {
 					vocabularies.add(object.toString());

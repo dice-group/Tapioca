@@ -18,21 +18,27 @@ public class EndpointAnalyzingTask implements Task {
 	private EndpointConfig endpointCfg;
 	private String endpointName;
 	private File outputFile;
+	private String cacheDirectory;
 
 	public EndpointAnalyzingTask(String endpoint, File outputFile) {
-		this(new EndpointConfig(endpoint), endpoint, outputFile);
+		this(new EndpointConfig(endpoint), endpoint, null, outputFile);
 	}
 
 	public EndpointAnalyzingTask(EndpointConfig endpointCfg, String endpointName, File outputFile) {
+		this(endpointCfg, endpointName, null, outputFile);
+	}
+
+	public EndpointAnalyzingTask(EndpointConfig endpointCfg, String endpointName, String cacheDirectory, File outputFile) {
 		this.endpointCfg = endpointCfg;
 		this.endpointName = endpointName;
 		this.outputFile = outputFile;
+		this.cacheDirectory = cacheDirectory;
 	}
 
 	@Override
 	public void run() {
 		LOGGER.info("Starting extraction from \"" + endpointName + "\"...");
-		SPARQLEndpointAnalyzer analyzer = new SPARQLEndpointAnalyzer();
+		SPARQLEndpointAnalyzer analyzer = new SPARQLEndpointAnalyzer(cacheDirectory);
 		try {
 			if (outputFile.exists()) {
 				LOGGER.info("There already is a file for \"" + endpointName + "\". Jumping over this endpoint.");

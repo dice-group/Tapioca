@@ -3,7 +3,6 @@ package org.aksw.simba.tapioca.analyzer.sparql;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,15 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.aksw.commons.util.StreamUtils;
-import org.aksw.jena_sparql_api.cache.core.QueryExecutionFactoryCacheEx;
-import org.aksw.jena_sparql_api.cache.extra.CacheBackend;
-import org.aksw.jena_sparql_api.cache.extra.CacheFrontend;
-import org.aksw.jena_sparql_api.cache.extra.CacheFrontendImpl;
-import org.aksw.jena_sparql_api.cache.h2.CacheCoreH2;
 import org.aksw.jena_sparql_api.core.QueryExecutionFactory;
-import org.aksw.jena_sparql_api.delay.core.QueryExecutionFactoryDelay;
-import org.aksw.jena_sparql_api.http.QueryExecutionFactoryHttp;
-import org.aksw.jena_sparql_api.pagination.core.QueryExecutionFactoryPaginated;
 import org.aksw.simba.tapioca.data.vocabularies.VOID;
 import org.aksw.simba.tapioca.extraction.voidex.VoidExtractor;
 import org.apache.commons.io.FileUtils;
@@ -37,13 +28,12 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
 import com.hp.hpl.jena.vocabulary.RDF;
 
-public class SPARQLEndpointAnalyzer {
+public class SPARQLEndpointAnalyzer extends AbstractSPARQLClient {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SPARQLEndpointAnalyzer.class);
 
 	private static final String VOCABULARY_BLACKLIST_FILE = "vocabulary_blacklist.txt";
 	private static final String SPECIAL_CLASSES_LIST_FILE = "special_classes.txt";
-	private static final long CACHE_TIME_TO_LIVE = 31l * 24l * 60l * 60l * 1000l; // 1month
 
 	/**
 	 * Result name of list result.
@@ -102,51 +92,11 @@ public class SPARQLEndpointAnalyzer {
 	private static final String REQUEST_ENTITIES_QUERY = "SELECT ?" + LIST_NAME + " " + FROM_CLAUSE_REPLACEMENT
 			+ " WHERE { ?" + LIST_NAME + " <" + RDF.type.getURI() + "> <" + URI_REPLACEMENT + "> }";
 
-	/**
-	 * The delay that the system will have between sending two queries.
-	 */
-	private static final int DELAY = 1000;
-
-	protected static String[][] readEndpointsFile(File file) throws IOException {
-		List<String> lines = FileUtils.readLines(file);
-		List<String> endpoints = new ArrayList<String>(lines.size());
-		List<String> endpointNames = new ArrayList<String>(lines.size());
-		List<String> graphs = new ArrayList<String>(lines.size());
-		String parts[];
-		for (String line : lines) {
-			if (!line.isEmpty()) {
-				parts = line.split("\t");
-				if (parts.length >= 2) {
-					endpointNames.add(parts[0]);
-					endpoints.add(parts[1]);
-					graphs.add((parts.length >= 3) ? parts[2] : null);
-				}
-			}
-		}
-		return new String[][] { endpoints.toArray(new String[endpoints.size()]),
-				endpointNames.toArray(new String[endpointNames.size()]), graphs.toArray(new String[graphs.size()]) };
-	}
-
-	protected static Map<EndpointConfig, String> filterEndpoints(String[] endpoints, String[] names, String[] graphs) {
-		Map<EndpointConfig, String> endpointNameMapping = new HashMap<EndpointConfig, String>();
-		String name;
-		EndpointConfig endpointCfg;
-		for (int i = 0; i < endpoints.length; ++i) {
-			endpointCfg = new EndpointConfig(endpoints[i], graphs[i]);
-			if (endpointNameMapping.containsKey(endpointCfg)) {
-				name = endpointNameMapping.get(endpointCfg) + ',' + names[i];
-			} else {
-				name = names[i];
-			}
-			// filter kupkb as it created errors in the past
-			if (!name.equals("kupkb")) {
-				endpointNameMapping.put(endpointCfg, name);
-			}
-		}
-		return endpointNameMapping;
-	}
-
 	public SPARQLEndpointAnalyzer() {
+	}
+
+	public SPARQLEndpointAnalyzer(String cacheDirectory) {
+		super(cacheDirectory);
 	}
 
 	public Model extractVoidInfo(EndpointConfig endpointCfg) {
@@ -279,32 +229,6 @@ public class SPARQLEndpointAnalyzer {
 		return voidModel;
 	}
 
-	protected static QueryExecutionFactory initQueryExecution(EndpointConfig endpointCfg)
-			throws ClassNotFoundException, SQLException {
-		QueryExecutionFactory qef;
-		if (endpointCfg.graph != null) {
-			qef = new QueryExecutionFactoryHttp(endpointCfg.uri, endpointCfg.graph);
-		} else {
-			qef = new QueryExecutionFactoryHttp(endpointCfg.uri);
-		}
-
-		qef = new QueryExecutionFactoryDelay(qef, DELAY);
-
-		CacheBackend cacheBackend = CacheCoreH2.create(endpointCfg.uri.replaceAll("[:/]", "_"), CACHE_TIME_TO_LIVE,
-				true);
-		CacheFrontend cacheFrontend = new CacheFrontendImpl(cacheBackend);
-		qef = new QueryExecutionFactoryCacheEx(qef, cacheFrontend);
-
-		// qef = new QueryExecutionFactoryPaginated(qef, 100);
-		try {
-			return new QueryExecutionFactoryPaginated(qef, 100);
-		} catch (Exception e) {
-			LOGGER.warn("Couldn't create Factory with pagination. Returning Factory without pagination. Exception: {}",
-					e.getLocalizedMessage());
-			return qef;
-		}
-	}
-
 	/**
 	 * This method queries a list of resources using the given query and the
 	 * given query execution factory. The result is returned as Resource array
@@ -429,6 +353,47 @@ public class SPARQLEndpointAnalyzer {
 			}
 		}
 		return list;
+	}
+
+	@Deprecated
+	protected static String[][] readEndpointsFile(File file) throws IOException {
+		List<String> lines = FileUtils.readLines(file);
+		List<String> endpoints = new ArrayList<String>(lines.size());
+		List<String> endpointNames = new ArrayList<String>(lines.size());
+		List<String> graphs = new ArrayList<String>(lines.size());
+		String parts[];
+		for (String line : lines) {
+			if (!line.isEmpty()) {
+				parts = line.split("\t");
+				if (parts.length >= 2) {
+					endpointNames.add(parts[0]);
+					endpoints.add(parts[1]);
+					graphs.add((parts.length >= 3) ? parts[2] : null);
+				}
+			}
+		}
+		return new String[][] { endpoints.toArray(new String[endpoints.size()]),
+				endpointNames.toArray(new String[endpointNames.size()]), graphs.toArray(new String[graphs.size()]) };
+	}
+
+	@Deprecated
+	protected static Map<EndpointConfig, String> filterEndpoints(String[] endpoints, String[] names, String[] graphs) {
+		Map<EndpointConfig, String> endpointNameMapping = new HashMap<EndpointConfig, String>();
+		String name;
+		EndpointConfig endpointCfg;
+		for (int i = 0; i < endpoints.length; ++i) {
+			endpointCfg = new EndpointConfig(endpoints[i], graphs[i]);
+			if (endpointNameMapping.containsKey(endpointCfg)) {
+				name = endpointNameMapping.get(endpointCfg) + ',' + names[i];
+			} else {
+				name = names[i];
+			}
+			// filter kupkb as it created errors in the past
+			if (!name.equals("kupkb")) {
+				endpointNameMapping.put(endpointCfg, name);
+			}
+		}
+		return endpointNameMapping;
 	}
 
 }
