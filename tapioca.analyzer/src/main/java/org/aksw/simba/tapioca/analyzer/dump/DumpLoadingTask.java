@@ -56,7 +56,7 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 					try {
 						loadDump(dumps[i], dumpFile, client);
 					} catch (Exception e) {
-						throw new RuntimeException("Exception while trying to download dump from \"" + dumps[i] + "\".");
+						throw new RuntimeException("Exception while trying to download dump from \"" + dumps[i] + "\".", e);
 					}
 				} else {
 					LOGGER.info(dumpFile.getAbsolutePath() + " is already existing. It won't be downloaded.");
