@@ -19,19 +19,16 @@ public class DumpAnalyzingTask implements Task {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DumpAnalyzingTask.class);
 
 	protected String datasetURI;
-	protected String datasetName;
 	protected File outputFolder;
 	protected String dumps[];
 	protected DumpFileAnalyzer analyzer;
 
-	public DumpAnalyzingTask(String datasetURI, String datasetName, File outputFolder, String dumps[]) {
-		this(datasetURI, datasetName, outputFolder, dumps, null);
+	public DumpAnalyzingTask(String datasetURI, File outputFolder, String dumps[]) {
+		this(datasetURI, outputFolder, dumps, null);
 	}
 
-	public DumpAnalyzingTask(String datasetURI, String datasetName, File outputFolder, String dumps[],
-			ExecutorService executor) {
+	public DumpAnalyzingTask(String datasetURI, File outputFolder, String dumps[], ExecutorService executor) {
 		this.datasetURI = datasetURI;
-		this.datasetName = datasetName;
 		this.outputFolder = outputFolder;
 		this.dumps = dumps;
 		if (executor != null) {
@@ -48,7 +45,7 @@ public class DumpAnalyzingTask implements Task {
 
 	@Override
 	public String getId() {
-		return "Analyzing(" + datasetName + ' ' + Arrays.toString(dumps) + ")";
+		return "Analyzing(" + datasetURI + ' ' + Arrays.toString(dumps) + ")";
 	}
 
 	@Override
@@ -59,7 +56,7 @@ public class DumpAnalyzingTask implements Task {
 	private void writeModel(Model voidModel) {
 		FileOutputStream fout = null;
 		try {
-			fout = new FileOutputStream(outputFolder + File.separator + datasetName + ".ttl");
+			fout = new FileOutputStream(outputFolder + File.separator + "void.ttl");
 			RDFDataMgr.write(fout, voidModel, Lang.TTL);
 		} catch (Exception e) {
 			LOGGER.error("", e);

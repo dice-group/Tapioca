@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -12,6 +13,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +23,20 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DumpLoadingTask.class);
 
+	private static final String DOWNLOAD_FOLDER = "temp";
+
 	protected File downloadFolder;
 	protected boolean loadingFinished = false;
-	protected HttpClient client;
+
+	public DumpLoadingTask(String datasetURI, File outputFolder, String[] dumps) {
+		this(datasetURI, outputFolder, dumps, null);
+	}
+
+	public DumpLoadingTask(String datasetURI, File outputFolder, String[] dumps, ExecutorService executor) {
+		super(datasetURI, outputFolder, dumps, executor);
+		downloadFolder = new File(outputFolder.getAbsolutePath() + File.separator + DOWNLOAD_FOLDER);
+
+	}
 
 	@Override
 	public void run() {
@@ -33,23 +47,28 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 	}
 
 	protected void loadDumps() {
-		File dumpFile;
-		for (int i = 0; i < dumps.length; ++i) {
-			dumpFile = new File(downloadFolder.getAbsolutePath() + File.separator + extractFileName(dumps[i]));
-			if (!dumpFile.exists()) {
-				try {
-					loadDump(dumps[i], dumpFile);
-				} catch (Exception e) {
-					throw new RuntimeException("Exception while trying to download dump from \"" + dumps[i] + "\".");
+		HttpClient client = new DefaultHttpClient();
+		try {
+			File dumpFile;
+			for (int i = 0; i < dumps.length; ++i) {
+				dumpFile = new File(downloadFolder.getAbsolutePath() + File.separator + extractFileName(dumps[i]));
+				if (!dumpFile.exists()) {
+					try {
+						loadDump(dumps[i], dumpFile, client);
+					} catch (Exception e) {
+						throw new RuntimeException("Exception while trying to download dump from \"" + dumps[i] + "\".");
+					}
+				} else {
+					LOGGER.info(dumpFile.getAbsolutePath() + " is already existing. It won't be downloaded.");
 				}
-			} else {
-				LOGGER.info(dumpFile.getAbsolutePath() + " is already existing. It won't be downloaded.");
+				dumps[i] = dumpFile.getAbsolutePath();
 			}
-			dumps[i] = dumpFile.getAbsolutePath();
+		} finally {
+			HttpClientUtils.closeQuietly(client);
 		}
 	}
 
-	protected void loadDump(String uri, File dumpFile) throws ClientProtocolException, IOException {
+	protected void loadDump(String uri, File dumpFile, HttpClient client) throws ClientProtocolException, IOException {
 		HttpGet hget = new HttpGet(uri);
 		HttpResponse hres = client.execute(hget);
 
@@ -73,7 +92,7 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 
 	@Override
 	public String getId() {
-		return "Loading/Analyzing(" + datasetName + ' ' + Arrays.toString(dumps) + ")";
+		return "Loading/Analyzing(" + datasetURI + ' ' + Arrays.toString(dumps) + ")";
 	}
 
 	@Override
