@@ -35,7 +35,6 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 	public DumpLoadingTask(String datasetURI, File outputFolder, String[] dumps, ExecutorService executor) {
 		super(datasetURI, outputFolder, dumps, executor);
 		downloadFolder = new File(outputFolder.getAbsolutePath() + File.separator + DOWNLOAD_FOLDER);
-
 	}
 
 	@Override
@@ -48,15 +47,20 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 
 	protected void loadDumps() {
 		HttpClient client = new DefaultHttpClient();
+		if (!downloadFolder.exists()) {
+			downloadFolder.mkdirs();
+		}
 		try {
 			File dumpFile;
 			for (int i = 0; i < dumps.length; ++i) {
 				dumpFile = new File(downloadFolder.getAbsolutePath() + File.separator + extractFileName(dumps[i]));
 				if (!dumpFile.exists()) {
+					LOGGER.info("Start loading dump \"" + dumps[i] + "\".");
 					try {
 						loadDump(dumps[i], dumpFile, client);
 					} catch (Exception e) {
-						throw new RuntimeException("Exception while trying to download dump from \"" + dumps[i] + "\".", e);
+						throw new RuntimeException(
+								"Exception while trying to download dump from \"" + dumps[i] + "\".", e);
 					}
 				} else {
 					LOGGER.info(dumpFile.getAbsolutePath() + " is already existing. It won't be downloaded.");
@@ -106,11 +110,23 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 
 	protected static String extractFileName(String uri) {
 		String splits[] = uri.split("[/#]");
-		for (int i = splits.length - 1; i >= 0; --i) {
+		String uriEnding = null;
+		for (int i = splits.length - 1; (i >= 0) & (uriEnding == null); --i) {
 			if (splits[i].length() > 0) {
-				return splits[i];
+				uriEnding = splits[i];
 			}
 		}
-		return "TEMP";
+		if (uriEnding == null) {
+			LOGGER.warn("Couldn't extract file name from \"" + uri + "\".");
+			return "TEMP";
+		}
+		if(uriEnding.contains("?")) {
+			if(uri.startsWith("?")) {
+				return extractFileName(uri.substring(0, uri.length() - uriEnding.length()));
+			} else {
+				uriEnding = uriEnding.split("\\?")[0];
+			}
+		}
+		return uriEnding;
 	}
 }

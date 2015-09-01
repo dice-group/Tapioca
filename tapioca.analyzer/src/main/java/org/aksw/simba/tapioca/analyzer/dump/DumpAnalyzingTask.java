@@ -20,6 +20,8 @@ public class DumpAnalyzingTask implements Task {
 
 	protected String datasetURI;
 	protected File outputFolder;
+	// FIXME instead of strings we should use a simple strucutre that is able to
+	// handle the media-type, charset and additional features
 	protected String dumps[];
 	protected DumpFileAnalyzer analyzer;
 
