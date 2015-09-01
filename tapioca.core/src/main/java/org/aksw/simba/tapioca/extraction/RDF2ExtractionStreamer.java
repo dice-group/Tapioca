@@ -9,6 +9,8 @@ import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.lang.PipedRDFIterator;
 import org.apache.jena.riot.lang.PipedRDFStream;
 import org.apache.jena.riot.lang.PipedTriplesStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hp.hpl.jena.graph.Triple;
 
@@ -24,41 +26,54 @@ import com.hp.hpl.jena.graph.Triple;
  */
 public class RDF2ExtractionStreamer {
 
-	private ExecutorService executor;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RDF2ExtractionStreamer.class);
 
-	public RDF2ExtractionStreamer() {
-		this.executor = Executors.newSingleThreadExecutor();
-	}
+    private ExecutorService executor;
 
-	public RDF2ExtractionStreamer(ExecutorService executor) {
-		this.executor = executor;
-	}
+    public RDF2ExtractionStreamer() {
+        this.executor = Executors.newSingleThreadExecutor();
+    }
 
-	public void runExtraction(String rdfData, String baseUri, Lang language, Extractor... extractors) {
-		PipedRDFIterator<Triple> iter = new PipedRDFIterator<Triple>();
-		PipedRDFStream<Triple> rdfStream = new PipedTriplesStream(iter);
-		runExtraction(iter, new String2RDFStreamingTask(rdfStream, new StringReader(rdfData), baseUri, language),
-				extractors);
-	}
+    public RDF2ExtractionStreamer(ExecutorService executor) {
+        this.executor = executor;
+    }
 
-	public void runExtraction(InputStream is, String baseUri, Lang language, Extractor... extractors) {
-		PipedRDFIterator<Triple> iter = new PipedRDFIterator<Triple>();
-		PipedRDFStream<Triple> rdfStream = new PipedTriplesStream(iter);
-		runExtraction(iter, new InputStream2RDFStreamingTask(rdfStream, is, baseUri, language), extractors);
-	}
+    public void runExtraction(String rdfData, String baseUri, Lang language, Extractor... extractors) {
+        PipedRDFIterator<Triple> iter = new PipedRDFIterator<Triple>();
+        PipedRDFStream<Triple> rdfStream = new PipedTriplesStream(iter);
+        BlockingStreamRDFDecorator streamDecorator = new BlockingStreamRDFDecorator(rdfStream);
+        runExtraction(iter, streamDecorator,
+                new String2RDFStreamingTask(streamDecorator, new StringReader(rdfData), baseUri, language), extractors);
+    }
 
-	protected void runExtraction(PipedRDFIterator<Triple> iter, Runnable task, Extractor extractors[]) {
-		executor.execute(task);
-		runExtraction(iter, extractors);
-	}
+    public void runExtraction(InputStream is, String baseUri, Lang language, Extractor... extractors) {
+        PipedRDFIterator<Triple> iter = new PipedRDFIterator<Triple>();
+        PipedRDFStream<Triple> rdfStream = new PipedTriplesStream(iter);
+        BlockingStreamRDFDecorator streamDecorator = new BlockingStreamRDFDecorator(rdfStream);
+        runExtraction(iter, streamDecorator, new InputStream2RDFStreamingTask(streamDecorator, is, baseUri, language),
+                extractors);
+    }
 
-	protected void runExtraction(PipedRDFIterator<Triple> iter, Extractor extractors[]) {
-		Triple triple;
-		while (iter.hasNext()) {
-			triple = iter.next();
-			for (int i = 0; i < extractors.length; ++i) {
-				extractors[i].handleTriple(triple);
-			}
-		}
-	}
+    protected void runExtraction(PipedRDFIterator<Triple> iter, BlockingStreamRDFDecorator streamDecorator,
+            Runnable task, Extractor extractors[]) {
+        executor.execute(task);
+        // Wait for the producer to start
+        try {
+            streamDecorator.waitToStart();
+        } catch (InterruptedException e) {
+            LOGGER.error("Interrupted while waiting for the producer. Throwing illegal state exception.", e);
+            throw new IllegalStateException("Interrupted while waiting for the producer.", e);
+        }
+        runExtraction(iter, extractors);
+    }
+
+    protected void runExtraction(PipedRDFIterator<Triple> iter, Extractor extractors[]) {
+        Triple triple;
+        while (iter.hasNext()) {
+            triple = iter.next();
+            for (int i = 0; i < extractors.length; ++i) {
+                extractors[i].handleTriple(triple);
+            }
+        }
+    }
 }
