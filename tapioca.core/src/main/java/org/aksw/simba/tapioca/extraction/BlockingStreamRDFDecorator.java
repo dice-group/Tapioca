@@ -98,7 +98,7 @@ public class BlockingStreamRDFDecorator implements StreamRDFDecorator {
                 flagLock.unlock();
             }
         }
-        System.out.println("Finished waiting...");
+        
     }
 
 }

@@ -3,8 +3,13 @@ package org.aksw.simba.tapioca.extraction;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
+import org.aksw.simba.topicmodeling.concurrent.overseers.Overseer;
+import org.aksw.simba.topicmodeling.concurrent.overseers.pool.ExecutorBasedOverseer;
+import org.aksw.simba.topicmodeling.concurrent.overseers.simple.SimpleOverseer;
+import org.aksw.simba.topicmodeling.concurrent.tasks.Task;
+import org.aksw.simba.topicmodeling.concurrent.tasks.TaskObserver;
+import org.apache.http.annotation.NotThreadSafe;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.lang.PipedRDFIterator;
 import org.apache.jena.riot.lang.PipedRDFStream;
@@ -24,47 +29,57 @@ import com.hp.hpl.jena.graph.Triple;
  * @author Michael R&ouml;der (roeder@informatik.uni-leipzig.de)
  *
  */
-public class RDF2ExtractionStreamer {
+@NotThreadSafe
+public class RDF2ExtractionStreamer implements TaskObserver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RDF2ExtractionStreamer.class);
 
-    private ExecutorService executor;
+    // private ExecutorService executor;
+    private Overseer overseer;
+    private Thread streamerThread;
 
     public RDF2ExtractionStreamer() {
-        this.executor = Executors.newSingleThreadExecutor();
+        // this.executor = Executors.newSingleThreadExecutor();
+        overseer = new SimpleOverseer();
+        overseer.addObserver(this);
     }
 
     public RDF2ExtractionStreamer(ExecutorService executor) {
-        this.executor = executor;
+        // this.executor = executor;
+        overseer = new ExecutorBasedOverseer(executor);
+        overseer.addObserver(this);
     }
 
-    public void runExtraction(String rdfData, String baseUri, Lang language, Extractor... extractors) {
+    public boolean runExtraction(String rdfData, String baseUri, Lang language, Extractor... extractors) {
         PipedRDFIterator<Triple> iter = new PipedRDFIterator<Triple>();
         PipedRDFStream<Triple> rdfStream = new PipedTriplesStream(iter);
         BlockingStreamRDFDecorator streamDecorator = new BlockingStreamRDFDecorator(rdfStream);
-        runExtraction(iter, streamDecorator,
+        return runExtraction(iter, streamDecorator,
                 new String2RDFStreamingTask(streamDecorator, new StringReader(rdfData), baseUri, language), extractors);
     }
 
-    public void runExtraction(InputStream is, String baseUri, Lang language, Extractor... extractors) {
+    public boolean runExtraction(InputStream is, String baseUri, Lang language, Extractor... extractors) {
         PipedRDFIterator<Triple> iter = new PipedRDFIterator<Triple>();
         PipedRDFStream<Triple> rdfStream = new PipedTriplesStream(iter);
         BlockingStreamRDFDecorator streamDecorator = new BlockingStreamRDFDecorator(rdfStream);
-        runExtraction(iter, streamDecorator, new InputStream2RDFStreamingTask(streamDecorator, is, baseUri, language),
-                extractors);
+        return runExtraction(iter, streamDecorator,
+                new InputStream2RDFStreamingTask(streamDecorator, is, baseUri, language), extractors);
     }
 
-    protected void runExtraction(PipedRDFIterator<Triple> iter, BlockingStreamRDFDecorator streamDecorator,
-            Runnable task, Extractor extractors[]) {
-        executor.execute(task);
+    protected boolean runExtraction(PipedRDFIterator<Triple> iter, BlockingStreamRDFDecorator streamDecorator,
+            Task task, Extractor extractors[]) {
+        // executor.execute(task);
+        streamerThread = Thread.currentThread();
+        overseer.startTask(task);
         // Wait for the producer to start
         try {
             streamDecorator.waitToStart();
         } catch (InterruptedException e) {
-            LOGGER.error("Interrupted while waiting for the producer. Throwing illegal state exception.", e);
-            throw new IllegalStateException("Interrupted while waiting for the producer.", e);
+            LOGGER.error("Interrupted while waiting for the producer. Aborting.", e);
+            return false;
         }
         runExtraction(iter, extractors);
+        return true;
     }
 
     protected void runExtraction(PipedRDFIterator<Triple> iter, Extractor extractors[]) {
@@ -75,5 +90,16 @@ public class RDF2ExtractionStreamer {
                 extractors[i].handleTriple(triple);
             }
         }
+    }
+
+    @Override
+    public void reportTaskFinished(Task task) {
+        // nothing to do
+    }
+
+    @Override
+    public void reportTaskThrowedException(Task task, Throwable t) {
+        LOGGER.error("Streaming task throwed an exception. I will try to interrupt the stream reading thread.");
+        streamerThread.interrupt();
     }
 }
