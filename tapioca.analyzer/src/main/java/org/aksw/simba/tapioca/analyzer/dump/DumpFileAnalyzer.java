@@ -6,8 +6,11 @@ import org.aksw.simba.tapioca.data.vocabularies.EVOID;
 import org.aksw.simba.tapioca.data.vocabularies.VOID;
 import org.aksw.simba.tapioca.extraction.voidex.SpecialClassExtractor;
 import org.aksw.simba.tapioca.extraction.voidex.VoidExtractor;
+import org.aksw.simba.tapioca.extraction.voidex.VoidInformation;
+import org.aksw.simba.tapioca.extraction.voidex.VoidParsingExtractor;
 
 import com.carrotsearch.hppc.ObjectIntOpenHashMap;
+import com.carrotsearch.hppc.ObjectObjectOpenHashMap;
 import com.hp.hpl.jena.rdf.model.Model;
 import com.hp.hpl.jena.rdf.model.ModelFactory;
 import com.hp.hpl.jena.rdf.model.Property;
@@ -27,9 +30,11 @@ public class DumpFileAnalyzer extends AbstractDumpExtractorApplier {
     public Model extractVoidInfo(String datsetUri, String... dumps) {
         VoidExtractor extractor = new VoidExtractor();
         SpecialClassExtractor sExtractor = new SpecialClassExtractor();
+        VoidParsingExtractor vpExtractor = new VoidParsingExtractor();
         for (int i = 0; i < dumps.length; ++i) {
-            extractFromDump(dumps[i], extractor, sExtractor);
+            extractFromDump(dumps[i], extractor, sExtractor, vpExtractor);
         }
+        addParsedVoidToCounts(extractor, vpExtractor);
         return generateVoidModel(datsetUri, extractor, sExtractor);
     }
 
@@ -71,5 +76,16 @@ public class DumpFileAnalyzer extends AbstractDumpExtractorApplier {
             }
         }
         return sum;
+    }
+
+    protected void addParsedVoidToCounts(VoidExtractor extractor, VoidParsingExtractor vpExtractor) {
+        ObjectObjectOpenHashMap<String, VoidInformation> voidInfo = vpExtractor.getVoidInformation();
+        ObjectIntOpenHashMap<String> countedClasses = extractor.getCountedClasses();
+        ObjectIntOpenHashMap<String> countedProperties = extractor.getCountedProperties();
+        for (int i = 0; i < voidInfo.allocated.length; ++i) {
+            if (voidInfo.allocated[i]) {
+                ((VoidInformation) (((Object[]) voidInfo.values)[i])).addToCount(countedClasses, countedProperties);
+            }
+        }
     }
 }
