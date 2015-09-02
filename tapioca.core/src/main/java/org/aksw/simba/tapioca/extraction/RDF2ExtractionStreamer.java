@@ -99,7 +99,7 @@ public class RDF2ExtractionStreamer implements TaskObserver {
 
     @Override
     public void reportTaskThrowedException(Task task, Throwable t) {
-        LOGGER.error("Streaming task throwed an exception. I will try to interrupt the stream reading thread.");
+        LOGGER.error("Streaming task throwed an exception. I will try to interrupt the stream reading thread.", t);
         streamerThread.interrupt();
     }
 }

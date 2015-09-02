@@ -21,7 +21,7 @@ public abstract class AbstractSPARQLClient {
 	/**
 	 * The delay that the system will have between sending two queries.
 	 */
-	private static final int DELAY = 1000;
+	private static final int DELAY = 5000;
 
 	/**
 	 * The lifetime of the cache.

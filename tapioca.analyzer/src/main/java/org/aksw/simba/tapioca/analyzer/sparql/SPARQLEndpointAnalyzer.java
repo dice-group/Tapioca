@@ -120,8 +120,21 @@ public class SPARQLEndpointAnalyzer extends AbstractSPARQLClient {
 		LOGGER.info("Requesting classes from " + endpointCfg + " ...");
 		Resource resources[] = queryList(qef, CLASS_LIST_QUERY.replace(FROM_CLAUSE_REPLACEMENT, fromClause));
 		if (resources == null) {
-			LOGGER.error("Couldn't get class list. Returning null.");
-			return null;
+			if (fromClause.isEmpty()) {
+				LOGGER.error("Couldn't get class list. Returning null.");
+				return null;
+			} else {
+				LOGGER.warn("Got no result. Retrying it without FROM clause...");
+				resources = queryList(qef, CLASS_LIST_QUERY.replace(FROM_CLAUSE_REPLACEMENT, ""));
+				if (resources == null) {
+					LOGGER.error("Couldn't get class list. Returning null.");
+					return null;
+				} else {
+					// there is a problem with the from clause. use an empty
+					// one.
+					fromClause = "";
+				}
+			}
 		}
 		LOGGER.info("Requesting class counts from " + endpointCfg + " ...");
 		long counts[] = null;
@@ -244,7 +257,7 @@ public class SPARQLEndpointAnalyzer extends AbstractSPARQLClient {
 		try {
 			resultSet = exec.execSelect();
 		} catch (Exception e) {
-			LOGGER.error("Couldn't query list. Returning null.", e);
+			LOGGER.error("Couldn't query list. Returning null for query \"" + query + "\".", e);
 			return null;
 		}
 		List<Resource> results = new ArrayList<Resource>();
