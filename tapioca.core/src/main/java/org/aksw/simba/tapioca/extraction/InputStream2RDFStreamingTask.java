@@ -22,6 +22,7 @@ public class InputStream2RDFStreamingTask implements Task {
         this.rdfStream = rdfStream;
         this.is = is;
         this.baseUri = baseUri;
+        this.language = language;
     }
 
     @Override
