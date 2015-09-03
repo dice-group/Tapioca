@@ -40,26 +40,32 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 		<!-- Jena SPARQL API -->
-        <dependency>
-            <groupId>org.aksw.jena-sparql-api</groupId>
-            <artifactId>jena-sparql-api-core</artifactId>
-            <version>${org.aksw.jena-sparql-api.version}</version>
-        </dependency>
+		<dependency>
+			<groupId>org.aksw.jena-sparql-api</groupId>
+			<artifactId>jena-sparql-api-core</artifactId>
+			<version>${org.aksw.jena-sparql-api.version}</version>
+		</dependency>
 		<!-- Jena SPARQL API -->
-        <dependency>
-            <groupId>org.aksw.jena-sparql-api</groupId>
-            <artifactId>jena-sparql-api-cache-h2</artifactId>
-            <version>${org.aksw.jena-sparql-api.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.aksw.simba</groupId>
-            <artifactId>topicmodeling.concurrent</artifactId>
-            <version>${org.aksw.simba.topicmodeling.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.aksw.simba</groupId>
-            <artifactId>topicmodeling.io</artifactId>
-            <version>${org.aksw.simba.topicmodeling.version}</version>
-        </dependency>
+		<dependency>
+			<groupId>org.aksw.jena-sparql-api</groupId>
+			<artifactId>jena-sparql-api-cache-h2</artifactId>
+			<version>${org.aksw.jena-sparql-api.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aksw.simba</groupId>
+			<artifactId>topicmodeling.concurrent</artifactId>
+			<version>${org.aksw.simba.topicmodeling.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aksw.simba</groupId>
+			<artifactId>topicmodeling.io</artifactId>
+			<version>${org.aksw.simba.topicmodeling.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.10</version>
+		</dependency>
+
 	</dependencies>
 </project>
