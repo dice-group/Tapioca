@@ -5,9 +5,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.zip.GZIPInputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -16,6 +19,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +29,12 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 	private static final Logger LOGGER = LoggerFactory.getLogger(DumpLoadingTask.class);
 
 	private static final String DOWNLOAD_FOLDER = "temp";
+	private static final boolean ADD_FILE_ENDING_IF_MISSING = true;
+	private static final String XML_CONTENT_TYPE = "application/xml";
 
 	protected File downloadFolder;
 	protected boolean loadingFinished = false;
+	protected boolean addFileEndingIfMissing = ADD_FILE_ENDING_IF_MISSING;
 
 	public DumpLoadingTask(String datasetURI, File outputFolder, String[] dumps) {
 		this(datasetURI, outputFolder, dumps, null);
@@ -57,7 +65,7 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 				if (!dumpFile.exists()) {
 					LOGGER.info("Start loading dump \"" + dumps[i] + "\".");
 					try {
-						loadDump(dumps[i], dumpFile, client);
+						dumpFile = loadDump(dumps[i], dumpFile, client);
 					} catch (Exception e) {
 						throw new RuntimeException(
 								"Exception while trying to download dump from \"" + dumps[i] + "\".", e);
@@ -72,7 +80,7 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 		}
 	}
 
-	protected void loadDump(String uri, File dumpFile, HttpClient client) throws ClientProtocolException, IOException {
+	protected File loadDump(String uri, File dumpFile, HttpClient client) throws ClientProtocolException, IOException {
 		HttpGet hget = new HttpGet(uri);
 		HttpResponse hres = client.execute(hget);
 
@@ -80,6 +88,9 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 			throw new RuntimeException("Wrong HTTP status: " + hres.getStatusLine().toString());
 		} else {
 			HttpEntity hen = hres.getEntity();
+			if (addFileEndingIfMissing) {
+				dumpFile = checkDumpFileEnding(hres, dumpFile);
+			}
 			InputStream is = null;
 			FileOutputStream fout = null;
 			try {
@@ -91,7 +102,44 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 				IOUtils.closeQuietly(fout);
 				EntityUtils.consume(hen);
 			}
+			return dumpFile;
 		}
+	}
+
+	private File checkDumpFileEnding(HttpResponse hres, File dumpFile) {
+		String filename = dumpFile.getName();
+		boolean gzipped = false;
+		if (filename.endsWith(".gz")) {
+			filename = filename.substring(0, filename.length() - 3);
+			gzipped = true;
+		}
+		Lang fileLanguage = RDFLanguages.resourceNameToLang(filename);
+		Header header = hres.getFirstHeader("Content-Type");
+		if (header == null) {
+			LOGGER.warn("Couldn't get content type header from the response. Can't check dump file ending.");
+			return dumpFile;
+		}
+		String contentType = header.getValue().split(";")[0];
+		Lang responseLanguage = null;
+		if (XML_CONTENT_TYPE.equalsIgnoreCase(contentType)) {
+			responseLanguage = Lang.RDFXML;
+		} else {
+			responseLanguage = RDFLanguages.contentTypeToLang(header.getValue().split(";")[0]);
+		}
+		if (responseLanguage == null) {
+			LOGGER.info("Got an unknown content type inside the response. Can't check dump file ending.");
+			return dumpFile;
+		}
+		if ((fileLanguage == null) || (responseLanguage != fileLanguage)) {
+			List<String> fileExtensions = responseLanguage.getFileExtensions();
+			if ((fileExtensions != null) && (fileExtensions.size() > 0)) {
+				filename += '.' + fileExtensions.get(0);
+				LOGGER.info("Extended the dump file name from \"" + dumpFile.getName() + "\" to \"" + filename + "\".");
+				return new File(dumpFile.getParentFile().getAbsolutePath() + File.separator
+						+ (gzipped ? filename + ".gz" : filename));
+			}
+		}
+		return dumpFile;
 	}
 
 	@Override
@@ -120,8 +168,8 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 			LOGGER.warn("Couldn't extract file name from \"" + uri + "\".");
 			return "TEMP";
 		}
-		if(uriEnding.contains("?")) {
-			if(uri.startsWith("?")) {
+		if (uriEnding.contains("?")) {
+			if (uri.startsWith("?")) {
 				return extractFileName(uri.substring(0, uri.length() - uriEnding.length()));
 			} else {
 				uriEnding = uriEnding.split("\\?")[0];
