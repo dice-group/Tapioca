@@ -3,13 +3,10 @@ package org.aksw.simba.tapioca.analyzer.dump;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
-import java.util.zip.GZIPInputStream;
 
 import org.aksw.simba.tapioca.extraction.Extractor;
 import org.aksw.simba.tapioca.extraction.RDF2ExtractionStreamer;
-import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.CompressorStreamFactory;
-import org.apache.commons.compress.compressors.FileNameUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.riot.RDFLanguages;
 import org.slf4j.Logger;

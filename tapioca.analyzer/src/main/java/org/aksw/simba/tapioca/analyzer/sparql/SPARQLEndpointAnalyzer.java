@@ -163,7 +163,7 @@ public class SPARQLEndpointAnalyzer extends AbstractSPARQLClient {
 
 		voidModel.add(endpointAsResource, RDF.type, VOID.Dataset);
 
-		long sum = 0;
+		long entities = 0;
 		Resource blank;
 		for (int i = 0; i < resources.length; ++i) {
 			blank = new ResourceImpl();
@@ -171,7 +171,7 @@ public class SPARQLEndpointAnalyzer extends AbstractSPARQLClient {
 			voidModel.add(blank, VOID.clazz, resources[i]);
 			if (counts != null) {
 				voidModel.addLiteral(blank, VOID.entities, counts[i]);
-				sum += counts[i];
+				entities += counts[i];
 			}
 		}
 
@@ -191,7 +191,7 @@ public class SPARQLEndpointAnalyzer extends AbstractSPARQLClient {
 
 		voidModel.addLiteral(endpointAsResource, VOID.classes, resources.length);
 		if (counts != null) {
-			voidModel.addLiteral(endpointAsResource, VOID.entities, sum);
+			voidModel.addLiteral(endpointAsResource, VOID.entities, entities);
 		}
 
 		LOGGER.info("Requesting properties from " + endpointCfg + " ...");
@@ -216,7 +216,7 @@ public class SPARQLEndpointAnalyzer extends AbstractSPARQLClient {
 		// objectCounts = queryCounts(qef[QUERY_FACTORY],
 		// COUNT_PROPERTY_OBJECTS_QUERY, resources);
 
-		sum = 0;
+		int triples = 0;
 		for (int i = 0; i < resources.length; ++i) {
 			blank = new ResourceImpl();
 			voidModel.add(endpointAsResource, VOID.propertyPartition, blank);
@@ -231,14 +231,17 @@ public class SPARQLEndpointAnalyzer extends AbstractSPARQLClient {
 			// }
 			if (counts != null) {
 				voidModel.addLiteral(blank, VOID.triples, counts[i]);
-				sum += counts[i];
+				triples += counts[i];
 			}
+		}
+		if ((entities == 0) && (triples == 0)) {
+			LOGGER.error("Got an empty VOID model without an entity and a triple. Returning null.");
+			return null;
 		}
 		voidModel.addLiteral(endpointAsResource, VOID.properties, resources.length);
 		if (counts != null) {
-			voidModel.addLiteral(endpointAsResource, VOID.triples, sum);
+			voidModel.addLiteral(endpointAsResource, VOID.triples, triples);
 		}
-
 		return voidModel;
 	}
 

@@ -51,20 +51,23 @@ public class DumpFileAnalyzer extends AbstractDumpExtractorApplier {
 
 		voidModel.add(datasetResource, RDF.type, VOID.Dataset);
 
-		long sum;
-		sum = addCountedUris(extractor.getCountedClasses(), voidModel, datasetResource, VOID.classPartition,
+		long entities;
+		entities = addCountedUris(extractor.getCountedClasses(), voidModel, datasetResource, VOID.classPartition,
 				VOID.clazz, VOID.entities);
-		sum += addCountedUris(sExtractor.getCountedSpecialClasses(), voidModel, datasetResource, EVOID.classPartition,
+		addCountedUris(sExtractor.getCountedSpecialClasses(), voidModel, datasetResource, EVOID.classPartition,
 				EVOID.specialClass, EVOID.entities);
 		voidModel.addLiteral(datasetResource, VOID.classes,
 				extractor.getCountedClasses().assigned + sExtractor.getCountedSpecialClasses().assigned);
-		voidModel.addLiteral(datasetResource, VOID.entities, sum);
+		voidModel.addLiteral(datasetResource, VOID.entities, entities);
 
-		sum = addCountedUris(extractor.getCountedProperties(), voidModel, datasetResource, VOID.propertyPartition,
+		long triples = addCountedUris(extractor.getCountedProperties(), voidModel, datasetResource, VOID.propertyPartition,
 				VOID.property, VOID.triples);
 		voidModel.addLiteral(datasetResource, VOID.properties, extractor.getCountedProperties().assigned);
-		voidModel.addLiteral(datasetResource, VOID.triples, sum);
-
+		voidModel.addLiteral(datasetResource, VOID.triples, triples);
+		if ((entities == 0) && (triples == 0)) {
+			LOGGER.error("Got an empty VOID model without an entity and a triple. Returning null.");
+			return null;
+		}
 		return voidModel;
 	}
 
