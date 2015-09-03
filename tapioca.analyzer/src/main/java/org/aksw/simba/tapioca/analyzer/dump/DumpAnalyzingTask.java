@@ -42,7 +42,10 @@ public class DumpAnalyzingTask implements Task {
 
 	@Override
 	public void run() {
-		writeModel(analyzer.extractVoidInfo(datasetURI, dumps));
+		Model model = analyzer.extractVoidInfo(datasetURI, dumps);
+		if (model != null) {
+			writeModel(model);
+		}
 	}
 
 	@Override

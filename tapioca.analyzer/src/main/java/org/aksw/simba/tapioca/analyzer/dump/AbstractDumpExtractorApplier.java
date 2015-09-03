@@ -22,7 +22,7 @@ public abstract class AbstractDumpExtractorApplier {
         this.executor = executor;
     }
 
-    protected void extractFromDump(String dump, Extractor... extractors) {
+    protected boolean extractFromDump(String dump, Extractor... extractors) {
         RDF2ExtractionStreamer streamer;
         if (executor != null) {
             streamer = new RDF2ExtractionStreamer(executor);
@@ -36,9 +36,10 @@ public abstract class AbstractDumpExtractorApplier {
                 fin = new GZIPInputStream(fin);
                 dump = dump.substring(0, dump.length() - 3);
             }
-            streamer.runExtraction(fin, "", RDFLanguages.resourceNameToLang(dump), extractors);
+            return streamer.runExtraction(fin, "", RDFLanguages.resourceNameToLang(dump), extractors);
         } catch (Exception e) {
             LOGGER.error("Couldn't read dump file \"" + dump + "\". Ignoring this dump.", e);
+            return false;
         } finally {
             IOUtils.closeQuietly(fin);
         }
