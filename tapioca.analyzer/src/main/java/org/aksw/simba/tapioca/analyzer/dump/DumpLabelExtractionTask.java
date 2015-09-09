@@ -11,10 +11,10 @@ import org.aksw.simba.topicmodeling.concurrent.tasks.Task;
 
 public class DumpLabelExtractionTask implements Task {
 
-    private String dumps[];
-    private File voidFile;
-    private File outputFile;
-    private DumpFileLabelExtractor extractor;
+	protected String dumps[];
+    protected File voidFile;
+    protected File outputFile;
+    protected DumpFileLabelExtractor extractor;
 
     public DumpLabelExtractionTask(String dumps[], File voidFile, File outputFile) {
         this(dumps, voidFile, outputFile, null);

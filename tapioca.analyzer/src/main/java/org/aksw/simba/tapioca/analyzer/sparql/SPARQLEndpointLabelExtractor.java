@@ -48,12 +48,13 @@ public class SPARQLEndpointLabelExtractor extends AbstractSPARQLClient {
 					e.getLocalizedMessage());
 			return null;
 		}
-		String fromClause;
-		if (endpointCfg.graph == null) {
-			fromClause = "";
-		} else {
-			fromClause = "FROM <" + endpointCfg.graph + ">";
-		}
+//		String fromClause;
+//		if (endpointCfg.graph == null) {
+//			fromClause = "";
+//		} else {
+//			fromClause = "FROM <" + endpointCfg.graph + ">";
+//		}
+		String fromClause = "";
 
 		LOGGER.info("Requesting labels from " + endpointCfg + " ...");
 		String queryForEndpoint = LIST_TRIPLES_QUERY.replace(FROM_CLAUSE_REPLACEMENT, fromClause);

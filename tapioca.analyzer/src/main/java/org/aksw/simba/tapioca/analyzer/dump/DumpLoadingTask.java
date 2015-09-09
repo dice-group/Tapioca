@@ -41,7 +41,7 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 
 	public DumpLoadingTask(String datasetURI, File outputFolder, String[] dumps, ExecutorService executor) {
 		super(datasetURI, outputFolder, dumps, executor);
-		downloadFolder = new File(outputFolder.getAbsolutePath() + File.separator + DOWNLOAD_FOLDER);
+		downloadFolder = generateDownloadFolder(outputFolder);
 	}
 
 	@Override
@@ -155,7 +155,7 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 		}
 	}
 
-	protected static String extractFileName(String uri) {
+	public static String extractFileName(String uri) {
 		String splits[] = uri.split("[/#]");
 		String uriEnding = null;
 		for (int i = splits.length - 1; (i >= 0) & (uriEnding == null); --i) {
@@ -175,5 +175,9 @@ public class DumpLoadingTask extends DumpAnalyzingTask {
 			}
 		}
 		return uriEnding;
+	}
+
+	public static File generateDownloadFolder(File outputFolder) {
+		return new File(outputFolder.getAbsolutePath() + File.separator + DOWNLOAD_FOLDER);
 	}
 }
