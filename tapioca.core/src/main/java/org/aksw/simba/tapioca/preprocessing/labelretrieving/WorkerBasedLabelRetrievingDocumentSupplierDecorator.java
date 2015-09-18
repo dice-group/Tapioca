@@ -25,7 +25,7 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator extends
             .getLogger(WorkerBasedLabelRetrievingDocumentSupplierDecorator.class);
 
     // private static final int MAX_NUMBER_OF_WORKERS = 20;
-    private static final int MAX_NUMBER_OF_WORKERS = 1;
+    private static final int MAX_NUMBER_OF_WORKERS = 3;
 
     private LocalLabelTokenizer localTokenizer = new LocalLabelTokenizer();
     private FileBasedTokenizedLabelRetriever fileBasedLabelTokenizers[];
