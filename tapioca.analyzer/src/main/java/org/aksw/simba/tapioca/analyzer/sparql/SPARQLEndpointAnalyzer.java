@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.aksw.commons.util.StreamUtils;
 import org.aksw.jena_sparql_api.core.QueryExecutionFactory;
+import org.aksw.simba.tapioca.data.vocabularies.EVOID;
 import org.aksw.simba.tapioca.data.vocabularies.VOID;
 import org.aksw.simba.tapioca.extraction.voidex.VoidExtractor;
 import org.apache.commons.io.FileUtils;
@@ -181,9 +182,9 @@ public class SPARQLEndpointAnalyzer extends AbstractSPARQLClient {
 				for (int j = 0; j < instances.length; ++j) {
 					if (!voidModel.containsResource(instances[j])) {
 						blank = new ResourceImpl();
-						voidModel.add(endpointAsResource, VOID.classPartition, blank);
-						voidModel.add(blank, VOID.clazz, instances[j]);
-						voidModel.addLiteral(blank, VOID.entities, 0);
+						voidModel.add(endpointAsResource, EVOID.classPartition, blank);
+						voidModel.add(blank, EVOID.specialClass, instances[j]);
+						voidModel.addLiteral(blank, EVOID.entities, 0);
 					}
 				}
 			}
