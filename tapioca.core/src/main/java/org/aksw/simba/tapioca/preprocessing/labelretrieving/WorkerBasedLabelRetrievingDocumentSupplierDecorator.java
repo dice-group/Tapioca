@@ -10,7 +10,7 @@ import org.aksw.simba.topicmodeling.concurrent.overseers.pool.DefeatableOverseer
 import org.aksw.simba.topicmodeling.concurrent.overseers.pool.ExecutorBasedOverseer;
 import org.aksw.simba.topicmodeling.concurrent.reporter.LogReporter;
 import org.aksw.simba.topicmodeling.concurrent.reporter.Reporter;
-import org.aksw.simba.topicmodeling.concurrent.tasks.Task;
+import org.aksw.simba.topicmodeling.concurrent.tasks.waiting.AbstractWaitingTask;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.AbstractPropertyEditingDocumentSupplierDecorator;
 import org.slf4j.Logger;
@@ -27,6 +27,8 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator extends
 	// private static final int MAX_NUMBER_OF_WORKERS = 20;
 	private static final int MAX_NUMBER_OF_WORKERS = 3;
 
+	// private static final long MAXIMUM_WAITING_TIME = 240000;
+
 	private LocalLabelTokenizer localTokenizer = new LocalLabelTokenizer();
 	private FileBasedTokenizedLabelRetriever fileBasedLabelTokenizers[];
 	private ThreadSafeCachingLabelTokenizerDecorator clientLabelTokenizer;
@@ -42,6 +44,7 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator extends
 		clientLabelTokenizer = ThreadSafeCachingLabelTokenizerDecorator.create(new RDFClientLabelRetriever(),
 				chacheFiles);
 		fileBasedLabelTokenizers = new FileBasedTokenizedLabelRetriever[0];
+		// new WaitingThreadInterrupter(overseer, MAXIMUM_WAITING_TIME);
 	}
 
 	public WorkerBasedLabelRetrievingDocumentSupplierDecorator(DocumentSupplier documentSource, File chacheFiles[],
@@ -60,19 +63,8 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator extends
 		fileBasedLabelTokenizers = tempRetrievers.toArray(new FileBasedTokenizedLabelRetriever[tempRetrievers.size()]);
 		clientLabelTokenizer = ThreadSafeCachingLabelTokenizerDecorator.create(new RDFClientLabelRetriever(),
 				chacheFiles);
+		// new WaitingThreadInterrupter(overseer, MAXIMUM_WAITING_TIME);
 	}
-
-	// @Override
-	// protected Document prepareDocument(Document document) {
-	// StringCountMapping mapping =
-	// document.getProperty(StringCountMapping.class);
-	// if (mapping == null) {
-	// LOGGER.error("Got a document without the needed StringCountMapping property. Ignoring this document.");
-	// } else {
-	// replaceURIsWithLabelTokens(mapping);
-	// }
-	// return document;
-	// }
 
 	@Deprecated
 	public WorkerBasedLabelRetrievingDocumentSupplierDecorator(DocumentSupplier supplier, boolean b) {
@@ -125,7 +117,7 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator extends
 		activeWorkers.release();
 	}
 
-	protected static class Worker implements Task {
+	protected static class Worker extends AbstractWaitingTask {
 		private String uri;
 		private long count;
 		private LocalLabelTokenizer localTokenizer;
@@ -158,7 +150,9 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator extends
 			}
 			// If the label couldn't be retrieved
 			if (tokens == null) {
+				this.startWaiting();
 				tokens = clientLabelTokenizer.getTokenizedLabel(rdfClient, uri, namespace);
+				this.stopWaiting();
 			}
 			// If the label couldn't be retrieved, create it based on the URI
 			if ((tokens == null) || (tokens.size() == 0)) {
