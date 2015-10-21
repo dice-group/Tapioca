@@ -123,7 +123,7 @@
 				</executions>
 			</plugin>
 			<!-- Javadoc plugin for generating documentation -->
-			<plugin>
+			<!-- <plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.10.1</version>
@@ -139,7 +139,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 			<!-- Resources management plugin -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

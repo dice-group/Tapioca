@@ -1,19 +1,19 @@
 <!--
 
-    This file is part of tapioca.parent.
+    This file is part of topicmodeling.lang.
 
-    tapioca.parent is free software: you can redistribute it and/or modify
+    topicmodeling.lang is free software: you can redistribute it and/or modify
     it under the terms of the GNU Lesser General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    tapioca.parent is distributed in the hope that it will be useful,
+    topicmodeling.lang is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU Lesser General Public License for more details.
 
     You should have received a copy of the GNU Lesser General Public License
-    along with tapioca.parent.  If not, see <http://www.gnu.org/licenses/>.
+    along with topicmodeling.lang.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
