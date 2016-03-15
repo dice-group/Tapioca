@@ -36,8 +36,7 @@ public class WebController {
     }
 
     @RequestMapping("/search")
-    public @ResponseBody
-    String search(@RequestParam(value = "voidString") String voidString) {
+    public @ResponseBody String search(@RequestParam(value = "voidString") String voidString) {
         return engine.retrieveSimilarDatasets(voidString);
         // SearchResult results[] = new SearchResult[result.size()];
         // for (int i = 0; i < results.length; ++i) {
@@ -48,8 +47,7 @@ public class WebController {
     }
 
     @RequestMapping("/blsearch")
-    public @ResponseBody
-    String searchBL(@RequestParam(value = "voidString") String voidString) {
+    public @ResponseBody String searchBL(@RequestParam(value = "voidString") String voidString) {
         return blEngine.retrieveSimilarDatasets(voidString);
         // TopDoubleObjectCollection<Dataset> result =
         // blEngine.retrieveSimilarDatasets(voidString);

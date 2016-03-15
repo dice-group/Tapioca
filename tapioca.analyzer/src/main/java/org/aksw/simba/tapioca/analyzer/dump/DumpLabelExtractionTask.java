@@ -25,6 +25,12 @@ import org.aksw.simba.tapioca.analyzer.label.LabelExtractionUtils;
 import org.aksw.simba.topicmodeling.commons.io.StorageHelper;
 import org.aksw.simba.topicmodeling.concurrent.tasks.Task;
 
+/**
+ * 
+ * 
+ * @author Michael R&ouml;der (roeder@informatik.uni-leipzig.de)
+ *
+ */
 public class DumpLabelExtractionTask implements Task {
 
 	protected String dumps[];

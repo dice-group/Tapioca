@@ -77,43 +77,43 @@ public abstract class AbstractEngine implements Engine {
             if (rdfMetaDataModel.containsResource(datasetResource)) {
                 rdfModel.add(rdfMetaDataModel.listStatements(datasetResource, null, (RDFNode) null));
                 // /// TODO REMOVE ME!!!
-                if (i < 7) {
-                    StmtIterator iter;
-                    System.out.println();
-                    System.out.println(datasetResource.getURI());
-                    iter = rdfMetaDataModel.listStatements(datasetResource,
-                            rdfMetaDataModel.createProperty("http://www.w3.org/2000/01/rdf-schema#label"),
-                            (RDFNode) null);
-                    System.out.print("label: ");
-                    if (iter.hasNext()) {
-                        System.out.print(iter.next().getObject().asLiteral().getString());
-                    }
-                    System.out.println();
-                    iter = rdfMetaDataModel.listStatements(datasetResource,
-                            rdfMetaDataModel.createProperty("http://www.w3.org/2000/01/rdf-schema#comment"),
-                            (RDFNode) null);
-                    System.out.print("description: ");
-                    if (iter.hasNext()) {
-                        System.out.print(iter.next().getObject().asLiteral().getString());
-                    }
-                    System.out.println();
-                    iter = rdfMetaDataModel.listStatements(datasetResource,
-                            rdfMetaDataModel.createProperty("http://www.w3.org/ns/dcat#keyword"),
-                            (RDFNode) null);
-                    System.out.print("keywords: ");
-                    boolean first = true;
-                    while (iter.hasNext()) {
-                        if(first) {
-                            first = false;
-                        } else {
-                            System.out.print(", ");
-                        }
-                        System.out.print('"');
-                        System.out.print(iter.next().getObject().asLiteral().getString());
-                        System.out.print('"');
-                    }
-                    System.out.println();
-                }
+                // if (i < 7) {
+                // StmtIterator iter;
+                // System.out.println();
+                // System.out.println(datasetResource.getURI());
+                // iter = rdfMetaDataModel.listStatements(datasetResource,
+                // rdfMetaDataModel.createProperty("http://www.w3.org/2000/01/rdf-schema#label"),
+                // (RDFNode) null);
+                // System.out.print("label: ");
+                // if (iter.hasNext()) {
+                // System.out.print(iter.next().getObject().asLiteral().getString());
+                // }
+                // System.out.println();
+                // iter = rdfMetaDataModel.listStatements(datasetResource,
+                // rdfMetaDataModel.createProperty("http://www.w3.org/2000/01/rdf-schema#comment"),
+                // (RDFNode) null);
+                // System.out.print("description: ");
+                // if (iter.hasNext()) {
+                // System.out.print(iter.next().getObject().asLiteral().getString());
+                // }
+                // System.out.println();
+                // iter = rdfMetaDataModel.listStatements(datasetResource,
+                // rdfMetaDataModel.createProperty("http://www.w3.org/ns/dcat#keyword"),
+                // (RDFNode) null);
+                // System.out.print("keywords: ");
+                // boolean first = true;
+                // while (iter.hasNext()) {
+                // if(first) {
+                // first = false;
+                // } else {
+                // System.out.print(", ");
+                // }
+                // System.out.print('"');
+                // System.out.print(iter.next().getObject().asLiteral().getString());
+                // System.out.print('"');
+                // }
+                // System.out.println();
+                // }
             } else {
                 LOGGER.warn("Got a dataset that does not occur inside the meta data model (URI=\""
                         + datasetResource.getURI() + "\").");

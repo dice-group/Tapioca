@@ -43,8 +43,8 @@ public class Config extends WebMvcConfigurerAdapter {
     private static final String MODEL_FOLDER_PROPERTY_KEY = "org.aksw.simba.tapioca.server.Engine.ModelFolder";
     private static final String META_DATA_FILE_PROEPRTY_KEY = "org.aksw.simba.tapioca.server.Engine.MetaDataFile";
 
-    public static @Bean
-    WorkerBasedLabelRetrievingDocumentSupplierDecorator createCachingLabelRetriever(Environment env) {
+    public static @Bean WorkerBasedLabelRetrievingDocumentSupplierDecorator createCachingLabelRetriever(
+            Environment env) {
         File labelFiles[] = {}; // TODO add label files
         String cacheFileNames[] = env.getProperty(LABEL_CACHING_FILES_PROPERTY_KEY, (new String[0]).getClass());
         File chacheFiles[] = new File[cacheFileNames.length];
@@ -54,14 +54,13 @@ public class Config extends WebMvcConfigurerAdapter {
         return new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, chacheFiles, labelFiles);
     }
 
-    public static @Bean
-    TMEngine createEngine(Environment env, WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
+    public static @Bean TMEngine createEngine(Environment env,
+            WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
         return TMEngine.createEngine(cachingLabelRetriever, new File(env.getProperty(MODEL_FOLDER_PROPERTY_KEY)),
                 new File(env.getProperty(META_DATA_FILE_PROEPRTY_KEY)));
     }
 
-    public static @Bean
-    BLEngine createBLEngine(Environment env) {
+    public static @Bean BLEngine createBLEngine(Environment env) {
         return BLEngine.createEngine(new File(env.getProperty(MODEL_FOLDER_PROPERTY_KEY)),
                 new File(env.getProperty(META_DATA_FILE_PROEPRTY_KEY)));
     }

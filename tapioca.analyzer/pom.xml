@@ -27,14 +27,6 @@
 	</parent>
 	<artifactId>tapioca.analyzer</artifactId>
 
-	<repositories>
-		<!-- Let's use a local repository for the local libraries of this project -->
-		<repository>
-			<id>local repository</id>
-			<url>${tapioca.local.repository}</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
 		<!-- Tapioca Core -->
 		<dependency>

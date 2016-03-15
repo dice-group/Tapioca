@@ -47,7 +47,7 @@
 		<!-- Project Properties -->
 		<java.version>1.7</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<tapioca.local.repository>file://${project.basedir}/${project.parent.relativePath}/repository</tapioca.local.repository>
+		<!-- <tapioca.local.repository>file://${project.basedir}/${project.parent.relativePath}/repository</tapioca.local.repository> -->
 		<!-- Library Versions -->
 		<com.carrotsearch.hppc.version>0.6.1</com.carrotsearch.hppc.version>
 		<lucene.version>4.4.0</lucene.version>

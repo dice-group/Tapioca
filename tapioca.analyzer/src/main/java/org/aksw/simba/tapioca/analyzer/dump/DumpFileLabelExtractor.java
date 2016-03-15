@@ -22,6 +22,13 @@ import java.util.concurrent.ExecutorService;
 import org.aksw.simba.tapioca.analyzer.label.LabelExtractionUtils;
 import org.aksw.simba.tapioca.analyzer.label.LabelExtractor;
 
+/**
+ * This class extracts the labels of a given Set of URIs from a given list of
+ * RDF dump files.
+ * 
+ * @author Michael R&ouml;der (roeder@informatik.uni-leipzig.de)
+ *
+ */
 public class DumpFileLabelExtractor extends AbstractDumpExtractorApplier {
 
     public DumpFileLabelExtractor() {
@@ -32,6 +39,17 @@ public class DumpFileLabelExtractor extends AbstractDumpExtractorApplier {
         super(executor);
     }
 
+    /**
+     * Extracts the labels of the given Set of URIs from the given dump files.
+     * 
+     * @param uris
+     *            the Set of URIs for which the labels should be extracted.
+     * @param dumps
+     *            the dump files
+     * @return An array containing the URIs and their labels. Take a look at
+     *         {@link LabelExtractionUtils#generateArray(java.util.Map)} for
+     *         more details.
+     */
     public String[][] extractLabels(Set<String> uris, String... dumps) {
         LabelExtractor extractor = new LabelExtractor(uris);
         for (int i = 0; i < dumps.length; ++i) {
