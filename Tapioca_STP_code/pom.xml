@@ -1,0 +1,103 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.aksw.simba</groupId>
+	<artifactId>tapioca</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<!-- MODULES -->	
+	<modules>
+		<module>tapioca.cores</module>		
+		<module>tapioca.webinterface</module>
+		<module>tapioca.metadata</module>
+		<module>tapioca.indexgenerator</module>
+	</modules>	
+	
+	<!-- REPOSITORIES -->
+	<repositories>
+		<repository>
+			<id>maven.aksw.internal</id>
+			<name>University Leipzig, AKSW Maven2 Repository</name>
+			<url>http://maven.aksw.org/repository/internal</url>
+		</repository>
+		<repository>
+			<id>maven.aksw.snapshots</id>
+			<name>University Leipzig, AKSW Maven2 Repository</name>
+			<url>http://maven.aksw.org/repository/snapshots</url>
+		</repository>
+	</repositories>
+	 
+	 <!-- DEPENDENCIES -->
+	 <dependencies>
+	 	<!-- JUNIT -->	
+	 	<dependency>
+	 		<groupId>junit</groupId>
+	 		<artifactId>junit</artifactId>
+	 		<version>4.12</version>
+	 	</dependency>
+		
+		<!-- JENA -->
+		<dependency>
+			<groupId>org.aksw.jena-sparql-api</groupId>
+			<artifactId>jena-sparql-api-core</artifactId>
+			<version>2.13.0-5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.aksw.jena-sparql-api</groupId>
+			<artifactId>jena-sparql-api-cache-h2</artifactId>
+			<version>2.13.0-5</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.jena</groupId>
+		    <artifactId>jena-core</artifactId>
+		    <version>2.13.0</version>
+		</dependency>		
+		
+		<!-- JUL To SLF4J Bridge -->		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jul-to-slf4j</artifactId>
+			<version>1.7.12</version>
+		</dependency>
+		
+		<!-- TOPIC MODELLING -->
+		<!-- data types -->
+		<dependency>
+			<groupId>org.aksw.simba</groupId>
+			<artifactId>topicmodeling.datatypes</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
+		</dependency>
+		<!-- commons -->
+		<dependency>
+			<groupId>org.aksw.simba</groupId>
+			<artifactId>topicmodeling.commons</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
+		</dependency>
+		<!-- preprocessing -->
+		<dependency>
+			<groupId>org.aksw.simba</groupId>
+			<artifactId>topicmodeling.preprocessing</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
+		</dependency>
+		<!-- i/o -->
+		<dependency>
+			<groupId>org.aksw.simba</groupId>
+			<artifactId>topicmodeling.io</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
+		</dependency>
+		<!-- mallet -->
+		<dependency>
+			<groupId>org.aksw.simba</groupId>
+			<artifactId>topicmodeling.mallet</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
+		</dependency>
+		<!-- concurrent -->			
+		<dependency>
+			<groupId>org.aksw.simba</groupId>
+			<artifactId>topicmodeling.concurrent</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
+		</dependency>		
+	 </dependencies>
+
+</project>

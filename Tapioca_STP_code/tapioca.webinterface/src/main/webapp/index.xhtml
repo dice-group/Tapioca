@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:h="http://xmlns.jcp.org/jsf/html"
+	  xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+	  xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	  xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">	  
+	
+	<h:head>
+	    <meta name="description" content="This is the website of Tapioca-Project from dsl16 team, University Leipzig, Germany" />
+	    <meta name="author" content="Duong Trung Duong" />
+	    <meta name="modified" content="Kai" />	
+		<title>Tapioca Webinterface</title>
+		<link href="#{request.contextPath}/index_xhtml/style.css" rel="stylesheet" type="text/css" />
+		<link href="http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css" />
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />		
+	</h:head>
+	
+	<h:body>
+		<div class="searchContainer" id="searchContainer">
+			<div class="tapiocaLogo"></div>
+			
+			<!-- Search form start -->
+			<h:form id="searchForm" enctype="multipart/form-data">
+				<!-- File upload start -->
+				<div class="uploadImage" id="uploadImage">
+					<h:outputLabel for="documentFile-browser" value="" styleClass="uploadElement" />
+					<h:inputFile id="documentFile-browser" value="#{dataBean.inputFile}" styleClass="uploadElement"
+						validator="#{dataBean.validateFile}" /> 
+				</div>	
+				<!-- File upload end -->
+			
+				<!-- Search bar start -->
+				<div class="searchBar" id="searchBar">
+					<h:inputText id="searchTextBox" value="#{dataBean.inputText}" a:placeholder="Search keyword" />  						
+					<h:commandButton id="searchButton" value="Search" onclick="showWithID('progressBarContainer');PF('pbAjax').start();" action="#{dataBean.result}"
+						styleClass="searchButton" />					
+				</div>
+				<!-- Search bar end -->					
+			</h:form>
+			<!-- Search form end	 -->
+		</div>		
+		
+		<!-- Progress bar start  -->
+		<div class="progressBarContainer" id="progressBarContainer" style="display:none" >
+			<div class="progressBarImage"></div>		
+			<p:progressBar widgetVar="pbAjax" ajax="true"
+				value="#{searchEngineObserver.progress}" 
+				labelTemplate="{value}%"
+				styleClass="animated"
+				interval="500">
+			   <p:ajax event="complete" 
+			   listener="#{searchEngineObserver.onComplete()}" oncomplete="PF('pbAjax').hide();" />				
+			</p:progressBar>
+		</div>
+		<!-- Progress bar end -->				
+		
+		<!-- Error message file upload start -->
+		<div class="errorMessage">
+			<p>
+				<h:message for="searchForm:documentFile-browser" />
+			</p>
+		</div>
+		<!-- Error message file upload end -->
+		
+		
+		<!-- Right menu start -->
+		<div class="menuContainer">
+			<nav id="functionMenu" class="functionMenu">
+				<a class="functionMenuTrigger"><span>Menu</span></a>
+				<ul>					
+					<li><a href="#readmeModal">Readme</a></li>
+					<li><a href="#toolsModal">Tools</a></li>					
+					<li><a href="#contactModal">Contact</a></li>
+				</ul>
+			</nav>
+		</div>
+		<!-- Right menu end -->
+
+		<!-- Readme window start -->
+		<div class="remodal" data-remodal-id="readmeModal" role="dialog">
+			<button data-remodal-action="close" class="remodal-close"
+				aria-label="Close"></button>
+			<div>
+				<h2>What is Tapioca? Basic Instructions.</h2>
+				<p> </p>
+				<p style="color: #74afad; font-size: 100%;">Tapioca is a search
+					engine for finding topically similar linked data datasets.</p>
+				<p style="color: #D9853B; font-size: 90%;">
+					If you are trying to find linked data datasets concerning a specific topic <br />
+					there are two ways of using Tapioca search enginge to do so
+				</p>
+				    <ul type="disc">
+      				<li>Type in a keyword into the search bar and get topically<br />
+      				similar datasets available in the Tapioca Index</li>
+       				<li>If you possess a linked data dataset and are looking to find<br />
+       				similar datasets please go on to our TOOLS page<br />
+       				and download the MetadataExtractionTool.<br />
+					It includes a User Guide explaining how to use it and which<br />
+					RDF serialization formats are supported.<br /> 
+					After extracting the metadata from your dataset simply upload<br />
+					the metadata file via the upload button next to the<br />
+					search bar and Tapioca will show you all available<br />
+					similar datasets in the Tapioca Index</li>
+   					 </ul>
+		<!--	<p style="color: #D9853B; font-size: 85%;">
+				    Type in a keyword into the search bar and get topically similar datasets<br />
+				    available in the Tapioca Index
+				</p>
+				<p style="color: #D9853B; font-size: 85%;">
+					If you possess a linked data dataset and are looking to find similar datasets<br /> 
+					please go on to our TOOLS page and download the MetadataExtractionTool.<br />
+					It includes a User Guide explaining how to use it<br /> 
+					and which RDF serialization formats are supported.<br /> 
+					After extracting the metadata from your dataset simply<br /> 
+					upload the metadata file via the upload button next to the search bar<br />
+					and Tapioca will show you all available similar datasets in the Tapioca Index
+				</p> -->
+				<p style="color: #D9853B; font-size: 90%;">
+					The given percentage behind each search result specifies the similarity<br />
+					between your dataset/keyword and the output dataset.<br />
+					Please note that, depending on the size of your input dataset,<br />
+					the calculation can take up to a few minutes to provide results.<br />
+					For any further questions please read the Tapioca documentation.
+				</p>
+				<p style="color: #74afad; font-size: 100%;">Enjoy!</p>	
+			</div>		
+			<br />
+			<button data-remodal-action="cancel" class="remodal-cancel">Close</button>
+		</div>
+		<!-- Readme window end -->
+
+		<!-- Tools window start -->
+		<div class="remodal" data-remodal-id="toolsModal" role="dialog">
+			<button data-remodal-action="close" class="remodal-close"
+				aria-label="Close"></button>
+			<div>
+				<h2>Our Tools</h2>
+ 				<p><a href="http://pcai042.informatik.uni-leipzig.de/~dsl16/metadata-extraction.zip" style="text-decoration: none"><font color="#74afad">Metadata Extraction</font></a></p>				
+			</div>		
+			<br />
+			<button data-remodal-action="cancel" class="remodal-cancel">Close</button>
+		</div>		
+		<!-- Tools window end -->
+
+		<!-- Contact window start -->
+		<div class="remodal" data-remodal-id="contactModal" role="dialog">
+			<button data-remodal-action="close" class="remodal-close"
+				aria-label="Close"></button>
+			<div>
+				<h2>Contact us</h2>
+				<p style="display:inline">
+ 				<a href="http://pcai042.informatik.uni-leipzig.de/~dsl16/index.html" >
+  					<img src="index_xhtml/Logo-Tapioca.jpg" width="120px" height="30px"> </img>
+				</a>
+				&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;
+ 		    	<a href="http://aksw.org/Projects/Tapioca.html" >
+  					<img src="index_xhtml/logo-aksw.jpg" width="120px" height="30px"></img>
+				</a>
+				</p>
+			</div>		
+			<br />
+			<button data-remodal-action="cancel" class="remodal-cancel">Close</button>
+		</div>				
+		<!-- Contact window end -->
+		
+		<!-- Footer start -->
+		<div class="copyrightText">
+			<p> &#169; DSL16-Team, University Leipzig. | <a href="http://pcai042.informatik.uni-leipzig.de/~dsl16/"	target="_blank">Homepage</a> </p>
+		</div>
+		<!-- Footer end -->
+		
+		<!-- Events -->
+		<script>
+		 $(document).on('opening', '.remodal', function () {
+		   console.log('opening');
+		 });
+		
+		 $(document).on('opened', '.remodal', function () {
+		   console.log('opened');
+		 });
+		
+		 $(document).on('closing', '.remodal', function (e) {
+		   console.log('closing' + (e.reason ? ', reason: ' + e.reason : ''));
+		 });
+		
+		 $(document).on('closed', '.remodal', function (e) {
+		   console.log('closed' + (e.reason ? ', reason: ' + e.reason : ''));
+		 });
+		
+		 $(document).on('confirmation', '.remodal', function () {
+		   console.log('confirmation');
+		 });
+		
+		 $(document).on('cancellation', '.remodal', function () {
+		   console.log('cancellation');
+		 });
+		</script>
+		<!-- Windows Modal events and script end -->			
+	</h:body>	
+	
+	<!-- Javascript start -->
+	<script src="index_xhtml/classie.js" type="text/javascript"></script> 
+	<script src="index_xhtml/borderMenu.js" type="text/javascript"></script>
+	<script src="index_xhtml/uploadDocument.js" type="text/javascript"></script>
+	<script	src="index_xhtml/jquery.min.js" type="text/javascript"></script>
+	<script src="index_xhtml/remodal.js" type="text/javascript"></script>	
+	<!-- Javascript end -->
+	
+</html>

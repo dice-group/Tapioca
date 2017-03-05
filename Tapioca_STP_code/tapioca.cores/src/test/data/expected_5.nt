@@ -1,0 +1,39 @@
+<http://example.org/testdata#5.nt> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://rdfs.org/ns/void#Dataset> .
+<http://example.org/testdata#5.nt> <http://rdfs.org/ns/void#classPartition> _:a .
+_:a <http://rdfs.org/ns/void#entities> "0"^^<http://www.w3.org/2001/XMLSchema#int> .
+_:a <http://rdfs.org/ns/void#class> <http://example.org/class1> .
+<http://example.org/testdata#5.nt> <http://rdfs.org/ns/void#classPartition> _:b .
+_:b <http://rdfs.org/ns/void#entities> "0"^^<http://www.w3.org/2001/XMLSchema#int> .
+_:b <http://rdfs.org/ns/void#class> <http://example.org/class2> .
+<http://example.org/testdata#5.nt> <http://rdfs.org/ns/void#classPartition> _:c .
+_:c <http://rdfs.org/ns/void#entities> "2"^^<http://www.w3.org/2001/XMLSchema#int> .
+_:c <http://rdfs.org/ns/void#class> <http://www.w3.org/2000/01/rdf-schema#Class> .
+<http://example.org/testdata#5.nt> <http://rdfs.org/ns/void#classPartition> _:d .
+_:d <http://rdfs.org/ns/void#entities> "2"^^<http://www.w3.org/2001/XMLSchema#int> .
+_:d <http://rdfs.org/ns/void#class> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://example.org/testdata#5.nt> <http://rdfs.org/ns/void#propertyPartition> _:e .
+_:e <http://rdfs.org/ns/void#triples> "0"^^<http://www.w3.org/2001/XMLSchema#int> .
+_:e <http://rdfs.org/ns/void#property> <http://example.org/property1> .
+<http://example.org/testdata#5.nt> <http://rdfs.org/ns/void#propertyPartition> _:f .
+_:f <http://rdfs.org/ns/void#triples> "0"^^<http://www.w3.org/2001/XMLSchema#int> .
+_:f <http://rdfs.org/ns/void#property> <http://example.org/property2> .
+<http://example.org/testdata#5.nt> <http://rdfs.org/ns/void#propertyPartition> _:g .
+_:g <http://rdfs.org/ns/void#triples> "1"^^<http://www.w3.org/2001/XMLSchema#int> .
+_:g <http://rdfs.org/ns/void#property> <http://www.w3.org/2000/01/rdf-schema#subClassOf> .
+<http://example.org/testdata#5.nt> <http://rdfs.org/ns/void#propertyPartition> _:h .
+_:h <http://rdfs.org/ns/void#triples> "1"^^<http://www.w3.org/2001/XMLSchema#int> .
+_:h <http://rdfs.org/ns/void#property> <http://www.w3.org/2000/01/rdf-schema#subPropertyOf> .
+<http://example.org/testdata#5.nt> <http://rdfs.org/ns/void#propertyPartition> _:i .
+_:i <http://rdfs.org/ns/void#triples> "4"^^<http://www.w3.org/2001/XMLSchema#int> .
+_:i <http://rdfs.org/ns/void#property> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> .
+<http://example.org/testdata#5.nt> <http://rdfs.org/ns/void#propertyPartition> _:j .
+_:j <http://rdfs.org/ns/void#triples> "4"^^<http://www.w3.org/2001/XMLSchema#int> .
+_:j <http://rdfs.org/ns/void#property> <http://www.w3.org/2000/01/rdf-schema#label> .
+<http://example.org/testdata#5.nt> <http://rdfs.org/ns/void#classes> "4"^^<http://www.w3.org/2001/XMLSchema#int> .
+<http://example.org/testdata#5.nt> <http://rdfs.org/ns/void#entities> "4"^^<http://www.w3.org/2001/XMLSchema#long> .
+<http://example.org/testdata#5.nt> <http://rdfs.org/ns/void#properties> "6"^^<http://www.w3.org/2001/XMLSchema#int> .
+<http://example.org/testdata#5.nt> <http://rdfs.org/ns/void#triples> "10"^^<http://www.w3.org/2001/XMLSchema#long> .
+<http://example.org/class1> <http://www.w3.org/2000/01/rdf-schema#label> "An example class" .
+<http://example.org/class2> <http://www.w3.org/2000/01/rdf-schema#label> "Another example class" .
+<http://example.org/property1> <http://www.w3.org/2000/01/rdf-schema#label> "An example property" .
+<http://example.org/property2> <http://www.w3.org/2000/01/rdf-schema#label> "And a second example property" .

@@ -1,0 +1,2 @@
+<http://example.org/class1> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://example.org/class2> .
+<http://example.org/property1> <http://www.w3.org/2000/01/rdf-schema#subPropertyOf> <http://example.org/property2> .

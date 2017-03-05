@@ -1,0 +1,3 @@
+country	20
+settlement	10
+capital	8

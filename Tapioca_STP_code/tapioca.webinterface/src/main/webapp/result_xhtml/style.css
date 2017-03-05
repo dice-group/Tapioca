@@ -1,0 +1,838 @@
+/* General settings start */
+html {
+	background: #fff;
+}
+body {
+	padding: 0;
+	margin: 0;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
+	font-size: 1em;
+}
+*,
+*:after,
+*::before {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+/* General settings end */
+
+/* ---------------------------------------------------------------------- */
+
+/* Navigation bar start */
+.navigationBarContainer {
+	position: relative;
+    z-index: 0;
+	width: 100%;
+	min-width: 520px;
+	height: 40px;
+	max-height: 40px;
+	background-color: #0B8C8C;
+	background: -webkit-gradient(linear, left top, left bottom, from(#0B8C8C), to(#0b8787));
+	background: -webkit-linear-gradient(top, #0B8C8C, #0b8787);
+	background: -moz-linear-gradient(top, #0B8C8C, #0b8787);
+	background: -ms-linear-gradient(top, #0B8C8C, #0b8787);
+	background: -o-linear-gradient(top, #0B8C8C, #0b8787);
+	border-bottom: 2px solid #0c9595;
+	-webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2);
+	box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2);
+}
+.tapiocaLogo {
+	float: left;
+	padding: 0;
+	margin: 0;
+	padding: 1px 5px;
+	display: inline-block;
+}
+.navigationBar {
+	padding: 0;
+	margin: 0;
+	display: block;
+	text-align: left;
+}
+.navigationBar li {
+	position: relative;
+	height: 40px;
+	color: white;
+	display: block;
+	list-style: none;
+	float: left;
+	padding: 6px 15px;
+}
+.navigationBar li a {
+	color: white;
+	text-decoration: none;
+}
+.navigationBar li:first-child {
+	border-left: 1px solid #097474;
+}
+.navigationBar li:nth-last-child(3) {
+	border-right: 1px solid #097474;
+}
+.navigationBar li:hover,
+.active-drop {
+	width: 5.5%;
+	background: #0da4a4;
+}
+
+.uploadImage {
+	width: 25px;
+	height: 25px;
+	display: block;
+	position: absolute;
+	top: 23%;
+	left: 10px;
+}
+
+.uploadImage input.uploadElement {
+   	display: none;
+}
+
+.uploadImage label.uploadElement {
+	background: url(Mini-Upload.png) no-repeat;	
+	/*appearance: button;
+	-webkit-appearance: button;
+ 	-moz-appearance: button;*/
+ 	display: block;
+	position: absolute;			 	
+	width: 100%;
+	height: 100%;
+	cursor: pointer;
+}
+
+.uploadImage label.uploadElement:hover {
+	-webkit-transform: scale(1.1);
+	transform: scale(1.1);
+}		
+
+.searchBar {
+	width: 93%;	
+	position: absolute;
+	top: 4px;
+	left: 40px;
+}
+.searchBar input {
+	width:100%;
+	font-weight: 300;
+	font-size: 1em;
+	border: none;
+	padding: 0.2em 0.3em 0.3em 1em;  
+	background: #075d5d;
+	color: white;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
+.searchBar input.searchButton {
+	display: none;
+}
+/* Navigation bar end */
+
+/* Error message start */
+.errorMessage {
+	padding: 15px;
+}
+.errorMessage p {
+	font-size: 1em;
+	font-weight: 600;
+	color: #000;
+}
+/* Error message end */
+
+/* ---------------------------------------------------------------------- */
+
+/* Menu start */
+*,
+*:after,
+*::before {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+	/* Declare menu */
+	.functionMenu {
+		position: relative;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 0;
+		border-width: 0px;
+		border-style: solid;
+		border-color: #333;
+		background-color: rgba(0,0,0,0);
+		-webkit-backface-visibility: hidden;
+		-webkit-transition: border-width 0.3s, background-color 0.3s, height 0s 0.3s;
+		transition: border-width 0.3s, background-color 0.3s, height 0s 0.3s;
+	}
+
+	/* Opened menu */
+	.functionMenu.functionMenu-open {
+		position: fixed;
+		height: 100%;
+		border-width: 0px 150px 0px 0px;
+		background-color: rgba(0,0,0,0.3);
+		-webkit-transition: border-width 0.3s, background-color 0.3s;
+		transition: border-width 0.3s, background-color 0.3s;
+	}
+	.functionMenu-overlay {
+		position: absolute;
+		width: 100%;
+	}
+	.functionMenu-open .functionMenu-overlay {
+		height: 100%;
+	}
+
+	/* Hamburger icon menu start */
+	.functionMenuTrigger {
+		position: fixed;
+		top: 3px;
+		right: 20px;
+		z-index: 999;
+		display: block;
+		width: 30px;
+		height: 35px;
+		cursor: pointer;
+	}
+	.functionMenuTrigger span {
+		position: absolute;
+		top: 50%;
+		left: 0;
+		display: block;
+		width: 100%;
+		height: 8%;
+		background-color: #fff;
+		font-size: 0px;
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		-khtml-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+		-webkit-transition: background-color 0.3s;
+		transition: background-color 0.3s;
+	}
+	.functionMenuTrigger span:before,
+	.functionMenuTrigger span:after {
+		position: absolute;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: #fff;
+		content: '';
+		-webkit-transition: -webkit-transform 0.3s;
+		transition: transform 0.3s;
+	}
+	.functionMenuTrigger span:before {
+		-webkit-transform: translateY(-250%);
+		transform: translateY(-250%);		
+	}
+	.functionMenuTrigger span:after {
+		-webkit-transform: translateY(250%);
+		transform: translateY(250%);
+	}
+	.functionMenu-open .functionMenuTrigger span:before {
+		-webkit-transform: translateY(-300%);
+		transform: translateY(-300%);		
+	}
+	.functionMenu-open .functionMenuTrigger span:after {
+		-webkit-transform: translateY(300%);
+		transform: translateY(300%);		
+	}
+	.functionMenuTrigger.scrolling {
+		position: fixed;
+		top: 3px;
+		right: 20px;
+		z-index: 999;
+		display: block;
+		width: 30px;
+		height: 35px;
+		cursor: pointer;
+		}	
+	.functionMenuTrigger.scrolling span {
+		position: absolute;
+		top: 50%;
+		left: 0;
+		display: block;
+		width: 100%;
+		height: 8%;
+		background-color: black;
+		font-size: 0px;
+		-webkit-touch-callout: none;
+		-webkit-user-select: none;
+		-khtml-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+		-webkit-transition: background-color 0.3s;
+		transition: background-color 0.3s;
+	}
+	.functionMenuTrigger.scrolling span:before,
+	.functionMenuTrigger.scrolling span:after {
+		position: absolute;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: black;
+		content: '';
+		-webkit-transition: -webkit-transform 0.3s;
+		transition: transform 0.3s;
+	}		
+	.functionMenuTrigger.scrolling span:before {
+		-webkit-transform: translateY(-250%);
+		transform: translateY(-250%);		
+	}
+	.functionMenuTrigger.scrolling span:after {
+		-webkit-transform: translateY(250%);
+		transform: translateY(250%);
+	}	
+	.functionMenu-open .functionMenuTrigger.scrolling span {
+		background: #fff;
+	}
+	
+	.functionMenu-open .functionMenuTrigger.scrolling span:before {
+		background: #fff;
+		-webkit-transform: translateY(-300%);
+		transform: translateY(-300%);		
+	}
+	.functionMenu-open .functionMenuTrigger.scrolling span:after {
+		background: #fff;
+		-webkit-transform: translateY(300%);
+		transform: translateY(300%);		
+	}	
+	/* Hamburger icon menu end */
+	
+	/* Menu, styles and effects start */
+	.functionMenu ul {
+		position: fixed;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.functionMenu ul {
+		top: 75px;
+		right: 0;
+	}
+	.functionMenu ul li {
+		visibility: hidden;
+		opacity: 0;
+		-webkit-transition: -webkit-transform 0.3s, opacity 0.2s, visibility 0s 0.3s;
+		transition: transform 0.3s, opacity 0.2s, visibility 0s 0.3s;
+	}
+	.functionMenu.functionMenu-open ul li{
+		visibility: visible;
+		opacity: 1;
+		-webkit-transition: -webkit-transform 0.3s, opacity 0.3s 0.1s;
+		transition: transform 0.3s, opacity 0.3s;
+	}
+	.functionMenu ul li {
+		width: 150px;
+		height: 50px;
+		line-height: 50px;
+		-webkit-transform: translate3d(100%,50%,0);
+		transform: translate3d(100%,50%,0);
+	}
+	.functionMenu.functionMenu-open ul li {
+		-webkit-transform: translate3d(0,0,0);
+		transform: translate3d(0,0,0);
+	}
+	.functionMenu ul li a {
+		display: block;
+		outline: none;
+		text-decoration: none;
+	}
+	.functionMenu ul li a {
+		padding: 0 20px;
+		box-shadow: inset 0 1px rgba(0,0,0,0.2);
+		color: #fff;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		font-size: 1em;
+		-webkit-transition: color 0.2s;
+		transition: color 0.2s;
+	}
+	.functionMenu ul li:last-child a {
+		box-shadow: inset 0 1px rgba(0,0,0,0.2), inset 0 -1px rgba(0,0,0,0.2);
+	}
+	.functionMenu ul li a:before {
+		color: #fff;
+		font-size: 24px;
+		-webkit-transition: color 0.2s;
+		transition: color 0.2s;
+	}
+	.functionMenu ul li a:hover,
+	.functionMenu ul li a:focus,
+	.functionMenu ul li a:hover:before,
+	.functionMenu ul li a:focus:before {
+		color: #1abc9c;
+	}
+	/* Menu, styles and effects end */
+/* Menu end */
+
+.navigationBar li.searchContainer {
+	width: 50%;
+	border-right: 1px solid #097474;
+	-webkit-transition: all 0.5s ease-in-out;
+	-moz-transition: all 0.5s ease-in-out;
+	-ms-transition: all 0.5s ease-in-out;
+	-o-transition: all 0.5s ease-in-out;
+}
+.navigationBar li.searchContainer:hover,
+.active-search {
+	width: 80%;
+}
+ul.dropdown-menu {
+	display: none;
+}
+/* Hamburger menu end */
+
+/* ---------------------------------------------------------------------- */
+
+
+/* Progress bar start */
+
+.ui-progressbar {
+	border:0px !important;
+	background-image:none;
+	background-color:white;	
+}
+
+.ui-progressbar.ui-widget-content {
+	border:0px !important;
+    background-color:transparent;
+    background-image:none;
+}
+.animated .ui-progressbar-value {
+	border:0px !important;
+    background-image: none;
+    background-color:transparent;    
+}
+
+.progressBarImage {
+    position: absolute; 
+    width: 100%; 
+    height: 100%; 
+    background: url('progressImage.gif') no-repeat center center;
+    top: -23%;
+}
+
+.progressBarContainer {
+    position: absolute;
+    margin-right: 1200px;
+    margin-left: -1200px;
+    width: 2400px;
+    height: 200px;
+    top: 50%;
+    left: 50%;
+}
+
+/* Progress bar end */
+
+
+/* Result list start */
+.resultListContainer h1 {
+	font-size: 130%;
+	margin: 0;
+}
+.resultListContainer h2 {
+	font-size: 100%;
+	font-weight: normal;
+	margin: 0;
+}
+.resultListContainer h2 a {
+	color: #0B8888;
+}
+.resultListContainer p {
+	margin: 0;
+}
+.resultListContainer a {
+	text-decoration: none;
+}
+.resultListContainer ul {
+	list-style-type: none;
+}
+.resultListContainer li {
+	margin: 20px 0;
+}
+/* Result list end */
+
+/* ---------------------------------------------------------------------- */
+
+/* ---------------------------------------------------------------------- */
+
+/* modalWindow start */		
+/* Hide scroll bar */
+
+html.remodal-is-locked {
+  overflow: hidden;
+
+  -ms-touch-action: none;
+  touch-action: none;
+}
+
+/* Anti FOUC */
+
+.remodal,
+[data-remodal-id] {
+  display: none;
+}
+
+/* Necessary styles of the overlay */
+
+.remodal-overlay {
+  position: fixed;
+  z-index: 9999;
+  top: -5000px;
+  right: -5000px;
+  bottom: -5000px;
+  left: -5000px;
+
+  display: none;
+}
+
+/* Necessary styles of the wrapper */
+
+.remodal-wrapper {
+  position: fixed;
+  z-index: 10000;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
+  display: none;
+  overflow: auto;
+
+  text-align: center;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+.remodal-wrapper:after {
+  display: inline-block;
+
+  height: 100%;
+  margin-left: -0.05em;
+
+  content: "";
+}
+
+/* Fix iPad, iPhone glitches */
+
+.remodal-overlay,
+.remodal-wrapper {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Necessary styles of the modal dialog */
+
+.remodal {
+  position: relative;
+
+  outline: none;
+
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+.remodal-is-initialized {
+  /* Disable Anti-FOUC */
+  display: inline-block;
+}
+
+/* Default theme styles for the background */
+
+.remodal-bg.remodal-is-opening,
+.remodal-bg.remodal-is-opened {
+  -webkit-filter: blur(3px);
+  filter: blur(3px);
+}
+
+/* Default theme styles of the overlay */
+
+.remodal-overlay {
+  background: rgba(43, 46, 56, 0.9);
+}
+
+.remodal-overlay.remodal-is-opening,
+.remodal-overlay.remodal-is-closing {
+  -webkit-animation-duration: 0.3s;
+  animation-duration: 0.3s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.remodal-overlay.remodal-is-opening {
+  -webkit-animation-name: remodal-overlay-opening-keyframes;
+  animation-name: remodal-overlay-opening-keyframes;
+}
+
+.remodal-overlay.remodal-is-closing {
+  -webkit-animation-name: remodal-overlay-closing-keyframes;
+  animation-name: remodal-overlay-closing-keyframes;
+}
+
+/* Default theme styles of the wrapper */
+
+.remodal-wrapper {
+  padding: 10px 10px 0;
+}
+
+/* Default theme styles of the modal dialog */
+
+.remodal {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 35px;
+
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+
+  color: #2b2e38;
+  background: #fff;
+}
+
+.remodal.remodal-is-opening,
+.remodal.remodal-is-closing {
+  -webkit-animation-duration: 0.3s;
+  animation-duration: 0.3s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+.remodal.remodal-is-opening {
+  -webkit-animation-name: remodal-opening-keyframes;
+  animation-name: remodal-opening-keyframes;
+}
+
+.remodal.remodal-is-closing {
+  -webkit-animation-name: remodal-closing-keyframes;
+  animation-name: remodal-closing-keyframes;
+}
+
+/* Vertical align of the modal dialog */
+
+.remodal,
+.remodal-wrapper:after {
+  vertical-align: middle;
+}
+
+/* Close button */
+
+.remodal-close {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  display: block;
+  overflow: visible;
+
+  width: 35px;
+  height: 35px;
+  margin: 0;
+  padding: 0;
+
+  cursor: pointer;
+  -webkit-transition: color 0.2s;
+  transition: color 0.2s;
+  text-decoration: none;
+
+  color: #95979c;
+  border: 0;
+  outline: 0;
+  background: transparent;
+}
+
+.remodal-close:hover,
+.remodal-close:focus {
+  color: #2b2e38;
+}
+
+.remodal-close:before {
+  font-family: Arial, "Helvetica CY", "Nimbus Sans L", sans-serif !important;
+  font-size: 25px;
+  line-height: 35px;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  display: block;
+
+  width: 35px;
+
+  content: "\00d7";
+  text-align: center;
+}
+
+/* Dialog buttons */
+
+.remodal-confirm,
+.remodal-cancel {
+  font: inherit;
+
+  display: inline-block;
+  overflow: visible;
+
+  min-width: 110px;
+  margin: 0;
+  padding: 12px 0;
+
+  cursor: pointer;
+  -webkit-transition: background 0.2s;
+  transition: background 0.2s;
+  text-align: center;
+  vertical-align: middle;
+  text-decoration: none;
+
+  border: 0;
+  outline: 0;
+}
+
+.remodal-confirm {
+  color: #fff;
+  background: #81c784;
+}
+
+.remodal-confirm:hover,
+.remodal-confirm:focus {
+  background: #66bb6a;
+}
+
+.remodal-cancel {
+  color: #fff;
+  background: #e57373;
+}
+
+.remodal-cancel:hover,
+.remodal-cancel:focus {
+  background: #ef5350;
+}
+
+/* Remove inner padding and border in Firefox 4+ for the button tag. */
+
+.remodal-confirm::-moz-focus-inner,
+.remodal-cancel::-moz-focus-inner,
+.remodal-close::-moz-focus-inner {
+  padding: 0;
+
+  border: 0;
+}
+
+/* Keyframes
+   ========================================================================== */
+
+@-webkit-keyframes remodal-opening-keyframes {
+  from {
+    -webkit-transform: scale(1.05);
+    transform: scale(1.05);
+
+    opacity: 0;
+  }
+  to {
+    -webkit-transform: none;
+    transform: none;
+
+    opacity: 1;
+  }
+}
+
+@keyframes remodal-opening-keyframes {
+  from {
+    -webkit-transform: scale(1.05);
+    transform: scale(1.05);
+
+    opacity: 0;
+  }
+  to {
+    -webkit-transform: none;
+    transform: none;
+
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes remodal-closing-keyframes {
+  from {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+
+    opacity: 1;
+  }
+  to {
+    -webkit-transform: scale(0.95);
+    transform: scale(0.95);
+
+    opacity: 0;
+  }
+}
+
+@keyframes remodal-closing-keyframes {
+  from {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+
+    opacity: 1;
+  }
+  to {
+    -webkit-transform: scale(0.95);
+    transform: scale(0.95);
+
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes remodal-overlay-opening-keyframes {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes remodal-overlay-opening-keyframes {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes remodal-overlay-closing-keyframes {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes remodal-overlay-closing-keyframes {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Media queries
+   ========================================================================== */
+
+@media only screen and (min-width: 641px) {
+  .remodal {
+    max-width: 700px;
+  }
+}
+
+/* modalWindow end */		
+
+/* ---------------------------------------------------------------------- */

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<!-- For assistance related to logback-translator or configuration  -->
+<!-- files in general, please contact the logback user mailing list -->
+<!-- at http://www.qos.ch/mailman/listinfo/logback-user             -->
+<!--                                                                -->
+<!-- For professional support please see                            -->
+<!--    http://www.qos.ch/shop/products/professionalSupport         -->
+<!--                                                                -->
+<configuration>
+  <appender name="stdlog" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss} %-5p %-25c{0} :: %m%n</pattern>
+    </encoder>
+  </appender>
+  <appender name="file" class="ch.qos.logback.core.FileAppender">
+    <file>tapioca.log</file>
+    <Append>true</Append>
+    <encoder>
+      <pattern>%d{HH:mm:ss} %-5p %-25c{0} :: %m%n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="com.hp.hpl.jena" level="INFO"/>
+  <root level="INFO">
+    <appender-ref ref="stdlog"/>
+    <appender-ref ref="file"/>
+  </root>
+</configuration>

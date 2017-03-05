@@ -1,0 +1,42 @@
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix void-ext: <http://stats.lod2.eu/rdf/void-ext/> .
+@prefix qb: <http://purl.org/linked-data/cube#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix ls-void: <http://stats.lod2.eu/rdf/void/> .
+@prefix ls-qb: <http://stats.lod2.eu/rdf/qb/> .
+@prefix ls-cr: <http://stats.lod2.eu/rdf/qb/criteria/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix xstats: <http://example.org/XStats#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://lodstats.aksw.org/stat_result/30952.void>
+    void:classPartition [
+        void:class <http://purl.obolibrary.org/obo/UBERON_0010061> ;
+        void:entities "211"^^xsd:int
+    ], [
+        void:class <http://purl.obolibrary.org/obo/NCBITaxon_5141> ;
+        void:entities "210"^^xsd:int
+    ], [
+        void:class <http://purl.obolibrary.org/obo/ERO_0001268> ;
+        void:entities "209"^^xsd:int
+    ], [
+        void:class <http://purl.obolibrary.org/obo/UBERON_0010579> ;
+        void:entities "207"^^xsd:int
+    ] ;
+    void:classes 4 ;
+    void:entities 837 ;
+    void:properties 2 ;
+    void:propertyPartition [
+        void:property <http://eagle-i.org/ont/repo/1.0/hasWorkflowState> ;
+        void:triples 21
+    ], [
+        void:property <http://eagle-i.org/ont/repo/1.0/hasWorkflowOwner> ;
+        void:triples 1
+    ], [
+        void:property rdf:type ;
+        void:triples 837
+    ] ;
+    void:triples 859 ;
+    a void:Dataset .

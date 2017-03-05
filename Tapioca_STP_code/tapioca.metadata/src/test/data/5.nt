@@ -1,0 +1,10 @@
+<http://example.org/class1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
+<http://example.org/class1> <http://www.w3.org/2000/01/rdf-schema#label> "An example class" .
+<http://example.org/class2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#Class> .
+<http://example.org/class2> <http://www.w3.org/2000/01/rdf-schema#label> "Another example class" .
+<http://example.org/class1> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://example.org/class2> .
+<http://example.org/property1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://example.org/property1> <http://www.w3.org/2000/01/rdf-schema#label> "An example property" .
+<http://example.org/property2> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/1999/02/22-rdf-syntax-ns#Property> .
+<http://example.org/property2> <http://www.w3.org/2000/01/rdf-schema#label> "And a second example property" .
+<http://example.org/property1> <http://www.w3.org/2000/01/rdf-schema#subPropertyOf> <http://example.org/property2> .
