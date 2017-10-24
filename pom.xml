@@ -1,19 +1,20 @@
 <!--
 
-    This file is part of tapioca.
+    Tapioca - ${project.description}
+    Copyright © 2015 Data Science Group (DICE) (michael.roeder@uni-paderborn.de)
 
-    tapioca is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Lesser General Public License as published by
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
-    tapioca is distributed in the hope that it will be useful,
+    This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Lesser General Public License for more details.
+    GNU Affero General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License
-    along with tapioca.  If not, see <http://www.gnu.org/licenses/>.
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -23,6 +24,7 @@
 	<artifactId>tapioca</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
+	<name>Tapioca</name>
 	<inceptionYear>2015</inceptionYear>
 
 	<!-- LICENSE -->
@@ -45,7 +47,7 @@
 	<!-- PROPERTIES -->
 	<properties>
 		<developer.name>Michael Röder</developer.name>
-		<developer.mail>roeder@informatik.uni-leipzig.de</developer.mail>
+		<developer.mail>michael.roeder@uni-paderborn.de</developer.mail>
 	</properties>
 
 	<!-- MODULES -->
@@ -63,19 +65,22 @@
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>2.6</version>
+				<version>3.0</version>
 				<configuration>
-					<header>com/mycila/maven/plugin/license/templates/LGPL-3.txt</header>
+					<header>com/mycila/maven/plugin/license/templates/AGPL-3.txt</header>
 					<properties>
-						<owner>${developer.name} (${developer.mail})</owner>
+						<owner>Data Science Group (DICE)</owner>
+						<email>michael.roeder@uni-paderborn.de</email>
 					</properties>
 					<excludes>
 						<exclude>**/README</exclude>
 						<exclude>**/LICENSE</exclude>
-						<exclude>**.log</exclude>
+						<exclude>**/Dockerfile</exclude>
 						<exclude>diagrams/**</exclude>
 						<exclude>src/test/resources/**</exclude>
 						<exclude>src/main/resources/**</exclude>
+						<exclude>src/main/webapp/**</exclude>
+						<exclude>Tapioca_STP_code/**</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
