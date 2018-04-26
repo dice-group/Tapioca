@@ -41,12 +41,11 @@ import org.aksw.simba.tapioca.analyzer.dump.DumpLoadingTask;
 import org.aksw.simba.tapioca.analyzer.sparql.EndpointAnalyzingTask;
 import org.aksw.simba.tapioca.analyzer.sparql.EndpointConfig;
 import org.aksw.simba.tapioca.analyzer.sparql.SPARQLEndpointAnalyzer;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.hp.hpl.jena.rdf.model.Model;
 
 public class EndpointAnalyzingTaskWithDumpBackup extends DumpLoadingTask {
 

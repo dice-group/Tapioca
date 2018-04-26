@@ -37,10 +37,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.system.StreamRDF;
-
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.sparql.core.Quad;
+import org.apache.jena.sparql.core.Quad;
 
 /**
  * A simple decorator that offers the additional {@link #waitToStart()} method

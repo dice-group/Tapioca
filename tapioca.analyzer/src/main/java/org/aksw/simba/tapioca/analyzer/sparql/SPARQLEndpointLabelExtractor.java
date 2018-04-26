@@ -43,13 +43,12 @@ import java.util.Set;
 import org.aksw.jena_sparql_api.core.QueryExecutionFactory;
 import org.aksw.simba.tapioca.analyzer.label.LabelExtractionUtils;
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.RDFClientLabelRetriever;
+import org.apache.jena.query.QueryExecution;
+import org.apache.jena.query.QuerySolution;
+import org.apache.jena.query.ResultSet;
+import org.apache.jena.rdf.model.RDFNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.hp.hpl.jena.query.QueryExecution;
-import com.hp.hpl.jena.query.QuerySolution;
-import com.hp.hpl.jena.query.ResultSet;
-import com.hp.hpl.jena.rdf.model.RDFNode;
 
 public class SPARQLEndpointLabelExtractor extends AbstractSPARQLClient {
 

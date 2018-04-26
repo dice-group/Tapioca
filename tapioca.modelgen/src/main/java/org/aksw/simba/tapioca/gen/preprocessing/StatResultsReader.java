@@ -41,16 +41,16 @@ import org.aksw.simba.tapioca.extraction.RDF2ExtractionStreamer;
 import org.aksw.simba.tapioca.gen.data.StatResult;
 import org.aksw.simba.tapioca.gen.util.StatResultComparator;
 import org.apache.commons.io.IOUtils;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.RDFLanguages;
+import org.apache.jena.sparql.vocabulary.FOAF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.carrotsearch.hppc.IntObjectOpenHashMap;
 import com.carrotsearch.hppc.IntOpenHashSet;
 import com.carrotsearch.hppc.ObjectObjectOpenHashMap;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.sparql.vocabulary.FOAF;
 
 public class StatResultsReader {
 

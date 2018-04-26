@@ -33,7 +33,7 @@
  */
 package org.aksw.simba.tapioca.analyzer;
 
-import com.hp.hpl.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.Model;
 
 public class Analyzer {
 

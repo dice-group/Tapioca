@@ -37,13 +37,12 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.aksw.simba.tapioca.extraction.AbstractExtractorTest;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 @RunWith(Parameterized.class)
 public class SpecialClassExtractorTest extends AbstractExtractorTest {

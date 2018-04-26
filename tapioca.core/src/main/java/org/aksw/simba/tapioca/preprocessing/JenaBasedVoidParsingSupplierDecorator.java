@@ -53,16 +53,16 @@ import org.aksw.simba.topicmodeling.utils.doc.DocumentDescription;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentName;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentText;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentURI;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.Lang;
+import org.apache.jena.vocabulary.DCTerms;
+import org.apache.jena.vocabulary.RDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.carrotsearch.hppc.ObjectLongOpenHashMap;
 import com.carrotsearch.hppc.ObjectObjectOpenHashMap;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.vocabulary.DCTerms;
-import com.hp.hpl.jena.vocabulary.RDF;
 
 /**
  * Parses the {@link DocumentText} as RDF VOID information (in turtle). Adds

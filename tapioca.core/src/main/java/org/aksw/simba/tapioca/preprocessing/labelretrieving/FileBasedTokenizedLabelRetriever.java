@@ -23,13 +23,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.aksw.simba.topicmodeling.commons.io.StorageHelper;
-import org.apache.http.annotation.ThreadSafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.carrotsearch.hppc.ObjectObjectOpenHashMap;
 
-@ThreadSafe
+//@ThreadSafe
 public class FileBasedTokenizedLabelRetriever extends AbstractTokenizedLabelRetriever {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileBasedTokenizedLabelRetriever.class);

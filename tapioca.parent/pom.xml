@@ -56,7 +56,7 @@
 		<org.aksw.simba.topicmodeling.version>0.0.2-SNAPSHOT</org.aksw.simba.topicmodeling.version>
 		<org.apache.commons.commons-lang3.version>3.3.2</org.apache.commons.commons-lang3.version>
 		<org.apache.commons.commons-io.version>2.4</org.apache.commons.commons-io.version>
-		<org.apache.jena.version>2.13.0</org.apache.jena.version>
+		<org.apache.jena.version>3.0.1</org.apache.jena.version>
 		<org.aksw.jena-sparql-api.version>${org.apache.jena.version}-1</org.aksw.jena-sparql-api.version>
 		<org.openrdf.sesame.version>2.7.0-beta1</org.openrdf.sesame.version>
 		<slf4j.version>1.7.10</slf4j.version>

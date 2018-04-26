@@ -39,11 +39,11 @@ import java.util.Arrays;
 import org.aksw.simba.tapioca.extraction.voidex.VoidExtractor;
 import org.aksw.simba.topicmodeling.concurrent.utils.MaxDurationCheckingThread;
 import org.apache.jena.riot.Lang;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 import org.junit.Test;
 
 import com.carrotsearch.hppc.ObjectIntOpenHashMap;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 import junit.framework.Assert;
 

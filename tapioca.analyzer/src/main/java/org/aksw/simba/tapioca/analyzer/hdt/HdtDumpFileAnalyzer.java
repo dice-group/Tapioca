@@ -31,21 +31,29 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with tapioca.analyzer.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.aksw.simba.tapioca.analyzer.dump;
+package org.aksw.simba.tapioca.analyzer.hdt;
 
-import java.util.concurrent.ExecutorService;
-
+import org.aksw.simba.tapioca.analyzer.dump.AbstractDumpExtractorApplier;
 import org.aksw.simba.tapioca.data.vocabularies.EVOID;
 import org.aksw.simba.tapioca.data.vocabularies.VOID;
+import org.aksw.simba.tapioca.extraction.Extractor;
 import org.aksw.simba.tapioca.extraction.voidex.SpecialClassExtractor;
 import org.aksw.simba.tapioca.extraction.voidex.VoidExtractor;
 import org.aksw.simba.tapioca.extraction.voidex.VoidInformation;
 import org.aksw.simba.tapioca.extraction.voidex.VoidParsingExtractor;
+import org.apache.commons.io.IOUtils;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.vocabulary.RDF;
+import org.rdfhdt.hdt.hdt.HDT;
+import org.rdfhdt.hdt.hdt.HDTManager;
+import org.rdfhdt.hdt.triples.IteratorTripleString;
+import org.rdfhdt.hdt.triples.TripleString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,23 +66,22 @@ import com.carrotsearch.hppc.ObjectObjectOpenHashMap;
  * @author Michael R&ouml;der (roeder@informatik.uni-leipzig.de)
  *
  */
-public class DumpFileAnalyzer extends AbstractDumpExtractorApplier {
+public class HdtDumpFileAnalyzer extends AbstractDumpExtractorApplier {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DumpFileAnalyzer.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HdtDumpFileAnalyzer.class);
 
-    public DumpFileAnalyzer() {
+    public HdtDumpFileAnalyzer() {
         super(null);
     }
 
-    public DumpFileAnalyzer(ExecutorService executor) {
-        super(executor);
-    }
-
     /**
-     * Extracts the VoID information of an RDF dataset comprising the given dump files.
+     * Extracts the VoID information of an RDF dataset comprising the given dump
+     * files.
      * 
-     * @param datsetUri the URI of the dataset
-     * @param dumps the dump files of the dataset
+     * @param datsetUri
+     *            the URI of the dataset
+     * @param dumps
+     *            the dump files of the dataset
      * @return a Model containing the VoID information
      */
     public Model extractVoidInfo(String datsetUri, String... dumps) {
@@ -89,6 +96,84 @@ public class DumpFileAnalyzer extends AbstractDumpExtractorApplier {
         }
         addParsedVoidToCounts(extractor, vpExtractor);
         return generateVoidModel(datsetUri, extractor, sExtractor);
+    }
+
+    @Override
+    protected boolean extractFromDump(String dump, Extractor... extractors) {
+        HDT hdt = null;
+        try {
+            hdt = HDTManager.loadIndexedHDT(dump, null);
+            IteratorTripleString iterator = hdt.search(null, null, null);
+            while (iterator.hasNext()) {
+                Triple triple = transform(iterator.next());
+                if(triple != null) {
+                for (int i = 0; i < extractors.length; ++i) {
+                    extractors[i].handleTriple(triple);
+                }
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            LOGGER.error("Couldn't read dump file \"" + dump + "\". Ignoring this dump.", e);
+            return false;
+        } finally {
+            IOUtils.closeQuietly(hdt);
+        }
+    }
+
+    private Triple transform(TripleString t) {
+        String temp = t.getSubject().toString();
+        Node s = createUriNode(temp);
+        if (s == null) {
+            s = createAnonNode(temp);
+            if (s == null) {
+                LOGGER.error("Couldn't parse subject of \"" + t.toString() + "\". Returning null.");
+                return null;
+            }
+        }
+        temp = t.getPredicate().toString();
+        Node p = createUriNode(temp);
+        if (p == null) {
+            LOGGER.error("Couldn't parse predicate of \"" + t.toString() + "\". Returning null.");
+            return null;
+        }
+        temp = t.getSubject().toString();
+        Node o = createUriNode(temp);
+        if (o == null) {
+            o = createAnonNode(temp);
+            if (o == null) {
+                o = createLiteralNode(temp);
+                if (o == null) {
+                    LOGGER.error("Couldn't parse object of \"" + t.toString() + "\". Returning null.");
+                    return null;
+                }
+            }
+        }
+        return new Triple(s, p, o);
+    }
+
+    private Node createUriNode(String n) {
+        try {
+            return NodeFactory.createURI(n);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Node createAnonNode(String n) {
+        try {
+            return NodeFactory.createBlankNode(n);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private Node createLiteralNode(String n) {
+        try {
+            return NodeFactory.createLiteral(n);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     protected Model generateVoidModel(String datsetUri, VoidExtractor extractor, SpecialClassExtractor sExtractor) {

@@ -49,6 +49,12 @@
 			<artifactId>topicmodeling.io</artifactId>
 			<version>${org.aksw.simba.topicmodeling.version}</version>
 		</dependency>
+		
+        <dependency>
+            <groupId>org.apache.jena</groupId>
+            <artifactId>jena-core</artifactId>
+            <version>3.1.0</version>
+        </dependency>
 	</dependencies>
 
 	<build>

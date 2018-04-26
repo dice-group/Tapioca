@@ -41,12 +41,17 @@ import java.util.Set;
 
 import org.aksw.simba.tapioca.data.DatasetClassInfo;
 import org.aksw.simba.tapioca.data.DatasetPropertyInfo;
+import org.aksw.simba.tapioca.data.vocabularies.VOID;
 import org.aksw.simba.tapioca.preprocessing.JenaBasedVoidParsingSupplierDecorator;
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.LabelTokenizerHelper;
 import org.aksw.simba.topicmodeling.io.SimpleDocSupplierFromFile;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.DocumentTextCreatingSupplierDecorator;
 import org.aksw.simba.topicmodeling.utils.doc.Document;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.Property;
+import org.apache.jena.rdf.model.RDFNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +94,23 @@ public class LabelExtractionUtils {
         } else {
             LOGGER.error("Document doesn't contain property information. Returning null.");
             return null;
+        }
+        return uris;
+    }
+    
+    public static Set<String> readUris(Model voidModel) {
+        Set<String> uris = new HashSet<String>();
+        Property properties[] = new Property[] {VOID.clazz, VOID.property};
+        NodeIterator iterator;
+        RDFNode n;
+        for (int i = 0; i < properties.length; i++) {
+            iterator = voidModel.listObjectsOfProperty(properties[i]);
+            while(iterator.hasNext()) {
+                n = iterator.next();
+                if(n.isURIResource()) {
+                    uris.add(n.asResource().getURI());
+                }
+            }
         }
         return uris;
     }

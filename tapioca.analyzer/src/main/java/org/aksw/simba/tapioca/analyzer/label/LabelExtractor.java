@@ -41,8 +41,7 @@ import java.util.Set;
 
 import org.aksw.simba.tapioca.extraction.AbstractExtractor;
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.RDFClientLabelRetriever;
-
-import com.hp.hpl.jena.graph.Triple;
+import org.apache.jena.graph.Triple;
 
 public class LabelExtractor extends AbstractExtractor {
 

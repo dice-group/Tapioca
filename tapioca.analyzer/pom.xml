@@ -41,6 +41,12 @@
 			<artifactId>jena-sparql-api-core</artifactId>
 			<version>${org.aksw.jena-sparql-api.version}</version>
 		</dependency>
+        <!-- HDT API -->
+        <dependency>
+            <artifactId>hdt-java-core</artifactId>
+            <groupId>org.rdfhdt</groupId>
+            <version>2.0-SNAPSHOT</version>
+        </dependency>
 		<!-- Jena SPARQL API -->
 		<dependency>
 			<groupId>org.aksw.jena-sparql-api</groupId>

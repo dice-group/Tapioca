@@ -42,15 +42,13 @@ import org.aksw.simba.topicmodeling.concurrent.overseers.pool.ExecutorBasedOvers
 import org.aksw.simba.topicmodeling.concurrent.overseers.simple.SimpleOverseer;
 import org.aksw.simba.topicmodeling.concurrent.tasks.Task;
 import org.aksw.simba.topicmodeling.concurrent.tasks.TaskObserver;
-import org.apache.http.annotation.NotThreadSafe;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.lang.PipedRDFIterator;
 import org.apache.jena.riot.lang.PipedRDFStream;
 import org.apache.jena.riot.lang.PipedTriplesStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.hp.hpl.jena.graph.Triple;
 
 /**
  * Class to manage the streaming of RDF from a source (a String or an
@@ -62,7 +60,7 @@ import com.hp.hpl.jena.graph.Triple;
  * @author Michael R&ouml;der (roeder@informatik.uni-leipzig.de)
  *
  */
-@NotThreadSafe
+//@NotThreadSafe
 public class RDF2ExtractionStreamer implements TaskObserver {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RDF2ExtractionStreamer.class);

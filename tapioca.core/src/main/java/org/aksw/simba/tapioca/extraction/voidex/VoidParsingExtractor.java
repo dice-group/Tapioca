@@ -35,12 +35,12 @@ package org.aksw.simba.tapioca.extraction.voidex;
 
 import org.aksw.simba.tapioca.data.vocabularies.VOID;
 import org.aksw.simba.tapioca.extraction.AbstractExtractor;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.carrotsearch.hppc.ObjectObjectOpenHashMap;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
 
 public class VoidParsingExtractor extends AbstractExtractor {
 

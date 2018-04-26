@@ -37,12 +37,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import org.aksw.simba.topicmodeling.concurrent.tasks.Task;
+import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.hp.hpl.jena.rdf.model.Model;
 
 public class EndpointAnalyzingTask implements Task {
 

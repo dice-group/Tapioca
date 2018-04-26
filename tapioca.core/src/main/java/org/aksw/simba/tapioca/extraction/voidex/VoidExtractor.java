@@ -39,13 +39,13 @@ import java.util.Set;
 
 import org.aksw.simba.tapioca.extraction.AbstractExtractor;
 import org.aksw.simba.tapioca.extraction.Extractor;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.vocabulary.OWL;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.RDFS;
 
 import com.carrotsearch.hppc.ObjectIntOpenHashMap;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.vocabulary.OWL;
-import com.hp.hpl.jena.vocabulary.RDF;
-import com.hp.hpl.jena.vocabulary.RDFS;
 
 /**
  * <p>

@@ -60,23 +60,24 @@ import org.aksw.simba.topicmodeling.utils.doc.DocumentDescription;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentName;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentURI;
 import org.apache.commons.io.IOUtils;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.n3.turtle.TurtleReader;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.RDFReader;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.riot.Lang;
+import org.apache.jena.vocabulary.DC;
+import org.apache.jena.vocabulary.OWL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.carrotsearch.hppc.IntObjectOpenHashMap;
 import com.carrotsearch.hppc.ObjectIntOpenHashMap;
-import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.Triple;
-import com.hp.hpl.jena.n3.turtle.TurtleReader;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFNode;
-import com.hp.hpl.jena.rdf.model.RDFReader;
-import com.hp.hpl.jena.rdf.model.Resource;
-import com.hp.hpl.jena.rdf.model.impl.ResourceImpl;
-import com.hp.hpl.jena.vocabulary.DC;
-import com.hp.hpl.jena.vocabulary.OWL;
 
 public class MetaDataInformationCollector {
 
@@ -171,7 +172,7 @@ public class MetaDataInformationCollector {
 		}
 		DatasetDescription description;
 		Resource datasetResource;
-		com.hp.hpl.jena.rdf.model.Statement s;
+		Statement s;
 		for (int i = 0; i < descriptions.allocated.length; ++i) {
 			if (descriptions.allocated[i]) {
 				description = (DatasetDescription) ((Object[]) descriptions.values)[i];
