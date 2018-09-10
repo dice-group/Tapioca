@@ -33,6 +33,11 @@
  */
 package org.aksw.simba.tapioca.analyzer.hdt;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import org.aksw.simba.tapioca.analyzer.dump.AbstractDumpExtractorApplier;
 import org.aksw.simba.tapioca.data.vocabularies.EVOID;
 import org.aksw.simba.tapioca.data.vocabularies.VOID;
@@ -72,6 +77,13 @@ public class HdtDumpFileAnalyzer extends AbstractDumpExtractorApplier {
 
     public HdtDumpFileAnalyzer() {
         super(null);
+    }
+    
+    public static void main(String[] args) throws IOException {
+    	HdtDumpFileAnalyzer analyzer = new HdtDumpFileAnalyzer();
+    	Model m = analyzer.extractVoidInfo("http://test.com/", "test.hdt");
+    	new File("out").createNewFile();
+    	m.write(new FileOutputStream("out.ttl"), "TTL");
     }
 
     /**

@@ -43,6 +43,7 @@ import org.aksw.simba.tapioca.analyzer.label.LabelExtractionUtils;
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.RDFClientLabelRetriever;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
+import org.rdfhdt.hdt.exceptions.NotFoundException;
 import org.rdfhdt.hdt.hdt.HDT;
 import org.rdfhdt.hdt.hdt.HDTManager;
 import org.rdfhdt.hdt.triples.IteratorTripleString;
@@ -58,44 +59,67 @@ import org.slf4j.LoggerFactory;
  */
 public class HdtLabelExtractor {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HdtLabelExtractor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(HdtLabelExtractor.class);
 
-    public HdtLabelExtractor() {
-    }
+	public HdtLabelExtractor() {
+	}
 
-    public String[][] extractLabels(File hdtDumpFile, Model voidModel) {
-        return extractLabels(hdtDumpFile, LabelExtractionUtils.readUris(voidModel));
-    }
+	public static void main(String[] args) {
+		HdtLabelExtractor extr = new HdtLabelExtractor();
+		HdtDumpFileAnalyzer analyzer = new HdtDumpFileAnalyzer();
+		String[][] labels = extr.extractLabels(new File("test.hdt"),
+				analyzer.extractVoidInfo("http://test.com", "test.hdt"));
+		for (String[] labelArr : labels) {
+			for (String label : labelArr) {
+				System.out.print(label + "  ");
+			}
+			System.out.println();
+		}
+	}
 
-    public String[][] extractLabels(File hdtDumpFile, Set<String> uris) {
-        HDT hdt = null;
-        try {
-            hdt = HDTManager.loadIndexedHDT(hdtDumpFile.getAbsolutePath(), null);
-            Map<String, Set<String>> labels = new HashMap<>();
-            IteratorTripleString iterator;
-            TripleString triple;
-            String subject;
-            Set<String> labelsOfUri;
-            for (int i = 0; i < RDFClientLabelRetriever.NAMING_PROPERTIES.length; ++i) {
-                iterator = hdt.search(null, RDFClientLabelRetriever.NAMING_PROPERTIES[i], null);
-                while (iterator.hasNext()) {
-                    triple = iterator.next();
-                    subject = triple.getSubject().toString();
-                    if (labels.containsKey(subject)) {
-                        labelsOfUri = labels.get(subject);
-                    } else {
-                        labelsOfUri = new HashSet<String>();
-                        labels.put(subject, labelsOfUri);
-                    }
-                    labelsOfUri.add(triple.getObject().toString());
-                }
-            }
-            return LabelExtractionUtils.generateArray(labels);
-        } catch (Exception e) {
-            LOGGER.error("Couldn't read dump file \"" + hdtDumpFile + "\". Ignoring this dump.", e);
-            return null;
-        } finally {
-            IOUtils.closeQuietly(hdt);
-        }
-    }
+	public String[][] extractLabels(File hdtDumpFile, Model voidModel) {
+		return extractLabels(hdtDumpFile, LabelExtractionUtils.readUris(voidModel));
+	}
+
+	public String[][] extractLabels(File hdtDumpFile, Set<String> uris) {
+		HDT hdt = null;
+		try {
+			hdt = HDTManager.loadIndexedHDT(hdtDumpFile.getAbsolutePath(), null);
+			IteratorTripleString it = hdt.search(null, null, null);
+
+			Map<String, Set<String>> labels = new HashMap<>();
+			IteratorTripleString iterator;
+			TripleString triple;
+			for (String uri : uris) {
+				Set<String> labelsOfUri = new HashSet<String>();;
+
+				if (labels.containsKey(uri)) {
+					labelsOfUri = labels.get(uri);
+					
+				}
+				for (int i = 0; i < RDFClientLabelRetriever.NAMING_PROPERTIES.length; ++i) {
+					try {
+						
+						iterator = hdt.search(uri, RDFClientLabelRetriever.NAMING_PROPERTIES[i], null);
+						while (iterator.hasNext()) {
+							triple = iterator.next();
+							if(!labels.containsKey(uri)) {
+								labels.put(uri, labelsOfUri);
+							}
+							labelsOfUri.add(triple.getObject().toString());
+						}
+
+					} catch (NotFoundException e) {
+						LOGGER.debug("Did not found property {}", RDFClientLabelRetriever.NAMING_PROPERTIES[i]);
+					}
+				}
+			}
+			return LabelExtractionUtils.generateArray(labels);
+		} catch (Exception e) {
+			LOGGER.error("Couldn't read dump file \"" + hdtDumpFile + "\". Ignoring this dump.", e);
+			return null;
+		} finally {
+			IOUtils.closeQuietly(hdt);
+		}
+	}
 }
