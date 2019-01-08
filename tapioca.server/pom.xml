@@ -89,6 +89,21 @@
             <artifactId>jul-to-slf4j</artifactId>
             <version>${slf4j.version}</version>
         </dependency> -->
+        <dependency>
+        	<groupId>org.apache.jena</groupId>
+        	<artifactId>jena-arq</artifactId>
+        	<version>3.6.0</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.apache.jena</groupId>
+        	<artifactId>jena-core</artifactId>
+        	<version>3.6.0</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.apache.jena</groupId>
+        	<artifactId>jena-iri</artifactId>
+        	<version>3.6.0</version>
+        </dependency>
 	</dependencies>
 
 	<build>
@@ -99,6 +114,37 @@
 				<version>2.6</version>
 				<configuration>
 					<finalName>tapioca</finalName>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.5.0</version>
+			</plugin>
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<header>com/mycila/maven/plugin/license/templates/LGPL-3.txt</header>
+					<properties>
+						<owner>Agile Knowledge Engineering and Semantic Web (AKSW)
+							(usbeck@informatik.uni-leipzig.de)</owner>
+					</properties>
+					<excludes>
+						<exclude>**/README</exclude>
+						<exclude>*.log</exclude>
+						<exclude>*.html</exclude>
+						<exclude>start.sh</exclude>
+						<exclude>**/LICENSE</exclude>
+						<exclude>documentation/**</exclude>
+						<exclude>repository/**</exclude>
+						<exclude>gerbil_data/**</exclude>
+						<exclude>src/main/resources/**</exclude>
+						<exclude>src/main/properties/**</exclude>
+						<exclude>src/main/webapp/**</exclude>
+						<exclude>src/test/resources/**</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 		</plugins>

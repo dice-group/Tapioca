@@ -1,0 +1,121 @@
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+	color: #bdbdbd !important;
+	opacity: 1; /* Firefox */
+}
+
+textarea {
+	resize: none;
+	border-bottom-left-radius: 0px !important;
+	border-bottom-right-radius: 0px !important;
+}
+
+.btn-bottom-unrounded {
+	border-bottom-left-radius: 0px !important;
+	border-bottom-right-radius: 0px !important;
+}
+
+.btn-top-unrounded {
+	border-top-left-radius: 0px !important;
+	border-top-right-radius: 0px !important;
+}
+
+.open > .dropdown-clear {
+	display: grid !important;
+}
+
+.dropdown-clear {
+	border: none;
+	top: 70%;
+	margin: 0px;
+	padding: 0px;
+}
+
+textarea::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+	color: #bdbdbd;
+	opacity: 1; /* Firefox */
+}
+
+html, body {
+	background: cadetblue;
+	font-size: 16px;
+}
+
+.spacer {
+	height: 10%;
+}
+
+.spacer5 {
+	height: 5%;
+}
+
+.btn5 {
+	width: 5%;
+	margin-left: 0px !important;
+	text-align: center;
+	font-size: 1.2em;
+	text-shadow: rgba(80, 80, 80, 0.08) 1px 1px, rgba(80, 80, 80, 0.07) 2px
+		2px, rgba(80, 80, 80, 0.09) 3px 3px, rgba(80, 80, 80, 0.04) 4px 4px,
+		rgba(80, 80, 80, 0.06) 5px 5px;
+	font-weight: bold;
+	height: 2.2em;
+}
+
+.btn20 {
+	width: 20%;
+	text-align: center;
+	font-size: 1.2em;
+	text-shadow: rgba(80, 80, 80, 0.08) 1px 1px, rgba(80, 80, 80, 0.07) 2px
+		2px, rgba(80, 80, 80, 0.09) 3px 3px, rgba(80, 80, 80, 0.04) 4px 4px,
+		rgba(80, 80, 80, 0.06) 5px 5px;
+	font-weight: bold;
+}
+
+.btn75 {
+	width: 75%;
+	text-align: center;
+	font-size: 1.2em;
+	text-shadow: rgba(80, 80, 80, 0.08) 1px 1px, rgba(80, 80, 80, 0.07) 2px
+		2px, rgba(80, 80, 80, 0.09) 3px 3px, rgba(80, 80, 80, 0.04) 4px 4px,
+		rgba(80, 80, 80, 0.06) 5px 5px;
+	font-weight: bold;
+}
+
+.btn100 {
+	width: 100%;
+}
+
+.text1-2 {
+	padding: 1.3em 1em 1.3em 1.5em;
+	font-size: 1.2em;
+	border: none;
+	outline: none;
+	-webkit-appearance: none;
+}
+
+.no-width {
+	width: 50%!;
+}
+
+.divfloat {
+	border: 1px solid gray;
+	width: 15em;
+	height: 5em;
+	overflow-y: scroll;
+}
+
+.buttonfloat {
+	float: right;
+}
+
+
+/* .divFile { */
+/*   position: relative; */
+/*   overflow: hidden; */
+/* } */
+.fileInput {
+  position: absolute;
+  font-size: 50px;
+  opacity: 0;
+  right: 0;
+  top: 0;
+}

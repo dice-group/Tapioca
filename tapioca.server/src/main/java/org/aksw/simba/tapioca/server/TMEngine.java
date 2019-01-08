@@ -82,10 +82,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.carrotsearch.hppc.ObjectObjectOpenHashMap;
-import com.hp.hpl.jena.n3.turtle.TurtleReader;
-import com.hp.hpl.jena.rdf.model.Model;
-import com.hp.hpl.jena.rdf.model.ModelFactory;
-import com.hp.hpl.jena.rdf.model.RDFReader;
+import org.apache.jena.n3.turtle.TurtleReader;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFReader;
 
 public class TMEngine extends AbstractEngine {
 

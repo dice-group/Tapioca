@@ -24,28 +24,112 @@
 <script
 	src="/tapioca/service/webjars/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 <!-- <link rel="icon" type="image/png" href="/gerbil/webResources/gerbilicon.png">  -->
+<link rel="stylesheet" type="text/css"
+	href="/tapioca/webResources/css/style.css"></link>
 </head>
-<body class="container">
-	<div class="jumbotron">
-		<div class="container">
-			<h1>Tapioca</h1>
+<body>
+	<div class="container no-width">
+		<div class="row spacer"></div>
+		<div class="row spacer"></div>
+		<div class="row">
+			<div class="col-sm-4"></div>
+			<div class="col-sm-4">
+				<div>
+					<img src="/tapioca/webResources/tapioca_logo3.svg" />
+				</div>
+			</div>
+			<div class="col-sm-4"></div>
 		</div>
-		<div class="container">
-			<p>Please insert your VOID information.</p>
+		<div class="row spacer5"></div>
+		<div id="alert-row" class="row">
+			<div class="alert alert-danger alert-dismissible">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				<strong>Error!</strong> <span id="error-msg"></span>
+			</div>
 		</div>
-		<div class="container">
-			<textarea cols="80" rows="10" name="voidInput" id="voidInput"></textarea>
+		<div id="success-row" class="row">
+			<div class="alert alert-success alert-dismissible">
+				<button type="button" class="close" data-dismiss="alert">&times;</button>
+				<strong>Successful!</strong> <span id="success-msg"></span>
+			</div>
 		</div>
-		<div class="container">
-			<button name=search onclick="sendRequest('service/search');">search</button>
-			<!-- <button name=search onclick="sendRequest('service/blsearch');">BL
+		<div class="row">
+			<!-- 			<div class="input-group mb-3 input-group-sm"> -->
+			<textarea class="form-control text1-2" cols="80" rows="7"
+				name="voidInput" id="voidInput"
+				placeholder="Insert your void information or upload your void file..."></textarea>
+		</div>
+		<div class="row">
+			<div class="btn-group btn100">
+				<div class="btn btn-success btn20 btn-top-unrounded"
+					onclick="upload();">
+					<span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
+					Upload <input class="fileInput" type="file" id="file"  />
+				</div>
+				<button type="button"
+					class="btn btn-primary btn75 btn-top-unrounded" name=search
+					onclick="sendRequest('service/search');">
+					<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+					Search
+				</button>
+				<button type="button"
+					class="btn btn-primary dropdown-toggle dropdown-toggle-split btn5 btn-top-unrounded"
+					data-toggle="dropdown">
+					<span class="caret"></span>
+				</button>
+				<div class="dropdown-menu dropdown-menu-right dropdown-clear">
+					<!-- 				<button type="button" class="dropdown-item btn btn-primary btn-bottom-unrounded" name=search -->
+					<!-- 					onclick="sendRequest('service/search');"> -->
+					<!-- 					Search -->
+					<!-- 				</button> -->
+					<button type="button" class="dropdown-item btn btn-primary "
+						name=search onclick="sendRequest('service/blsearch');">
+						<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+						BL-Search
+					</button>
+				</div>
+			</div>
+		</div>
+		<!-- <button name=search onclick="sendRequest('service/blsearch');">BL
 				- search</button> -->
-		</div>
+
+	</div>
+	<div class="row">
 		<div class="container" id="results"></div>
 	</div>
+
 	<script type="application/ld+json" id="resultAsJSONLD"></script>
 	<script type="text/javascript">
+		$('#alert-row').hide();
+		var fileText;
+		$('#success-row').hide();
+		$('#file').on('change', function () {
+			
+			var file = this.files[0];
+			upload(file);
+		    //do your function.
+		});
+		
+		function upload(input) {
+			$('#success-row').hide();
+	        var reader = new FileReader();
+	        reader.onload = function(){
+	          fileText = reader.result;
+	          console.log(fileText);
+	          $('#success-msg').text('File could be uploaded');
+	 		  $('#success-row').show();
+	 		  $('#voidInput').prop('disabled', true);
+	        };
+	        reader.readAsText(input);
+		}
+
 		function sendRequest(requestURL) {
+			$('#alert-row').hide();
+			$('#success-row').hide();
+			var voidInfo = $('#voidInput').val();
+			if(fileText !=null){
+				voidInfo = fileText;
+			}
 			$('#resultAsJSONLD').html('');
 			$('#results').html('');
 			$.ajax({
@@ -53,14 +137,18 @@
 				method : 'POST',
 				url : requestURL,
 				data : {
-					voidString : $('#voidInput').val()
+					voidString : voidInfo
 				},
 				cache : false
 			}).done(function(data) {
 				showResults(data);
-			}).fail(function() {
-				alert("error");
+			}).fail(function(err) {
+				console.log(err);
+				$('#error-msg').text(err.status + " " + err.statusText);
+				$('#alert-row').show();
 			});
+			$('#voidInput').prop('disabled', false);
+			fileText=null;
 		}
 		function showResults(jsonLdGraph) {
 			$('#resultAsJSONLD')
@@ -69,7 +157,9 @@
 		}
 		function renderResults(jsonLdGraph) {
 			// TODO add a human readable form
-			$('#results').append('<pre>' + JSON.stringify(jsonLdGraph, null, '\t') + '</pre>');
+			$('#results').append(
+					'<pre>' + JSON.stringify(jsonLdGraph, null, '\t')
+							+ '</pre>');
 		}
 	</script>
 </body>
