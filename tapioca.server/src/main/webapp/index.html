@@ -64,7 +64,7 @@
 				<div class="btn btn-success btn20 btn-top-unrounded"
 					onclick="upload();">
 					<span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
-					Upload <input class="fileInput" type="file" id="file"  />
+					Upload <input class="fileInput" type="file" id="file" />
 				</div>
 				<button type="button"
 					class="btn btn-primary btn75 btn-top-unrounded" name=search
@@ -103,33 +103,43 @@
 		$('#alert-row').hide();
 		var fileText;
 		$('#success-row').hide();
-		$('#file').on('change', function () {
-			
+		$('#file').on('change', function() {
+
 			var file = this.files[0];
 			upload(file);
-		    //do your function.
+			//do your function.
 		});
-		
+
 		function upload(input) {
 			$('#success-row').hide();
-	        var reader = new FileReader();
-	        reader.onload = function(){
-	          fileText = reader.result;
-	          console.log(fileText);
-	          $('#success-msg').text('File could be uploaded');
-	 		  $('#success-row').show();
-	 		  $('#voidInput').prop('disabled', true);
-	        };
-	        reader.readAsText(input);
+			$('#error-row').hide();
+			var reader = new FileReader();
+			reader.onload = function() {
+				fileText = reader.result;
+				console.log(fileText);
+				$('#success-msg').text('File could be uploaded');
+				$('#success-row').show();
+// 				$('#voidInput').prop('disabled', true);
+				$('#voidInput').text(fileText);
+			};
+			reader.onerror = function() {
+				fileText = null;
+				console.log(fileText);
+				$('#error-msg').text('File could not be uploaded');
+				$('#error-row').show();
+				$('#voidInput').prop('disabled', false);
+			};
+
+			reader.readAsText(input);
 		}
 
 		function sendRequest(requestURL) {
 			$('#alert-row').hide();
 			$('#success-row').hide();
 			var voidInfo = $('#voidInput').val();
-			if(fileText !=null){
-				voidInfo = fileText;
-			}
+// 			if (fileText != null) {
+// 				voidInfo = fileText;
+// 			}
 			$('#resultAsJSONLD').html('');
 			$('#results').html('');
 			$.ajax({
@@ -148,7 +158,7 @@
 				$('#alert-row').show();
 			});
 			$('#voidInput').prop('disabled', false);
-			fileText=null;
+			fileText = null;
 		}
 		function showResults(jsonLdGraph) {
 			$('#resultAsJSONLD')
