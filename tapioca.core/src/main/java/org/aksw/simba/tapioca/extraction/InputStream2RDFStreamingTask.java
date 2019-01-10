@@ -42,6 +42,7 @@ import org.apache.jena.riot.system.StreamRDF;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@Deprecated
 public class InputStream2RDFStreamingTask implements Task {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InputStream2RDFStreamingTask.class);

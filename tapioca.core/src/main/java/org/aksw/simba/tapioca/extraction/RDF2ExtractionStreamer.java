@@ -60,6 +60,7 @@ import org.slf4j.LoggerFactory;
  * @author Michael R&ouml;der (roeder@informatik.uni-leipzig.de)
  *
  */
+@Deprecated
 //@NotThreadSafe
 public class RDF2ExtractionStreamer implements TaskObserver {
 
