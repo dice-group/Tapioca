@@ -37,6 +37,13 @@ import org.aksw.simba.topicmodeling.utils.doc.DocumentText;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Creates a new corpus file based on the void information from a given
+ * directory.
+ * 
+ * @author Michael R&ouml;der (michael.roeder@uni-paderborn.de)
+ *
+ */
 public class InitialCorpusCreation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InitialCorpusCreation.class);
@@ -44,8 +51,10 @@ public class InitialCorpusCreation {
     // public static final String CORPUS_NAME = "lod";
     // public static final String CORPUS_NAME = "synthUniVsDBpUnis";
     // public static final String CORPUS_NAME = "CrawledRdfData";
+    @Deprecated
     public static final String CORPUS_NAME = "lodStats";
     // public static final String CORPUS_NAME = "DataHub";
+    @Deprecated
     public static final String CORPUS_FILE = "C:/Daten/tapioca/" + CORPUS_NAME + ".corpus";
 
     // public static final File INPUT_FOLDER = new File("pages");
@@ -59,14 +68,20 @@ public class InitialCorpusCreation {
     // File("C:/Daten/Dropbox/lodstats-rdf/23032015/void");
 
     // public static final boolean PARSE_FROM_LOD_STATS = false;
+    @Deprecated
     public static final File INPUT_FOLDER = new File("C:/Daten/Dropbox/lodstats-rdf/23032015/void");
 
     public static void main(String[] args) {
+        if (args.length < 2) {
+            System.err.println("Not enough arguments. Call the program as:");
+            System.err.println("InitialCorpusCreation <input-directory> <output-corpus-file>");
+            System.exit(1);
+        }
         InitialCorpusCreation creation = new InitialCorpusCreation();
-        creation.run(CORPUS_FILE, INPUT_FOLDER);
+        creation.run(new File(args[0]), new File(args[1]));
     }
 
-    protected void run(String corpusFile, File inputFolder) {
+    protected void run(File inputFolder, File corpusFile) {
         FolderReader reader = new FolderReader(inputFolder);
         reader.setUseFolderNameAsCategory(true);
         DocumentSupplier supplier = reader;
@@ -75,11 +90,11 @@ public class InitialCorpusCreation {
         // supplier = new LodStatVoidParsingSupplierDecorator(supplier);
         // }
         supplier = new JenaBasedVoidParsingSupplierDecorator(supplier);
-        supplier = new PropertyRemovingSupplierDecorator(supplier, Arrays.asList(DocumentRawData.class,
-                DocumentText.class));
+        supplier = new PropertyRemovingSupplierDecorator(supplier,
+                Arrays.asList(DocumentRawData.class, DocumentText.class));
 
-        XmlWritingDocumentConsumer consumer = XmlWritingDocumentConsumer.createXmlWritingDocumentConsumer((new File(
-                corpusFile)).getAbsoluteFile());
+        XmlWritingDocumentConsumer consumer = XmlWritingDocumentConsumer
+                .createXmlWritingDocumentConsumer(corpusFile.getAbsoluteFile());
         XmlWritingDocumentConsumer.registerParseableDocumentProperty(DatasetClassInfo.class);
         XmlWritingDocumentConsumer.registerParseableDocumentProperty(DatasetSpecialClassesInfo.class);
         XmlWritingDocumentConsumer.registerParseableDocumentProperty(DatasetPropertyInfo.class);

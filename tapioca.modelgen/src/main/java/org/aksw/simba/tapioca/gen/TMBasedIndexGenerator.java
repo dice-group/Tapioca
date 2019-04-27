@@ -92,7 +92,7 @@ public class TMBasedIndexGenerator {
 
     protected static void generateFirstCorpusFile() {
         InitialCorpusCreation creation = new InitialCorpusCreation();
-        creation.run(CORPUS_FILE, INPUT_FOLDER);
+        creation.run(INPUT_FOLDER, new File(CORPUS_FILE));
     }
 
     protected void generateLDACorpusFile() {

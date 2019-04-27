@@ -46,7 +46,7 @@
 	<!-- PROPERTIES -->
 	<properties>
 		<!-- Project Properties -->
-		<java.version>1.7</java.version>
+		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- <tapioca.local.repository>file://${project.basedir}/${project.parent.relativePath}/repository</tapioca.local.repository> -->
 		<!-- Library Versions -->
