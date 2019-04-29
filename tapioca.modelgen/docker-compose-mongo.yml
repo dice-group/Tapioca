@@ -4,6 +4,8 @@ services:
 
   mongodb:
     image: mongo:4.0.0
+    volumes:
+      - ./data/mongodb:/data
     ports:
       - "27017:27017"
 
