@@ -22,6 +22,7 @@ import com.github.jsonldjava.shaded.com.google.common.collect.Streams;
 import com.google.gson.Gson;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoWriteException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Indexes;
@@ -105,7 +106,8 @@ public class LabelMongoDBGenerator {
         return uriCollection;
     }
 
-    protected static void store(SimpleBuffer buffer, MongoCollection<Document> uriCollection, Gson gson) throws SQLException {
+    protected static void store(SimpleBuffer buffer, MongoCollection<Document> uriCollection, Gson gson)
+            throws SQLException {
         if (buffer.tokens.isEmpty() || (buffer.uri == null) || buffer.uri.isEmpty()) {
             return;
         }
@@ -117,13 +119,21 @@ public class LabelMongoDBGenerator {
             // deserialize tokens
             @SuppressWarnings("unchecked")
             List<String> tokens = (List<String>) document.get(TOKENS_FIELD);
-            tokens = Streams.concat(tokens.stream(),buffer.tokens.stream()).distinct().collect(Collectors.toList());
+            tokens = Streams.concat(tokens.stream(), buffer.tokens.stream()).distinct().collect(Collectors.toList());
             Document update = new Document().append("$set", new BasicDBObject().append(TOKENS_FIELD, tokens));
             uriCollection.updateOne(query, update);
         } else {
             // Insert the URI
             query.append(TOKENS_FIELD, buffer.tokens);
-            uriCollection.insertOne(query);
+            try {
+                uriCollection.insertOne(query);
+            } catch (MongoWriteException e) {
+                if (e.getMessage().contains("key too large to index")) {
+                    LOGGER.error("The following URI is too long and will be ignored: {}", buffer.uri);
+                } else {
+                    throw e;
+                }
+            }
         }
     }
 
