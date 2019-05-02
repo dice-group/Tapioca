@@ -29,9 +29,13 @@ import org.aksw.simba.tapioca.preprocessing.JenaBasedVoidParsingSupplierDecorato
 import org.aksw.simba.topicmodeling.io.FolderReader;
 import org.aksw.simba.topicmodeling.io.xml.XmlWritingDocumentConsumer;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
+import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.DocumentFilteringSupplierDecorator;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.DocumentTextCreatingSupplierDecorator;
 import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.PropertyRemovingSupplierDecorator;
+import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.filter.StringContainingDocumentPropertyBasedFilter;
+import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.filter.StringContainingDocumentPropertyBasedFilter.StringContainingDocumentPropertyBasedFilterType;
 import org.aksw.simba.topicmodeling.utils.doc.Document;
+import org.aksw.simba.topicmodeling.utils.doc.DocumentName;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentRawData;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentText;
 import org.slf4j.Logger;
@@ -85,6 +89,10 @@ public class InitialCorpusCreation {
         FolderReader reader = new FolderReader(inputFolder);
         reader.setUseFolderNameAsCategory(true);
         DocumentSupplier supplier = reader;
+        // Remove all files which do not end with .ttl
+        supplier = new DocumentFilteringSupplierDecorator(supplier, new StringContainingDocumentPropertyBasedFilter<>(
+                StringContainingDocumentPropertyBasedFilterType.ENDS_WITH, DocumentName.class, ".ttl", true));
+        
         supplier = new DocumentTextCreatingSupplierDecorator(supplier);
         // if (PARSE_FROM_LOD_STATS) {
         // supplier = new LodStatVoidParsingSupplierDecorator(supplier);
