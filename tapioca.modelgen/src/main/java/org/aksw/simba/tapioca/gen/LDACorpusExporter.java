@@ -90,39 +90,41 @@ public class LDACorpusExporter extends LDACorpusCreation {
 	}
 
 	public LDACorpusExporter(String corpusName, String corpusFile, UriUsage uriUsage, WordOccurence wordOccurence) {
-		super(corpusName, corpusFile, uriUsage, wordOccurence);
+//		super(corpusName, corpusFile, uriUsage, wordOccurence);
+	    super(null,null,null,null);
+	    // FIXME add output file instead of corpus name usage
 	}
 
 	public void run(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
-		String corpusName = generateCorpusName();
-
-		DocumentSupplier supplier = readCorpus();
-		supplier = useWhiteListFilter(supplier);
-		supplier = generateDocuments(supplier, cachingLabelRetriever);
-		supplier = filterStopWordsAndEmptyDocs(supplier);
-
-		// Since this property is not serializeable we have to remove it
-		List<Class<? extends DocumentProperty>> propertiesToRemove = new ArrayList<Class<? extends DocumentProperty>>();
-		propertiesToRemove.add(DatasetVocabularies.class);
-		propertiesToRemove.add(DatasetPropertyInfo.class);
-		propertiesToRemove.add(DatasetSpecialClassesInfo.class);
-		propertiesToRemove.add(DatasetClassInfo.class);
-		propertiesToRemove.add(StringCountMapping.class);
-		supplier = new PropertyRemovingSupplierDecorator(supplier, propertiesToRemove);
-
-		XmlWritingDocumentConsumer consumer = null;
-		XmlWritingDocumentConsumer.registerParseableDocumentProperty(SimpleTokenizedText.class);
-		consumer = XmlWritingDocumentConsumer.createXmlWritingDocumentConsumer(new File((new File(this.corpusFile))
-				.getParentFile().getAbsolutePath() + File.separator + corpusName + "_export.xml"));
-		supplier = new DocumentConsumerAdaptingSupplierDecorator(supplier, consumer);
-
-		ListCorpusCreator<List<Document>> preprocessor = new ListCorpusCreator<List<Document>>(supplier,
-				new DocumentListCorpus<List<Document>>(new ArrayList<Document>()));
-		preprocessor.getCorpus();
-
-		cachingLabelRetriever.storeCache();
-		if (consumer != null) {
-			IOUtils.closeQuietly(consumer);
-		}
+//		String corpusName = generateCorpusName();
+//
+//		DocumentSupplier supplier = readCorpus();
+//		supplier = useWhiteListFilter(supplier);
+//		supplier = generateDocuments(supplier, cachingLabelRetriever);
+//		supplier = filterStopWordsAndEmptyDocs(supplier);
+//
+//		// Since this property is not serializeable we have to remove it
+//		List<Class<? extends DocumentProperty>> propertiesToRemove = new ArrayList<Class<? extends DocumentProperty>>();
+//		propertiesToRemove.add(DatasetVocabularies.class);
+//		propertiesToRemove.add(DatasetPropertyInfo.class);
+//		propertiesToRemove.add(DatasetSpecialClassesInfo.class);
+//		propertiesToRemove.add(DatasetClassInfo.class);
+//		propertiesToRemove.add(StringCountMapping.class);
+//		supplier = new PropertyRemovingSupplierDecorator(supplier, propertiesToRemove);
+//
+//		XmlWritingDocumentConsumer consumer = null;
+//		XmlWritingDocumentConsumer.registerParseableDocumentProperty(SimpleTokenizedText.class);
+//		consumer = XmlWritingDocumentConsumer.createXmlWritingDocumentConsumer(new File((new File(this.corpusFile))
+//				.getParentFile().getAbsolutePath() + File.separator + corpusName + "_export.xml"));
+//		supplier = new DocumentConsumerAdaptingSupplierDecorator(supplier, consumer);
+//
+//		ListCorpusCreator<List<Document>> preprocessor = new ListCorpusCreator<List<Document>>(supplier,
+//				new DocumentListCorpus<List<Document>>(new ArrayList<Document>()));
+//		preprocessor.getCorpus();
+//
+//		cachingLabelRetriever.storeCache();
+//		if (consumer != null) {
+//			IOUtils.closeQuietly(consumer);
+//		}
 	}
 }

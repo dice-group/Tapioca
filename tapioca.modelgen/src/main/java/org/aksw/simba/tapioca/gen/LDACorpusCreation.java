@@ -55,6 +55,9 @@ import org.aksw.simba.tapioca.preprocessing.StringCountToSimpleTokenizedTextConv
 import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSupplierDecorator;
 import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSupplierDecorator.UriUsage;
 import org.aksw.simba.tapioca.preprocessing.UriFilteringDocumentSupplierDecorator;
+import org.aksw.simba.tapioca.preprocessing.labelretrieving.FileBasedTokenizedLabelRetriever;
+import org.aksw.simba.tapioca.preprocessing.labelretrieving.MongoDBBasedTokenizedLabelRetriever;
+import org.aksw.simba.tapioca.preprocessing.labelretrieving.TokenizedLabelRetriever;
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.WorkerBasedLabelRetrievingDocumentSupplierDecorator;
 import org.aksw.simba.topicmodeling.io.CorpusObjectWriter;
 import org.aksw.simba.topicmodeling.io.gzip.GZipCorpusObjectWriter;
@@ -77,6 +80,11 @@ import org.aksw.simba.topicmodeling.utils.doc.DocumentProperty;
 import org.aksw.simba.topicmodeling.utils.doc.DocumentURI;
 import org.aksw.simba.topicmodeling.utils.vocabulary.SimpleVocabulary;
 import org.aksw.simba.topicmodeling.utils.vocabulary.Vocabulary;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
@@ -84,308 +92,369 @@ import org.slf4j.LoggerFactory;
 
 public class LDACorpusCreation {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(LDACorpusCreation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LDACorpusCreation.class);
 
-	public static final File CACHE_FILES[] = new File[] { new File("C:/Daten/tapioca/cache/uriToLabelCache_1.object"),
-			new File("C:/Daten/tapioca/cache/uriToLabelCache_2.object"),
-			new File("C:/Daten/tapioca/cache/uriToLabelCache_3.object") };
-	// public static final File CACHE_FILES[] = new File[] { new
-	// File("/home/mroeder/tapioca/uriToLabelCache_1.object"),
-	// new File("/home/mroeder/tapioca/uriToLabelCache_2.object"),
-	// new File("/home/mroeder/tapioca/uriToLabelCache_3.object") };
+    public static final File CACHE_FILES[] = new File[] { new File("C:/Daten/tapioca/cache/uriToLabelCache_1.object"),
+            new File("C:/Daten/tapioca/cache/uriToLabelCache_2.object"),
+            new File("C:/Daten/tapioca/cache/uriToLabelCache_3.object") };
+    // public static final File CACHE_FILES[] = new File[] { new
+    // File("/home/mroeder/tapioca/uriToLabelCache_1.object"),
+    // new File("/home/mroeder/tapioca/uriToLabelCache_2.object"),
+    // new File("/home/mroeder/tapioca/uriToLabelCache_3.object") };
 
-	// public static final String CORPUS_NAME = "lodStatsGold";
-	public static final String CORPUS_NAME = "lodDiagram";
-	public static final String CORPUS_FILE = "/Daten/tapioca/" + CORPUS_NAME + ".corpus";
+    // public static final String CORPUS_NAME = "lodStatsGold";
+    @Deprecated
+    public static final String CORPUS_NAME = "lodDiagram";
+    @Deprecated
+    public static final String CORPUS_FILE = "/Daten/tapioca/" + CORPUS_NAME + ".corpus";
+//    @Deprecated
+//    private static final boolean EXPORT_CORPUS_AS_XML = false;
 
-	private static final boolean EXPORT_CORPUS_AS_XML = false;
+    public static void main(String[] args) {
+        // create CLI Options object
+        Options options = new Options();
+        options.addOption("n", "input-file", true, "the input corpus file");
+        options.addOption("o", "output-file", true, "the output corpus file");
+        options.addOption("l", "label-file", true, "a label file that should be used to retrieve labels");
+        options.addOption("c", "cache-file", true, "a cache file that can be used to cache labels retrieved via HTTP");
+        options.addOption("h", "mongo-db-host", true,
+                "the host name of a MongoDB instance containing URI to label mappings");
+        options.addOption("p", "mongo-db-port", true,
+                "the port of a MongoDB instance containing URI to label mappings");
+        options.addOption("x", "export-xml", false, "export the corpus as XML");
+        CommandLineParser parser = new DefaultParser();
+        CommandLine cmd = null;
+        try {
+            cmd = parser.parse(options, args);
+        } catch (ParseException e) {
+            LOGGER.error("Couldn't parse commands. Aborting.", e);
+            return;
+        }
+        if (!cmd.hasOption("n")) {
+            LOGGER.error("Input file is not defined. Please provide an input file.");
+        }
+        String inputFile = cmd.getOptionValue("n");
+        if (!cmd.hasOption("o")) {
+            LOGGER.error("Output file is not defined. Please provide an Output file.");
+        }
+        String outputFile = cmd.getOptionValue("o");
 
-	public static void main(String[] args) {
-		// HttpClient client = HttpOp.getDefaultHttpClient();
-		// HttpClientBuilder hcbuilder = HttpClientBuilder.create();
-		// hcbuilder.useSystemProperties();
-		// hcbuilder.setRetryHandler(new StandardHttpRequestRetryHandler(1,
-		// true));
-		// HttpOp.setDefaultHttpClient(hcbuilder.build());
-		// System.setProperty(org.apache.http.params.CoreConnectionPNames.CONNECTION_TIMEOUT,
-		// "60000");
-		UriUsage uriUsages[] = UriUsage.values();
-		// UriUsage uriUsages[] = new UriUsage[] {
-		// UriUsage.CLASSES_AND_PROPERTIES };
-		WordOccurence wordOccurences[] = new WordOccurence[] { WordOccurence.UNIQUE, WordOccurence.LOG };
+        // UriUsage uriUsages[] = UriUsage.values();
+        UriUsage uriUsages[] = new UriUsage[] { UriUsage.CLASSES_AND_PROPERTIES };
+        WordOccurence wordOccurences[] = new WordOccurence[] { /* WordOccurence.UNIQUE, */WordOccurence.LOG };
 
-		String corpusName = CORPUS_NAME;
+//        String corpusName = CORPUS_NAME;
 
-		File labelsFiles[] = new File[] { new File(CORPUS_FILE.replace(".corpus", ".labels.object")),
-				new File(CORPUS_FILE.replace(".corpus", ".ret_labels_1.object")) };
-		WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever;
-		cachingLabelRetriever = new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, CACHE_FILES, labelsFiles);
-		// LabelRetrievingDocumentSupplierDecorator cachingLabelRetriever;
-		// cachingLabelRetriever = new
-		// LabelRetrievingDocumentSupplierDecorator(null, false, labelsFiles);
+        // File labelsFiles[] = new File[] { new File(CORPUS_FILE.replace(".corpus",
+        // ".labels.object")),
+        // new File(CORPUS_FILE.replace(".corpus", ".ret_labels_1.object")) };
 
-		LDACorpusCreation corpusCreation;
-		for (int i = 0; i < uriUsages.length; ++i) {
-			for (int j = 0; j < wordOccurences.length; ++j) {
-				System.out.println("Starting corpus \"" + corpusName + "\" with " + uriUsages[i] + " and "
-						+ wordOccurences[j]);
-				corpusCreation = new LDACorpusCreation(corpusName, CORPUS_FILE, uriUsages[i], wordOccurences[j]);
-				corpusCreation.run(cachingLabelRetriever);
-			}
-		}
-		cachingLabelRetriever.close();
-	}
+        MongoDBBasedTokenizedLabelRetriever mongoRetriever = null;
+        WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever = null;
+        try {
+            List<TokenizedLabelRetriever> retrievers = new ArrayList<>();
+            if (cmd.hasOption("h") || cmd.hasOption("p")) {
+                if (cmd.hasOption("h") && cmd.hasOption("p")) {
+                    mongoRetriever = MongoDBBasedTokenizedLabelRetriever.create(cmd.getOptionValue("h"),
+                            Integer.parseInt(cmd.getOptionValue("p")));
+                    retrievers.add(mongoRetriever);
+                } else {
+                    LOGGER.error("If one of the options h or p is defined, the other option has to be defined as well.");
+                    return;
+                }
+            }
+            if (cmd.hasOption("l")) {
+                for (String file : cmd.getOptionValues("l")) {
+                    retrievers.add(FileBasedTokenizedLabelRetriever.create(file));
+                }
+            }
+            File cacheFiles[] = null;
+            if (cmd.hasOption("c")) {
+                String fileNames[] = cmd.getOptionValues("c");
+                cacheFiles = new File[fileNames.length];
+                for (int i = 0; i < fileNames.length; ++i) {
+                    cacheFiles[i] = new File(fileNames[i]);
+                }
+            } else {
+                cacheFiles = new File[0];
+            }
+            cachingLabelRetriever = new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, cacheFiles,
+                    retrievers);
+            // LabelRetrievingDocumentSupplierDecorator cachingLabelRetriever;
+            // cachingLabelRetriever = new
+            // LabelRetrievingDocumentSupplierDecorator(null, false, labelsFiles);
 
-	protected final String corpusName;
-	protected final String corpusFile;
-	protected final UriUsage uriUsage;
-	protected final WordOccurence wordOccurence;
-	protected final boolean exportCorpusAsXml;
+            LDACorpusCreation corpusCreation;
+            for (int i = 0; i < uriUsages.length; ++i) {
+                for (int j = 0; j < wordOccurences.length; ++j) {
+                    System.out.println("Starting corpus \"" + inputFile + "\" with " + uriUsages[i] + " and "
+                            + wordOccurences[j]);
+                    corpusCreation = new LDACorpusCreation(inputFile, uriUsages[i], wordOccurences[j], outputFile);
+                    corpusCreation.run(cachingLabelRetriever);
+                }
+            }
+        } finally {
+            if (mongoRetriever != null) {
+                try {
+                    mongoRetriever.close();
+                } catch (Exception e) {
+                }
+            }
+            if (cachingLabelRetriever != null) {
+                try {
+                    cachingLabelRetriever.close();
+                } catch (Exception e) {
+                }
+            }
+        }
 
-	public LDACorpusCreation(String corpusName, String corpusFile, UriUsage uriUsage, WordOccurence wordOccurence) {
-		this.corpusName = corpusName;
-		this.corpusFile = corpusFile;
-		this.uriUsage = uriUsage;
-		this.wordOccurence = wordOccurence;
-		this.exportCorpusAsXml = EXPORT_CORPUS_AS_XML;
-	}
+    }
 
-	public LDACorpusCreation(String corpusName, String corpusFile, UriUsage uriUsage, WordOccurence wordOccurence,
-			boolean exportCorpusAsXml) {
-		this.corpusName = corpusName;
-		this.corpusFile = corpusFile;
-		this.uriUsage = uriUsage;
-		this.wordOccurence = wordOccurence;
-		this.exportCorpusAsXml = exportCorpusAsXml;
-	}
+    protected final String inputFile;
+    protected final String outputFile;
+    protected final UriUsage uriUsage;
+    protected final WordOccurence wordOccurence;
+    protected final boolean exportCorpusAsXml;
 
-	public void run(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
-		String corpusName = generateCorpusName();
+    public LDACorpusCreation(String inputFile, UriUsage uriUsage, WordOccurence wordOccurence, String outputFile) {
+        this(inputFile, uriUsage, wordOccurence, outputFile, false);
+    }
 
-		XmlWritingDocumentConsumer consumer = null;
-		if (exportCorpusAsXml) {
-			consumer = XmlWritingDocumentConsumer.createXmlWritingDocumentConsumer(new File("./export.xml"));
-		}
+    public LDACorpusCreation(String inputFile, UriUsage uriUsage, WordOccurence wordOccurence,
+            String outputFile , boolean exportCorpusAsXml) {
+        this.inputFile = inputFile;
+        this.outputFile = outputFile;
+        this.uriUsage = uriUsage;
+        this.wordOccurence = wordOccurence;
+        this.exportCorpusAsXml = exportCorpusAsXml;
+    }
 
-		Corpus corpus = generateCorpusAndIndexWords(cachingLabelRetriever, consumer);
+    public void run(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
+        //String corpusName = generateCorpusName();
 
-		cachingLabelRetriever.storeCache();
-		if (consumer != null) {
-			IOUtils.closeQuietly(consumer);
-		}
+        XmlWritingDocumentConsumer consumer = null;
+        if (exportCorpusAsXml) {
+            consumer = XmlWritingDocumentConsumer.createXmlWritingDocumentConsumer(new File("./export.xml"));
+        }
 
-		CorpusObjectWriter writer = new GZipCorpusObjectWriter(new File(corpusName));
-		writer.writeCorpus(corpus);
-	}
+        Corpus corpus = generateCorpusAndIndexWords(cachingLabelRetriever, consumer);
 
-	/**
-	 * Reads the corpus from the XML file created by the
-	 * {@link InitialCorpusCreation}.
-	 * 
-	 * @return DocumentSupplier managing the stream of documents.
-	 */
-	protected DocumentSupplier readCorpus() {
-		DocumentSupplier supplier = StreamBasedXmlDocumentSupplier.createReader(new File(corpusFile), true);
-		StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetClassInfo.class);
-		StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetSpecialClassesInfo.class);
-		StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetPropertyInfo.class);
-		StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetVocabularies.class);
+        cachingLabelRetriever.storeCache();
+        if (consumer != null) {
+            IOUtils.closeQuietly(consumer);
+        }
 
-		supplier = new DocumentFilteringSupplierDecorator(supplier, new DocumentFilter() {
-			public boolean isDocumentGood(Document document) {
-				DocumentName name = document.getProperty(DocumentName.class);
-				DocumentURI uri = document.getProperty(DocumentURI.class);
-				LOGGER.info("Processing of {} ({}) starts", name != null ? name.get() : "null", uri != null ? uri.get()
-						: "null");
-				return true;
-			}
-		});
-		return supplier;
-	}
+        CorpusObjectWriter writer = new GZipCorpusObjectWriter(new File(outputFile));
+        writer.writeCorpus(corpus);
+    }
 
-	/**
-	 * Applies a white list filter if there is a white list filter file for this
-	 * corpus.
-	 * 
-	 * @param supplier
-	 * @return
-	 */
-	protected DocumentSupplier useWhiteListFilter(DocumentSupplier supplier) {
-		File whitelistFile = new File(corpusFile.replace(".corpus", "_whitelist.txt"));
-		if (whitelistFile.exists()) {
-			try {
-				final Set<String> whitelist = new HashSet<String>(FileUtils.readLines(whitelistFile));
-				supplier = new DocumentFilteringSupplierDecorator(supplier, new DocumentFilter() {
-					public boolean isDocumentGood(Document document) {
-						DocumentName docName = document.getProperty(DocumentName.class);
-						if (docName != null) {
-							String name = docName.get();
-							if (name.endsWith(".ttl")) {
-								name = name.substring(0, name.length() - 4);
-							}
-							DocumentURI uri = document.getProperty(DocumentURI.class);
-							return whitelist.contains(name) || ((uri != null) && (whitelist.contains(uri.get())));
-						} else {
-							return false;
-						}
-					}
-				});
-				LOGGER.info("Using whitelistfile \"{}\".", whitelistFile);
-			} catch (IOException e) {
-				LOGGER.error("Error while reading whitelist \"" + whitelistFile + "\".", e);
-			}
-		} else {
-			LOGGER.info("Can't use whitelistfile \"{}\".", whitelistFile);
-		}
-		return supplier;
-	}
+    /**
+     * Reads the corpus from the XML file created by the
+     * {@link InitialCorpusCreation}.
+     * 
+     * @return DocumentSupplier managing the stream of documents.
+     */
+    protected DocumentSupplier readCorpus() {
+        DocumentSupplier supplier = StreamBasedXmlDocumentSupplier.createReader(new File(inputFile), true);
+        StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetClassInfo.class);
+        StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetSpecialClassesInfo.class);
+        StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetPropertyInfo.class);
+        StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetVocabularies.class);
 
-	/**
-	 * Generates tokenized documents based on their URI counts. URIs are
-	 * filtered and counted. After that their labels are retrieved and added to
-	 * the documents {@link SimpleTokenizedText} based on the
-	 * {@link WordOccurence} used.
-	 * 
-	 * @param supplier
-	 * @param cachingLabelRetriever
-	 * @return
-	 */
-	protected DocumentSupplier generateDocuments(DocumentSupplier supplier,
-			WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
-		// Filter URIs
-		supplier = filterUris(supplier);
-		// Filter documents with missing property or class URIs
-		// supplier = new DocumentFilteringSupplierDecorator(supplier, new
-		// NoClassAndPropertyDocumentFilter());
+        supplier = new DocumentFilteringSupplierDecorator(supplier, new DocumentFilter() {
+            public boolean isDocumentGood(Document document) {
+                DocumentName name = document.getProperty(DocumentName.class);
+                DocumentURI uri = document.getProperty(DocumentURI.class);
+                LOGGER.info("Processing of {} ({}) starts", name != null ? name.get() : "null",
+                        uri != null ? uri.get() : "null");
+                return true;
+            }
+        });
+        return supplier;
+    }
 
-		// Count the URIs
-		supplier = new UriCountMappingCreatingDocumentSupplierDecorator(supplier, uriUsage);
+    /**
+     * Applies a white list filter if there is a white list filter file for this
+     * corpus.
+     * 
+     * @param supplier
+     * @return
+     */
+    protected DocumentSupplier useWhiteListFilter(DocumentSupplier supplier) {
+        File whitelistFile = new File(inputFile.replace(".corpus", "_whitelist.txt"));
+        if (whitelistFile.exists()) {
+            try {
+                final Set<String> whitelist = new HashSet<String>(FileUtils.readLines(whitelistFile));
+                supplier = new DocumentFilteringSupplierDecorator(supplier, new DocumentFilter() {
+                    public boolean isDocumentGood(Document document) {
+                        DocumentName docName = document.getProperty(DocumentName.class);
+                        if (docName != null) {
+                            String name = docName.get();
+                            if (name.endsWith(".ttl")) {
+                                name = name.substring(0, name.length() - 4);
+                            }
+                            DocumentURI uri = document.getProperty(DocumentURI.class);
+                            return whitelist.contains(name) || ((uri != null) && (whitelist.contains(uri.get())));
+                        } else {
+                            return false;
+                        }
+                    }
+                });
+                LOGGER.info("Using whitelistfile \"{}\".", whitelistFile);
+            } catch (IOException e) {
+                LOGGER.error("Error while reading whitelist \"" + whitelistFile + "\".", e);
+            }
+        } else {
+            LOGGER.info("Can't use whitelistfile \"{}\".", whitelistFile);
+        }
+        return supplier;
+    }
 
-		// Retrieve and tokenize the labels
-		// LabelRetrievingDocumentSupplierDecorator cachingLabelRetriever = new
-		// LabelRetrievingDocumentSupplierDecorator(
-		// supplier);
-		// Check whether there is a file containing labels
-		cachingLabelRetriever.setDecoratedDocumentSupplier(supplier);
-		supplier = cachingLabelRetriever;
-		// supplier = new ExceptionCatchingDocumentSupplierDecorator(supplier);
-		// Convert the counted tokens into tokenized text
-		supplier = new StringCountToSimpleTokenizedTextConvertingDocumentSupplierDecorator(supplier, wordOccurence);
-		return supplier;
-	}
+    /**
+     * Generates tokenized documents based on their URI counts. URIs are filtered
+     * and counted. After that their labels are retrieved and added to the documents
+     * {@link SimpleTokenizedText} based on the {@link WordOccurence} used.
+     * 
+     * @param supplier
+     * @param cachingLabelRetriever
+     * @return
+     */
+    protected DocumentSupplier generateDocuments(DocumentSupplier supplier,
+            WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
+        // Filter URIs
+        supplier = filterUris(supplier);
+        // Filter documents with missing property or class URIs
+        // supplier = new DocumentFilteringSupplierDecorator(supplier, new
+        // NoClassAndPropertyDocumentFilter());
 
-	/**
-	 * Filters URIs based on the {@link VocabularyBlacklist}.
-	 * 
-	 * @param supplier
-	 * @return
-	 */
-	protected DocumentSupplier filterUris(DocumentSupplier supplier) {
-		Set<String> blacklist = VocabularyBlacklist.getInstance();
-		supplier = new UriFilteringDocumentSupplierDecorator<DatasetClassInfo>(supplier, blacklist,
-				DatasetClassInfo.class);
-		supplier = new SimpleBlankNodeRemovingDocumentSupplierDecorator<DatasetClassInfo>(supplier,
-				DatasetClassInfo.class);
-		supplier = new UriFilteringDocumentSupplierDecorator<DatasetPropertyInfo>(supplier, blacklist,
-				DatasetPropertyInfo.class);
-		supplier = new SimpleBlankNodeRemovingDocumentSupplierDecorator<DatasetPropertyInfo>(supplier,
-				DatasetPropertyInfo.class);
-		supplier = new SimpleBlankNodeRemovingDocumentSupplierDecorator<DatasetSpecialClassesInfo>(supplier,
-				DatasetSpecialClassesInfo.class);
-		return supplier;
-	}
+        // Count the URIs
+        supplier = new UriCountMappingCreatingDocumentSupplierDecorator(supplier, uriUsage);
 
-	protected DocumentSupplier filterStopWordsAndEmptyDocs(DocumentSupplier supplier) {
-		// Filter the stop words
-		supplier = new SimpleTokenizedTextTermFilter(supplier, StandardEnglishPosTaggingTermFilter.getInstance());
-		// Filter empty documents
-		supplier = new DocumentFilteringSupplierDecorator(supplier, new DocumentFilter() {
+        // Retrieve and tokenize the labels
+        // LabelRetrievingDocumentSupplierDecorator cachingLabelRetriever = new
+        // LabelRetrievingDocumentSupplierDecorator(
+        // supplier);
+        // Check whether there is a file containing labels
+        cachingLabelRetriever.setDecoratedDocumentSupplier(supplier);
+        supplier = cachingLabelRetriever;
+        // supplier = new ExceptionCatchingDocumentSupplierDecorator(supplier);
+        // Convert the counted tokens into tokenized text
+        supplier = new StringCountToSimpleTokenizedTextConvertingDocumentSupplierDecorator(supplier, wordOccurence);
+        return supplier;
+    }
 
-			public boolean isDocumentGood(Document document) {
-				SimpleTokenizedText text = document.getProperty(SimpleTokenizedText.class);
-				DocumentName name = document.getProperty(DocumentName.class);
-				DocumentURI uri = document.getProperty(DocumentURI.class);
-				if ((text != null) && (text.getTokens().length > 0)) {
-					LOGGER.info("{} ({}) is accepted as part of the corpus", name != null ? name.get() : "null",
-							uri != null ? uri.get() : "null");
-					return true;
-				} else {
-					LOGGER.info("{} ({}) is sorted out and won't be part of the corpus", name != null ? name.get() : "null",
-							uri != null ? uri.get() : "null");
-					return false;
-				}
-			}
-		});
-		return supplier;
-	}
+    /**
+     * Filters URIs based on the {@link VocabularyBlacklist}.
+     * 
+     * @param supplier
+     * @return
+     */
+    protected DocumentSupplier filterUris(DocumentSupplier supplier) {
+        Set<String> blacklist = VocabularyBlacklist.getInstance();
+        supplier = new UriFilteringDocumentSupplierDecorator<DatasetClassInfo>(supplier, blacklist,
+                DatasetClassInfo.class);
+        supplier = new SimpleBlankNodeRemovingDocumentSupplierDecorator<DatasetClassInfo>(supplier,
+                DatasetClassInfo.class);
+        supplier = new UriFilteringDocumentSupplierDecorator<DatasetPropertyInfo>(supplier, blacklist,
+                DatasetPropertyInfo.class);
+        supplier = new SimpleBlankNodeRemovingDocumentSupplierDecorator<DatasetPropertyInfo>(supplier,
+                DatasetPropertyInfo.class);
+        supplier = new SimpleBlankNodeRemovingDocumentSupplierDecorator<DatasetSpecialClassesInfo>(supplier,
+                DatasetSpecialClassesInfo.class);
+        return supplier;
+    }
 
-	protected String generateCorpusName() {
-		String corpusName = this.corpusName;
-		switch (uriUsage) {
-		case CLASSES: {
-			corpusName += "_classes_";
-			break;
-		}
-		case EXTENDED_CLASSES: {
-			corpusName += "_eclasses_";
-			break;
-		}
-		case PROPERTIES: {
-			corpusName += "_prop_";
-			break;
-		}
-		case CLASSES_AND_PROPERTIES: {
-			corpusName += "_all_";
-			break;
-		}
-		case EXTENDED_CLASSES_AND_PROPERTIES: {
-			corpusName += "_eall_";
-			break;
-		}
-		}
-		corpusName += (wordOccurence == WordOccurence.UNIQUE) ? "unique.object" : "log.object";
-		return corpusName;
-	}
+    protected DocumentSupplier filterStopWordsAndEmptyDocs(DocumentSupplier supplier) {
+        // Filter the stop words
+        supplier = new SimpleTokenizedTextTermFilter(supplier, StandardEnglishPosTaggingTermFilter.getInstance());
+        // Filter empty documents
+        supplier = new DocumentFilteringSupplierDecorator(supplier, new DocumentFilter() {
 
-	public Corpus generateCorpusAndIndexWords(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
-		return generateCorpusAndIndexWords(cachingLabelRetriever, null);
-	}
+            public boolean isDocumentGood(Document document) {
+                SimpleTokenizedText text = document.getProperty(SimpleTokenizedText.class);
+                DocumentName name = document.getProperty(DocumentName.class);
+                DocumentURI uri = document.getProperty(DocumentURI.class);
+                if ((text != null) && (text.getTokens().length > 0)) {
+                    LOGGER.info("{} ({}) is accepted as part of the corpus", name != null ? name.get() : "null",
+                            uri != null ? uri.get() : "null");
+                    return true;
+                } else {
+                    LOGGER.info("{} ({}) is sorted out and won't be part of the corpus",
+                            name != null ? name.get() : "null", uri != null ? uri.get() : "null");
+                    return false;
+                }
+            }
+        });
+        return supplier;
+    }
 
-	public Corpus generateCorpusAndIndexWords(
-			WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever,
-			XmlWritingDocumentConsumer consumer) {
-		DocumentSupplier supplier = generateCorpus(cachingLabelRetriever);
+//    protected String generateCorpusName() {
+//        String corpusName = this.corpusName;
+//        switch (uriUsage) {
+//        case CLASSES: {
+//            corpusName += "_classes_";
+//            break;
+//        }
+//        case EXTENDED_CLASSES: {
+//            corpusName += "_eclasses_";
+//            break;
+//        }
+//        case PROPERTIES: {
+//            corpusName += "_prop_";
+//            break;
+//        }
+//        case CLASSES_AND_PROPERTIES: {
+//            corpusName += "_all_";
+//            break;
+//        }
+//        case EXTENDED_CLASSES_AND_PROPERTIES: {
+//            corpusName += "_eall_";
+//            break;
+//        }
+//        }
+//        corpusName += (wordOccurence == WordOccurence.UNIQUE) ? "unique.object" : "log.object";
+//        return corpusName;
+//    }
 
-		Vocabulary vocabulary = new SimpleVocabulary();
-		supplier = new SimpleWordIndexingSupplierDecorator(supplier, vocabulary);
-		supplier = new DocumentWordCountingSupplierDecorator(supplier);
+    public Corpus generateCorpusAndIndexWords(
+            WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
+        return generateCorpusAndIndexWords(cachingLabelRetriever, null);
+    }
 
-		if (consumer != null) {
-			supplier = new DocumentConsumerAdaptingSupplierDecorator(supplier, consumer);
-		}
+    public Corpus generateCorpusAndIndexWords(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever,
+            XmlWritingDocumentConsumer consumer) {
+        DocumentSupplier supplier = generateCorpus(cachingLabelRetriever);
 
-		// Since this property is not serializeable we have to remove it
-		List<Class<? extends DocumentProperty>> propertiesToRemove = new ArrayList<Class<? extends DocumentProperty>>();
-		propertiesToRemove.add(DatasetVocabularies.class);
-		propertiesToRemove.add(DatasetPropertyInfo.class);
-		propertiesToRemove.add(DatasetSpecialClassesInfo.class);
-		propertiesToRemove.add(DatasetClassInfo.class);
-		propertiesToRemove.add(StringCountMapping.class);
-		propertiesToRemove.add(SimpleTokenizedText.class);
-		supplier = new PropertyRemovingSupplierDecorator(supplier, propertiesToRemove);
+        Vocabulary vocabulary = new SimpleVocabulary();
+        supplier = new SimpleWordIndexingSupplierDecorator(supplier, vocabulary);
+        supplier = new DocumentWordCountingSupplierDecorator(supplier);
 
-		ListCorpusCreator<List<Document>> preprocessor = new ListCorpusCreator<List<Document>>(supplier,
-				new DocumentListCorpus<List<Document>>(new ArrayList<Document>()));
-		Corpus corpus = preprocessor.getCorpus();
-		corpus.addProperty(new CorpusVocabulary(vocabulary));
-		return corpus;
-	}
+        if (consumer != null) {
+            supplier = new DocumentConsumerAdaptingSupplierDecorator(supplier, consumer);
+        }
 
-	public DocumentSupplier generateCorpus(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
-		DocumentSupplier supplier = readCorpus();
-		supplier = useWhiteListFilter(supplier);
-		supplier = generateDocuments(supplier, cachingLabelRetriever);
-		supplier = filterStopWordsAndEmptyDocs(supplier);
-		return supplier;
-	}
+        // Since this property is not serializeable we have to remove it
+        List<Class<? extends DocumentProperty>> propertiesToRemove = new ArrayList<Class<? extends DocumentProperty>>();
+        propertiesToRemove.add(DatasetVocabularies.class);
+        propertiesToRemove.add(DatasetPropertyInfo.class);
+        propertiesToRemove.add(DatasetSpecialClassesInfo.class);
+        propertiesToRemove.add(DatasetClassInfo.class);
+        propertiesToRemove.add(StringCountMapping.class);
+        propertiesToRemove.add(SimpleTokenizedText.class);
+        supplier = new PropertyRemovingSupplierDecorator(supplier, propertiesToRemove);
+
+        ListCorpusCreator<List<Document>> preprocessor = new ListCorpusCreator<List<Document>>(supplier,
+                new DocumentListCorpus<List<Document>>(new ArrayList<Document>()));
+        Corpus corpus = preprocessor.getCorpus();
+        corpus.addProperty(new CorpusVocabulary(vocabulary));
+        return corpus;
+    }
+
+    public DocumentSupplier generateCorpus(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
+        DocumentSupplier supplier = readCorpus();
+        supplier = useWhiteListFilter(supplier);
+        supplier = generateDocuments(supplier, cachingLabelRetriever);
+        supplier = filterStopWordsAndEmptyDocs(supplier);
+        return supplier;
+    }
 }

@@ -105,8 +105,11 @@ public class TMBasedIndexGenerator {
                 return;
             }
         }
-        LDACorpusCreation creation = new LDACorpusCreation(CORPUS_NAME, CORPUS_FILE, UriUsage.CLASSES_AND_PROPERTIES,
-                WordOccurence.LOG);
+        // FIXME fix this by using the output file instead of the corpus name
+//        LDACorpusCreation creation = new LDACorpusCreation(CORPUS_NAME, CORPUS_FILE, UriUsage.CLASSES_AND_PROPERTIES,
+//                WordOccurence.LOG);
+        LDACorpusCreation creation = new LDACorpusCreation(CORPUS_FILE, UriUsage.CLASSES_AND_PROPERTIES,
+                WordOccurence.LOG, null);
         WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever;
         cachingLabelRetriever = new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, CACHE_FILES, new File[0]);
         creation.run(cachingLabelRetriever);

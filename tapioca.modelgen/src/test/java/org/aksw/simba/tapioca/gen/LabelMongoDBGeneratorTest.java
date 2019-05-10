@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.aksw.simba.tapioca.preprocessing.labelretrieving.MongoDBBasedTokenizedLabelRetriever;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.bson.Document;
 import org.junit.Assert;
@@ -47,7 +48,7 @@ public class LabelMongoDBGeneratorTest {
         generator.readTsv(MONGO_HOST, MONGO_PORT, temp.getAbsolutePath());
         
         try (MongoClient client = new MongoClient(MONGO_HOST, MONGO_PORT)) {
-            MongoCollection<Document> uriCollection = generator.open(client);
+            MongoCollection<Document> uriCollection = MongoDBBasedTokenizedLabelRetriever.open(client);
             Iterator<Document> iterator = uriCollection.find().iterator();
             Document document;
             String uri;
@@ -55,9 +56,9 @@ public class LabelMongoDBGeneratorTest {
             Set<String> expectedTokens;
             while (iterator.hasNext()) {
                 document = iterator.next();
-                uri = document.getString(LabelMongoDBGenerator.URI_FIELD);
+                uri = document.getString(MongoDBBasedTokenizedLabelRetriever.URI_FIELD);
                 Assert.assertTrue("unknown URI " + uri, expectedlabels.containsKey(uri));
-                tokens = (List<String>) document.get(LabelMongoDBGenerator.TOKENS_FIELD);
+                tokens = (List<String>) document.get(MongoDBBasedTokenizedLabelRetriever.TOKENS_FIELD);
                 expectedTokens = expectedlabels.remove(uri);
                 for(String token : tokens) {
                     Assert.assertTrue("unknown token " + uri + " for URI " + uri, expectedTokens.remove(token));

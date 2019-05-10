@@ -114,6 +114,7 @@ public class LaundromatCorpusUpdater {
                     if ((line.length > URI_ID) && (line.length > HASH_ID)) {
                         hash2Uri.put(line[HASH_ID], line[URI_ID]);
                     }
+                    line = reader.readNext();
                 }
                 reader.close();
                 return new LaundromatDocumentUpdater(documentSource, hash2Uri);

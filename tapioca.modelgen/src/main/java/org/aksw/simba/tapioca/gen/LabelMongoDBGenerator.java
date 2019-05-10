@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.aksw.simba.tapioca.preprocessing.labelretrieving.MongoDBBasedTokenizedLabelRetriever;
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +38,6 @@ public class LabelMongoDBGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LabelMongoDBGenerator.class);
 
-    private static final String DB_NAME = "tapioca";
-    private static final String COLLECTION_URIS = "uris";
-    public static final String URI_FIELD = "uri";
-    public static final String TOKENS_FIELD = "tokens";
-
     public static void main(String[] args) throws InterruptedException {
         if (args.length < 3) {
             LOGGER.error("Not enough arguments:\nLabelDBGenerator <mongo-db-host> <mongo-db-port> <input-file>");
@@ -58,7 +54,7 @@ public class LabelMongoDBGenerator {
 
     protected void readTsv(String dbHost, int dbPort, String inputFile) {
         try (MongoClient client = new MongoClient(dbHost, dbPort)) {
-            MongoCollection<Document> uriCollection = open(client);
+            MongoCollection<Document> uriCollection = MongoDBBasedTokenizedLabelRetriever.open(client);
             SimpleBuffer buffer = new SimpleBuffer();
             // try (Stream<String> stream = Files.lines(Paths.get(inputFile))) {
             // stream.sequential().forEach(l -> addTsvLine(l, buffer, preparedStmts));
@@ -82,49 +78,25 @@ public class LabelMongoDBGenerator {
         }
     }
 
-    public MongoCollection<Document> open(MongoClient client) {
-        MongoDatabase mongoDB = client.getDatabase(DB_NAME);
-        if (!queueTableExists(mongoDB)) {
-            return initDB(mongoDB);
-        }
-        return mongoDB.getCollection(COLLECTION_URIS);
-    }
-
-    public boolean queueTableExists(MongoDatabase mongoDB) {
-        for (String collection : mongoDB.listCollectionNames()) {
-            if (collection.toLowerCase().equals(COLLECTION_URIS.toLowerCase())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    protected MongoCollection<Document> initDB(MongoDatabase mongoDB) {
-        mongoDB.createCollection(COLLECTION_URIS);
-        MongoCollection<Document> uriCollection = mongoDB.getCollection(COLLECTION_URIS);
-        uriCollection.createIndex(Indexes.ascending(URI_FIELD));
-        return uriCollection;
-    }
-
     protected static void store(SimpleBuffer buffer, MongoCollection<Document> uriCollection, Gson gson)
             throws SQLException {
         if (buffer.tokens.isEmpty() || (buffer.uri == null) || buffer.uri.isEmpty()) {
             return;
         }
-        Document query = new Document(URI_FIELD, buffer.uri);
+        Document query = new Document(MongoDBBasedTokenizedLabelRetriever.URI_FIELD, buffer.uri);
         Iterator<Document> iterator = uriCollection.find(query).iterator();
         if (iterator.hasNext()) {
             // Update existing URI
             Document document = iterator.next();
             // deserialize tokens
             @SuppressWarnings("unchecked")
-            List<String> tokens = (List<String>) document.get(TOKENS_FIELD);
+            List<String> tokens = (List<String>) document.get(MongoDBBasedTokenizedLabelRetriever.TOKENS_FIELD);
             tokens = Streams.concat(tokens.stream(), buffer.tokens.stream()).distinct().collect(Collectors.toList());
-            Document update = new Document().append("$set", new BasicDBObject().append(TOKENS_FIELD, tokens));
+            Document update = new Document().append("$set", new BasicDBObject().append(MongoDBBasedTokenizedLabelRetriever.TOKENS_FIELD, tokens));
             uriCollection.updateOne(query, update);
         } else {
             // Insert the URI
-            query.append(TOKENS_FIELD, buffer.tokens);
+            query.append(MongoDBBasedTokenizedLabelRetriever.TOKENS_FIELD, buffer.tokens);
             try {
                 uriCollection.insertOne(query);
             } catch (MongoWriteException e) {
