@@ -134,6 +134,7 @@ public class LaundromatCorpusUpdater {
         public LaundromatDocumentUpdater(DocumentSupplier documentSource, Map<String, String> hash2Uri) {
             super(documentSource);
             this.hash2Uri = hash2Uri;
+            LOGGER.info("Initialized with " + hash2Uri.size() + " elements.");
         }
 
         @Override

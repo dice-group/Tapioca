@@ -24,7 +24,8 @@ public class LaundromatCorpusUpdaterTest {
         updater.run(tsvFile, inputFile, outputFile);
 
         Set<String> expectedUris = new HashSet<String>(Arrays.asList(
-                "http://www.icane.es/data/api/active-population-economic-sector-nace09.rdf", "models/4.06.rdf"));
+                "http://www.icane.es/data/api/active-population-economic-sector-nace09.rdf", "models/4.06.rdf",
+                "data/worldbank-linkeddata/data/climates/433.2046.2065.annualavg.ppt_days10.rdf"));
 
         DocumentSupplier supplier = StreamBasedXmlDocumentSupplier.createReader(outputFile);
         Document document;

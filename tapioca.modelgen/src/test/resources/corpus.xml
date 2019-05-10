@@ -18,4 +18,13 @@
 <DocumentCategory></DocumentCategory>
 <DocumentURI>http://lodlaundromat.org/resource/9a30b946c7f5fb8463398f970e5261cb</DocumentURI>
 </Document>
+<Document id="1">
+<DatasetSpecialClassesInfo></DatasetSpecialClassesInfo>
+<DocumentName>4523562a5f9f12947d10029002c136a3.ttl</DocumentName>
+<DatasetClassInfo>http://ex.org/Class1&gt;1</DatasetClassInfo>
+<DatasetVocabularies></DatasetVocabularies>
+<DatasetPropertyInfo>http://ex.org/Prop1&gt;1</DatasetPropertyInfo>
+<DocumentCategory></DocumentCategory>
+<DocumentURI>http://lodlaundromat.org/resource/4523562a5f9f12947d10029002c136a3</DocumentURI>
+</Document>
 </corpus>
