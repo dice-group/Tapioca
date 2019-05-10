@@ -17,9 +17,15 @@
  */
 package org.aksw.simba.tapioca.gen;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -112,6 +118,80 @@ public class LaundromatCorpusUpdater {
         public static final int HASH_ID = 6;
 
         public static LaundromatDocumentUpdater create(DocumentSupplier documentSource, File tsvFile) {
+            Map<String, String> hash2Uri = new HashMap<>();
+            try (Reader reader = new InputStreamReader(new BufferedInputStream(new FileInputStream(tsvFile)),
+                    StandardCharsets.UTF_8)) {
+                StringBuilder builder = new StringBuilder();
+                /*
+                 * Status. 0 = new line started and we are waiting for the first whitespace. 1 =
+                 * a whitespace has been found, we are waiting for the next non-whitespace which
+                 * should be the start of the hash. 2 = reading the hash. 3 = hash ended,
+                 * waiting for the URI. 4 = URI. 5 = URI ended, waiting for the end of line.
+                 */
+                int state = 0;
+                String hash = null;
+                char c;
+                while (reader.ready()) {
+                    c = (char) reader.read();
+                    switch (state) {
+                    case 0: {
+                        if (Character.isWhitespace(c)) {
+                            state = 1;
+                        }
+                        break;
+                    }
+                    case 1: // falls through
+                    case 3: {
+                        if (!Character.isWhitespace(c)) {
+                            ++state;
+                            builder.append(c);
+                        }
+                        break;
+                    }
+                    case 2: {
+                        if (Character.isWhitespace(c)) {
+                            state = 3;
+                            hash = builder.toString();
+                            builder.delete(0, builder.length());
+                        } else {
+                            builder.append(c);
+                        }
+                        break;
+                    }
+                    case 4: {
+                        if (Character.isWhitespace(c)) {
+                            hash2Uri.put(hash, builder.toString());
+                            builder.delete(0, builder.length());
+                            state = 5;
+                        } else {
+                            builder.append(c);
+                        }
+                        break;
+                    }
+                    case 5: {
+                        if (c == '\n') {
+                            state = 0;
+                        }
+                        break;
+                    }
+                    default: {
+                        throw new IllegalStateException("Unknown state " + state);
+                    }
+                    }
+                }
+                return new LaundromatDocumentUpdater(documentSource, hash2Uri);
+            } catch (Exception e) {
+                LOGGER.error("Exception while creating LaundromatDocumentUpdater. Returning null.", e);
+                return null;
+            }
+        }
+
+        /*
+         * This method had issues on the server since it was not able to recognise the
+         * whitespaces as separators.
+         */
+        @Deprecated
+        public static LaundromatDocumentUpdater createWithCSVReader(DocumentSupplier documentSource, File tsvFile) {
             Map<String, String> hash2Uri = new HashMap<>();
             try (FileReader fReader = new FileReader(tsvFile)) {
                 CSVReader reader = new CSVReader(fReader, ' ');
