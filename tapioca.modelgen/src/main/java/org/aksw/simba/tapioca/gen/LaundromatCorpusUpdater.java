@@ -20,6 +20,7 @@ package org.aksw.simba.tapioca.gen;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -119,7 +120,7 @@ public class LaundromatCorpusUpdater {
                     if ((line.length > URI_ID) && (line.length > HASH_ID)) {
                         hash2Uri.put(line[HASH_ID], line[URI_ID]);
                     } else {
-                        LOGGER.info("Discarded " + line.toString());
+                        LOGGER.info("Discarded " + Arrays.toString(line));
                     }
                     line = reader.readNext();
                 }
