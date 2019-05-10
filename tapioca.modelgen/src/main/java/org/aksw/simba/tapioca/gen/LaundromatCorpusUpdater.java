@@ -102,8 +102,13 @@ public class LaundromatCorpusUpdater {
 
         public static final String LAUNDROMAT_URI_PREFIX = "http://lodlaundromat.org/resource/";
         public static final int LAUNDROMAT_URI_PREFIX_LENGTH = LAUNDROMAT_URI_PREFIX.length();
-        public static final int URI_ID = 1;
-        public static final int HASH_ID = 2;
+        /*
+         * It is unclear why the laundromat TSV file is not a real TSV file but contains
+         * only whitespaces instead of tab characters. However, the following IDs should
+         * work for the complete file
+         */
+        public static final int URI_ID = 14;
+        public static final int HASH_ID = 6;
 
         public static LaundromatDocumentUpdater create(DocumentSupplier documentSource, File tsvFile) {
             Map<String, String> hash2Uri = new HashMap<>();
@@ -148,7 +153,7 @@ public class LaundromatCorpusUpdater {
         }
 
         protected String extractHash(DocumentURI uri) {
-            return uri.get().substring(LAUNDROMAT_URI_PREFIX_LENGTH);
+            return uri.get().trim().substring(LAUNDROMAT_URI_PREFIX_LENGTH);
         }
     }
 }

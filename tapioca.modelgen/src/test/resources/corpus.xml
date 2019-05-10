@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<corpus xmlns="http://semweb.unister.de/xml-corpus-schema-2013">
+<Document id="0">
+<DatasetSpecialClassesInfo></DatasetSpecialClassesInfo>
+<DocumentName>f01f8fc196ed3e3f8a65247b68f07635.ttl</DocumentName>
+<DatasetClassInfo>http://ex.org/Class1&gt;1</DatasetClassInfo>
+<DatasetVocabularies></DatasetVocabularies>
+<DatasetPropertyInfo>http://ex.org/Prop1&gt;1</DatasetPropertyInfo>
+<DocumentCategory></DocumentCategory>
+<DocumentURI>http://lodlaundromat.org/resource/f01f8fc196ed3e3f8a65247b68f07635</DocumentURI>
+</Document>
+<Document id="1">
+<DatasetSpecialClassesInfo></DatasetSpecialClassesInfo>
+<DocumentName>9a30b946c7f5fb8463398f970e5261cb.ttl</DocumentName>
+<DatasetClassInfo>http://ex.org/Class1&gt;1</DatasetClassInfo>
+<DatasetVocabularies></DatasetVocabularies>
+<DatasetPropertyInfo>http://ex.org/Prop1&gt;1</DatasetPropertyInfo>
+<DocumentCategory></DocumentCategory>
+<DocumentURI>http://lodlaundromat.org/resource/9a30b946c7f5fb8463398f970e5261cb</DocumentURI>
+</Document>
+</corpus>
