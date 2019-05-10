@@ -118,6 +118,8 @@ public class LaundromatCorpusUpdater {
                 while (line != null) {
                     if ((line.length > URI_ID) && (line.length > HASH_ID)) {
                         hash2Uri.put(line[HASH_ID], line[URI_ID]);
+                    } else {
+                        LOGGER.info("Discarded " + line.toString());
                     }
                     line = reader.readNext();
                 }
