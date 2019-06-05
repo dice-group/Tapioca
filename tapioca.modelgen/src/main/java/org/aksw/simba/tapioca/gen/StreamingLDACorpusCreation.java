@@ -438,9 +438,9 @@ public class StreamingLDACorpusCreation {
         if(isParallel) {
             docStream = docStream.parallel();
         }
-        useWhiteListFilter(docStream);
-        generateDocuments(docStream, cachingLabelRetriever);
-        filterStopWordsAndEmptyDocs(docStream);
+        docStream = useWhiteListFilter(docStream);
+        docStream = generateDocuments(docStream, cachingLabelRetriever);
+        docStream = filterStopWordsAndEmptyDocs(docStream);
         return docStream;
     }
 }
