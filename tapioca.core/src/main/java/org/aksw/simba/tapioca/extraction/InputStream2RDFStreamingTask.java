@@ -35,7 +35,7 @@ package org.aksw.simba.tapioca.extraction;
 
 import java.io.InputStream;
 
-import org.aksw.simba.topicmodeling.concurrent.tasks.Task;
+import org.dice_research.topicmodeling.concurrent.tasks.Task;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.system.StreamRDF;

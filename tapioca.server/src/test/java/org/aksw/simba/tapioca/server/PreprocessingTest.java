@@ -43,12 +43,12 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.WorkerBasedLabelRetrievingDocumentSupplierDecorator;
-import org.aksw.simba.topicmodeling.preprocessing.SingleDocumentPreprocessor;
-import org.aksw.simba.topicmodeling.utils.doc.Document;
-import org.aksw.simba.topicmodeling.utils.doc.DocumentText;
-import org.aksw.simba.topicmodeling.utils.doc.DocumentWordCounts;
-import org.aksw.simba.topicmodeling.utils.vocabulary.SimpleVocabulary;
-import org.aksw.simba.topicmodeling.utils.vocabulary.Vocabulary;
+import org.dice_research.topicmodeling.preprocessing.SingleDocumentPreprocessor;
+import org.dice_research.topicmodeling.utils.doc.Document;
+import org.dice_research.topicmodeling.utils.doc.DocumentText;
+import org.dice_research.topicmodeling.utils.doc.DocumentWordCounts;
+import org.dice_research.topicmodeling.utils.vocabulary.SimpleVocabulary;
+import org.dice_research.topicmodeling.utils.vocabulary.Vocabulary;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;

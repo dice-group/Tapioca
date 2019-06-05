@@ -37,11 +37,11 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.util.concurrent.ExecutorService;
 
-import org.aksw.simba.topicmodeling.concurrent.overseers.Overseer;
-import org.aksw.simba.topicmodeling.concurrent.overseers.pool.ExecutorBasedOverseer;
-import org.aksw.simba.topicmodeling.concurrent.overseers.simple.SimpleOverseer;
-import org.aksw.simba.topicmodeling.concurrent.tasks.Task;
-import org.aksw.simba.topicmodeling.concurrent.tasks.TaskObserver;
+import org.dice_research.topicmodeling.concurrent.overseers.Overseer;
+import org.dice_research.topicmodeling.concurrent.overseers.pool.ExecutorBasedOverseer;
+import org.dice_research.topicmodeling.concurrent.overseers.simple.SimpleOverseer;
+import org.dice_research.topicmodeling.concurrent.tasks.Task;
+import org.dice_research.topicmodeling.concurrent.tasks.TaskObserver;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.lang.PipedRDFIterator;

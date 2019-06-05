@@ -19,9 +19,9 @@ package org.aksw.simba.tapioca.preprocessing;
 
 import java.util.Set;
 
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.AbstractPropertyEditingDocumentSupplierDecorator;
-import org.aksw.simba.topicmodeling.utils.doc.AbstractSimpleDocumentProperty;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.decorator.AbstractPropertyEditingDocumentSupplierDecorator;
+import org.dice_research.topicmodeling.utils.doc.AbstractSimpleDocumentProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

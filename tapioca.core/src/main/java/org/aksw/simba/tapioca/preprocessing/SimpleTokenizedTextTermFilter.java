@@ -18,10 +18,10 @@
 package org.aksw.simba.tapioca.preprocessing;
 
 import org.aksw.simba.tapioca.data.SimpleTokenizedText;
-import org.aksw.simba.topicmodeling.lang.Term;
-import org.aksw.simba.topicmodeling.lang.postagging.PosTaggingTermFilter;
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.AbstractPropertyEditingDocumentSupplierDecorator;
+import org.dice_research.topicmodeling.lang.Term;
+import org.dice_research.topicmodeling.lang.postagging.PosTaggingTermFilter;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.decorator.AbstractPropertyEditingDocumentSupplierDecorator;
 
 import com.carrotsearch.hppc.ObjectArrayList;
 

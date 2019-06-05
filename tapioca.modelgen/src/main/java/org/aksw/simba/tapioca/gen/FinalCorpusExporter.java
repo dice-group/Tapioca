@@ -38,10 +38,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
-import org.aksw.simba.topicmodeling.io.gzip.GZipCorpusObjectReader;
-import org.aksw.simba.topicmodeling.utils.corpus.Corpus;
-import org.aksw.simba.topicmodeling.utils.doc.Document;
-import org.aksw.simba.topicmodeling.utils.doc.DocumentURI;
+import org.dice_research.topicmodeling.io.gzip.GZipCorpusObjectReader;
+import org.dice_research.topicmodeling.utils.corpus.Corpus;
+import org.dice_research.topicmodeling.utils.doc.Document;
+import org.dice_research.topicmodeling.utils.doc.DocumentURI;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.n3.turtle.TurtleReader;
 import org.apache.jena.rdf.model.Model;

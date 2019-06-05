@@ -33,7 +33,7 @@
  */
 package org.aksw.simba.tapioca.data;
 
-import org.aksw.simba.topicmodeling.utils.doc.AbstractDocumentProperty;
+import org.dice_research.topicmodeling.utils.doc.AbstractDocumentProperty;
 
 public class DatasetTriplesCount extends AbstractDocumentProperty {
 

@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.aksw.simba.topicmodeling.commons.io.StorageHelper;
+import org.dice_research.topicmodeling.commons.io.StorageHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

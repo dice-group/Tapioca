@@ -36,7 +36,7 @@ package org.aksw.simba.tapioca.analyzer.sparql;
 import java.io.File;
 import java.io.FileOutputStream;
 
-import org.aksw.simba.topicmodeling.concurrent.tasks.Task;
+import org.dice_research.topicmodeling.concurrent.tasks.Task;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;

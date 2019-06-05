@@ -23,13 +23,13 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.aksw.simba.tapioca.data.StringCountMapping;
-import org.aksw.simba.topicmodeling.concurrent.overseers.pool.DefeatableOverseer;
-import org.aksw.simba.topicmodeling.concurrent.overseers.pool.ExecutorBasedOverseer;
-import org.aksw.simba.topicmodeling.concurrent.reporter.LogReporter;
-import org.aksw.simba.topicmodeling.concurrent.reporter.Reporter;
-import org.aksw.simba.topicmodeling.concurrent.tasks.waiting.AbstractWaitingTask;
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.AbstractPropertyEditingDocumentSupplierDecorator;
+import org.dice_research.topicmodeling.concurrent.overseers.pool.DefeatableOverseer;
+import org.dice_research.topicmodeling.concurrent.overseers.pool.ExecutorBasedOverseer;
+import org.dice_research.topicmodeling.concurrent.reporter.LogReporter;
+import org.dice_research.topicmodeling.concurrent.reporter.Reporter;
+import org.dice_research.topicmodeling.concurrent.tasks.waiting.AbstractWaitingTask;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.decorator.AbstractPropertyEditingDocumentSupplierDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

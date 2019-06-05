@@ -22,9 +22,9 @@ import org.aksw.simba.tapioca.data.DatasetLODStatsInfo;
 import org.aksw.simba.tapioca.data.DatasetPropertyInfo;
 import org.aksw.simba.tapioca.data.DatasetSpecialClassesInfo;
 import org.aksw.simba.tapioca.data.StringCountMapping;
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.AbstractPropertyAppendingDocumentSupplierDecorator;
-import org.aksw.simba.topicmodeling.utils.doc.Document;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.decorator.AbstractPropertyAppendingDocumentSupplierDecorator;
+import org.dice_research.topicmodeling.utils.doc.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

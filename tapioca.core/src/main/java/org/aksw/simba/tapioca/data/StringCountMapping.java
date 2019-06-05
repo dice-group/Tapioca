@@ -17,7 +17,7 @@
  */
 package org.aksw.simba.tapioca.data;
 
-import org.aksw.simba.topicmodeling.utils.doc.AbstractSimpleDocumentProperty;
+import org.dice_research.topicmodeling.utils.doc.AbstractSimpleDocumentProperty;
 
 import com.carrotsearch.hppc.ObjectLongOpenHashMap;
 

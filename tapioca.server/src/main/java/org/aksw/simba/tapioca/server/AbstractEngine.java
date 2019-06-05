@@ -35,10 +35,10 @@ package org.aksw.simba.tapioca.server;
 
 import java.io.StringWriter;
 
-import org.aksw.simba.topicmodeling.commons.collections.TopDoubleObjectCollection;
-import org.aksw.simba.topicmodeling.preprocessing.SingleDocumentPreprocessor;
-import org.aksw.simba.topicmodeling.utils.doc.Document;
-import org.aksw.simba.topicmodeling.utils.doc.DocumentText;
+import org.dice_research.topicmodeling.commons.collections.TopDoubleObjectCollection;
+import org.dice_research.topicmodeling.preprocessing.SingleDocumentPreprocessor;
+import org.dice_research.topicmodeling.utils.doc.Document;
+import org.dice_research.topicmodeling.utils.doc.DocumentText;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;

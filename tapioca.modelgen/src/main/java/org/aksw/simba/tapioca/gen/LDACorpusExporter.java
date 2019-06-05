@@ -46,14 +46,14 @@ import org.aksw.simba.tapioca.data.StringCountMapping;
 import org.aksw.simba.tapioca.preprocessing.StringCountToSimpleTokenizedTextConvertingDocumentSupplierDecorator.WordOccurence;
 import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSupplierDecorator.UriUsage;
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.WorkerBasedLabelRetrievingDocumentSupplierDecorator;
-import org.aksw.simba.topicmodeling.io.xml.XmlWritingDocumentConsumer;
-import org.aksw.simba.topicmodeling.preprocessing.ListCorpusCreator;
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.DocumentConsumerAdaptingSupplierDecorator;
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.PropertyRemovingSupplierDecorator;
-import org.aksw.simba.topicmodeling.utils.corpus.DocumentListCorpus;
-import org.aksw.simba.topicmodeling.utils.doc.Document;
-import org.aksw.simba.topicmodeling.utils.doc.DocumentProperty;
+import org.dice_research.topicmodeling.io.xml.XmlWritingDocumentConsumer;
+import org.dice_research.topicmodeling.preprocessing.ListCorpusCreator;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.decorator.DocumentConsumerAdaptingSupplierDecorator;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.decorator.PropertyRemovingSupplierDecorator;
+import org.dice_research.topicmodeling.utils.corpus.DocumentListCorpus;
+import org.dice_research.topicmodeling.utils.doc.Document;
+import org.dice_research.topicmodeling.utils.doc.DocumentProperty;
 import org.apache.commons.io.IOUtils;
 
 /**

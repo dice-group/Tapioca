@@ -18,14 +18,14 @@
 package org.aksw.simba.tapioca.preprocessing;
 
 import org.aksw.simba.tapioca.data.SimpleTokenizedText;
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.AbstractPropertyAppendingDocumentSupplierDecorator;
-import org.aksw.simba.topicmodeling.utils.doc.Document;
-import org.aksw.simba.topicmodeling.utils.doc.DocumentTextWordIds;
-import org.aksw.simba.topicmodeling.utils.vocabulary.Vocabulary;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.decorator.AbstractPropertyAppendingDocumentSupplierDecorator;
+import org.dice_research.topicmodeling.utils.doc.Document;
+import org.dice_research.topicmodeling.utils.doc.DocumentTextWordIds;
+import org.dice_research.topicmodeling.utils.vocabulary.Vocabulary;
 
-public class SimpleWordIndexingSupplierDecorator extends
-        AbstractPropertyAppendingDocumentSupplierDecorator<DocumentTextWordIds> {
+public class SimpleWordIndexingSupplierDecorator
+        extends AbstractPropertyAppendingDocumentSupplierDecorator<DocumentTextWordIds> {
 
     private Vocabulary vocabulary;
 
@@ -49,10 +49,12 @@ public class SimpleWordIndexingSupplierDecorator extends
         int wordIds[] = new int[tokens.length];
         int wordId;
         for (int i = 0; i < tokens.length; ++i) {
-            wordId = vocabulary.getId(tokens[i]);
-            if (wordId == Vocabulary.WORD_NOT_FOUND) {
-                vocabulary.add(tokens[i]);
+            synchronized (vocabulary) {
                 wordId = vocabulary.getId(tokens[i]);
+                if (wordId == Vocabulary.WORD_NOT_FOUND) {
+                    vocabulary.add(tokens[i]);
+                    wordId = vocabulary.getId(tokens[i]);
+                }
             }
             wordIds[i] = wordId;
         }

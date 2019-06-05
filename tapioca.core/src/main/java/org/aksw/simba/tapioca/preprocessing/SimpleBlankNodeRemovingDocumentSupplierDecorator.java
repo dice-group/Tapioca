@@ -17,9 +17,9 @@
  */
 package org.aksw.simba.tapioca.preprocessing;
 
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.decorator.AbstractPropertyEditingDocumentSupplierDecorator;
-import org.aksw.simba.topicmodeling.utils.doc.AbstractSimpleDocumentProperty;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.decorator.AbstractPropertyEditingDocumentSupplierDecorator;
+import org.dice_research.topicmodeling.utils.doc.AbstractSimpleDocumentProperty;
 
 import com.carrotsearch.hppc.ObjectLongOpenHashMap;
 import com.carrotsearch.hppc.ObjectOpenHashSet;

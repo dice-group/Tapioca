@@ -37,8 +37,8 @@ import java.io.File;
 import java.util.Set;
 
 import org.aksw.simba.tapioca.analyzer.label.LabelExtractionUtils;
-import org.aksw.simba.topicmodeling.commons.io.StorageHelper;
-import org.aksw.simba.topicmodeling.concurrent.tasks.Task;
+import org.dice_research.topicmodeling.commons.io.StorageHelper;
+import org.dice_research.topicmodeling.concurrent.tasks.Task;
 
 public class EndpointLabelExtractionTask implements Task {
 

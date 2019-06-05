@@ -33,7 +33,7 @@
  */
 package org.aksw.simba.tapioca.data;
 
-import org.aksw.simba.topicmodeling.utils.doc.AbstractStringArrayContainingDocumentProperty;
+import org.dice_research.topicmodeling.utils.doc.AbstractStringArrayContainingDocumentProperty;
 
 public class SimpleTokenizedText extends AbstractStringArrayContainingDocumentProperty {
 

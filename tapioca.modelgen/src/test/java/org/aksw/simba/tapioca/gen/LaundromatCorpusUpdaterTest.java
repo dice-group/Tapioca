@@ -6,10 +6,10 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.aksw.simba.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier;
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
-import org.aksw.simba.topicmodeling.utils.doc.Document;
-import org.aksw.simba.topicmodeling.utils.doc.DocumentURI;
+import org.dice_research.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
+import org.dice_research.topicmodeling.utils.doc.Document;
+import org.dice_research.topicmodeling.utils.doc.DocumentURI;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -35,13 +35,13 @@ package org.aksw.simba.tapioca.gen;
 
 import java.io.File;
 
-import org.aksw.simba.topicmodeling.algorithm.mallet.MalletLdaWrapper;
-import org.aksw.simba.topicmodeling.algorithms.ModelingAlgorithm;
-import org.aksw.simba.topicmodeling.algorithms.ProbTopicModelingAlgorithmStateSupplier;
-import org.aksw.simba.topicmodeling.io.CorpusReader;
-import org.aksw.simba.topicmodeling.io.gzip.GZipCorpusObjectReader;
-import org.aksw.simba.topicmodeling.io.gzip.GZipProbTopicModelingAlgorithmStateWriter;
-import org.aksw.simba.topicmodeling.utils.corpus.Corpus;
+import org.dice_research.topicmodeling.algorithm.mallet.MalletLdaWrapper;
+import org.dice_research.topicmodeling.algorithms.ModelingAlgorithm;
+import org.dice_research.topicmodeling.algorithms.ProbTopicModelingAlgorithmStateSupplier;
+import org.dice_research.topicmodeling.io.CorpusReader;
+import org.dice_research.topicmodeling.io.gzip.GZipCorpusObjectReader;
+import org.dice_research.topicmodeling.io.gzip.GZipProbTopicModelingAlgorithmStateWriter;
+import org.dice_research.topicmodeling.utils.corpus.Corpus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

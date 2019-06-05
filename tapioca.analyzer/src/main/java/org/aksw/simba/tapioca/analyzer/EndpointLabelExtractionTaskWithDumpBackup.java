@@ -42,7 +42,7 @@ import org.aksw.simba.tapioca.analyzer.label.LabelExtractionUtils;
 import org.aksw.simba.tapioca.analyzer.sparql.EndpointAnalyzingTask;
 import org.aksw.simba.tapioca.analyzer.sparql.EndpointConfig;
 import org.aksw.simba.tapioca.analyzer.sparql.SPARQLEndpointLabelExtractor;
-import org.aksw.simba.topicmodeling.commons.io.StorageHelper;
+import org.dice_research.topicmodeling.commons.io.StorageHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

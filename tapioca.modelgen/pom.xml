@@ -31,13 +31,13 @@
 
 		<!-- Topicmodeling MALLET -->
 		<dependency>
-			<groupId>org.aksw.simba</groupId>
+			<groupId>org.dice-research</groupId>
 			<artifactId>topicmodeling.mallet</artifactId>
 			<version>${org.aksw.simba.topicmodeling.version}</version>
 		</dependency>
 		<!-- Topicmodeling IO -->
 		<dependency>
-			<groupId>org.aksw.simba</groupId>
+			<groupId>org.dice-research</groupId>
 			<artifactId>topicmodeling.io</artifactId>
 			<version>${org.aksw.simba.topicmodeling.version}</version>
 		</dependency>

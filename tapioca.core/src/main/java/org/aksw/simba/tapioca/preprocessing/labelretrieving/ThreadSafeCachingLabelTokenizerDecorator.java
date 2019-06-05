@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
-import org.aksw.simba.topicmodeling.commons.io.StorageHelper;
+import org.dice_research.topicmodeling.commons.io.StorageHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -128,7 +128,7 @@ public class ThreadSafeCachingLabelTokenizerDecorator implements TokenizedLabelR
             }
             cachedTokenizedLabels.put(uri, result != null ? result.toArray(new String[result.size()]) : null);
             ++cacheChanges;
-            if ((forceStorageAfterChanges > 0) && (cacheChanges >= forceStorageAfterChanges)) {
+            if ((forceStorageAfterChanges > 0) && (cacheChanges >= forceStorageAfterChanges) && (cacheFiles.length > 0)) {
                 LOGGER.info("Storing the cache has been forced...");
                 performCacheStorage();
             }
@@ -157,6 +157,9 @@ public class ThreadSafeCachingLabelTokenizerDecorator implements TokenizedLabelR
     }
 
     private void performCacheStorage() {
+      if(cacheFiles.length == 0) {
+        return;
+      }
         for (int i = cacheFiles.length - 2; i >= 0; --i) {
             cacheFiles[i].renameTo(cacheFiles[i + 1]);
         }

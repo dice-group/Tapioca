@@ -17,9 +17,9 @@
  */
 package org.aksw.simba.tapioca.data;
 
-import org.aksw.simba.topicmodeling.utils.doc.AbstractSimpleDocumentProperty;
-import org.aksw.simba.topicmodeling.utils.doc.ParseableDocumentProperty;
-import org.aksw.simba.topicmodeling.utils.doc.StringContainingDocumentProperty;
+import org.dice_research.topicmodeling.utils.doc.AbstractSimpleDocumentProperty;
+import org.dice_research.topicmodeling.utils.doc.ParseableDocumentProperty;
+import org.dice_research.topicmodeling.utils.doc.StringContainingDocumentProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

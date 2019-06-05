@@ -39,8 +39,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import org.aksw.simba.tapioca.analyzer.label.LabelExtractionUtils;
-import org.aksw.simba.topicmodeling.commons.io.StorageHelper;
-import org.aksw.simba.topicmodeling.concurrent.tasks.Task;
+import org.dice_research.topicmodeling.commons.io.StorageHelper;
+import org.dice_research.topicmodeling.concurrent.tasks.Task;
 
 /**
  * 

@@ -38,7 +38,7 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
-import org.aksw.simba.topicmodeling.utils.doc.AbstractSimpleDocumentProperty;
+import org.dice_research.topicmodeling.utils.doc.AbstractSimpleDocumentProperty;
 
 import com.carrotsearch.hppc.ObjectOpenHashSet;
 

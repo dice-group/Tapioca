@@ -45,12 +45,12 @@
 			<version>${org.aksw.jena-sparql-api.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.aksw.simba</groupId>
+			<groupId>org.dice-research</groupId>
 			<artifactId>topicmodeling.concurrent</artifactId>
 			<version>${org.aksw.simba.topicmodeling.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.aksw.simba</groupId>
+			<groupId>org.dice-research</groupId>
 			<artifactId>topicmodeling.io</artifactId>
 			<version>${org.aksw.simba.topicmodeling.version}</version>
 		</dependency>

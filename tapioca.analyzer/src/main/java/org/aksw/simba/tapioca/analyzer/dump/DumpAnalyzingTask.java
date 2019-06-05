@@ -38,7 +38,7 @@ import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 
-import org.aksw.simba.topicmodeling.concurrent.tasks.Task;
+import org.dice_research.topicmodeling.concurrent.tasks.Task;
 import org.apache.commons.io.IOUtils;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.riot.Lang;

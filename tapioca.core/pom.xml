@@ -59,25 +59,25 @@
         </dependency> -->
 		<!-- Topicmodeling Commons -->
 		<dependency>
-			<groupId>org.aksw.simba</groupId>
+			<groupId>org.dice-research</groupId>
 			<artifactId>topicmodeling.commons</artifactId>
 			<version>${org.aksw.simba.topicmodeling.version}</version>
 		</dependency>
 		<!-- Topicmodeling Concurrent -->
 		<dependency>
-			<groupId>org.aksw.simba</groupId>
+			<groupId>org.dice-research</groupId>
 			<artifactId>topicmodeling.concurrent</artifactId>
 			<version>${org.aksw.simba.topicmodeling.version}</version>
 		</dependency>
 		<!-- Topicmodeling Datatypes -->
 		<dependency>
-			<groupId>org.aksw.simba</groupId>
+			<groupId>org.dice-research</groupId>
 			<artifactId>topicmodeling.datatypes</artifactId>
 			<version>${org.aksw.simba.topicmodeling.version}</version>
 		</dependency>
 		<!-- Topicmodeling Preprocessing -->
 		<dependency>
-			<groupId>org.aksw.simba</groupId>
+			<groupId>org.dice-research</groupId>
 			<artifactId>topicmodeling.preprocessing</artifactId>
 			<version>${org.aksw.simba.topicmodeling.version}</version>
 		</dependency>

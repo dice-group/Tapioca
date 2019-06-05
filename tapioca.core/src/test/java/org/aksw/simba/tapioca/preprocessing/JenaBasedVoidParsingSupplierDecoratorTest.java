@@ -8,10 +8,10 @@ import java.util.List;
 
 import org.aksw.simba.tapioca.data.DatasetClassInfo;
 import org.aksw.simba.tapioca.data.DatasetPropertyInfo;
-import org.aksw.simba.topicmodeling.preprocessing.docsupplier.CorpusWrappingDocumentSupplier;
-import org.aksw.simba.topicmodeling.utils.corpus.DocumentListCorpus;
-import org.aksw.simba.topicmodeling.utils.doc.Document;
-import org.aksw.simba.topicmodeling.utils.doc.DocumentText;
+import org.dice_research.topicmodeling.preprocessing.docsupplier.CorpusWrappingDocumentSupplier;
+import org.dice_research.topicmodeling.utils.corpus.DocumentListCorpus;
+import org.dice_research.topicmodeling.utils.doc.Document;
+import org.dice_research.topicmodeling.utils.doc.DocumentText;
 import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
