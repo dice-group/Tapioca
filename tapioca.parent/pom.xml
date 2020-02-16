@@ -52,7 +52,7 @@
 		<!-- Library Versions -->
 		<com.carrotsearch.hppc.version>0.6.1</com.carrotsearch.hppc.version>
 		<lucene.version>4.4.0</lucene.version>
-		<junit.version>4.8.2</junit.version>
+		<junit.version>4.13</junit.version>
 		<org.aksw.simba.topicmodeling.version>0.0.3-SNAPSHOT</org.aksw.simba.topicmodeling.version>
 		<org.apache.commons.commons-lang3.version>3.3.2</org.apache.commons.commons-lang3.version>
 		<org.apache.commons.commons-io.version>2.4</org.apache.commons.commons-io.version>

@@ -35,9 +35,8 @@ package org.aksw.simba.tapioca.extraction;
 
 import java.util.Arrays;
 
-import junit.framework.Assert;
-
 import org.apache.jena.riot.Lang;
+import org.junit.Assert;
 
 import com.carrotsearch.hppc.ObjectIntOpenHashMap;
 
