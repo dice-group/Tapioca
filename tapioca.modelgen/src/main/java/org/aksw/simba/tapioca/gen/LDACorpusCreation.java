@@ -56,6 +56,7 @@ import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSuppl
 import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSupplierDecorator.UriUsage;
 import org.aksw.simba.tapioca.preprocessing.UriFilteringDocumentSupplierDecorator;
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.FileBasedTokenizedLabelRetriever;
+import org.aksw.simba.tapioca.preprocessing.labelretrieving.LODCatLabelServiceBasedRetriever;
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.MongoDBBasedTokenizedLabelRetriever;
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.TokenizedLabelRetriever;
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.WorkerBasedLabelRetrievingDocumentSupplierDecorator;
@@ -121,6 +122,8 @@ public class LDACorpusCreation {
                 "the host name of a MongoDB instance containing URI to label mappings");
         options.addOption("p", "mongo-db-port", true,
                 "the port of a MongoDB instance containing URI to label mappings");
+        options.addOption("s", "label-service", true,
+                "the URL of a label retrieval service");
         options.addOption("x", "export-xml", false, "export the corpus as XML");
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = null;
@@ -164,6 +167,9 @@ public class LDACorpusCreation {
                     LOGGER.error("If one of the options h or p is defined, the other option has to be defined as well.");
                     return;
                 }
+            }
+            if (cmd.hasOption("s")) {
+                retrievers.add(new LODCatLabelServiceBasedRetriever(cmd.getOptionValue("s")));
             }
             if (cmd.hasOption("l")) {
                 for (String file : cmd.getOptionValues("l")) {

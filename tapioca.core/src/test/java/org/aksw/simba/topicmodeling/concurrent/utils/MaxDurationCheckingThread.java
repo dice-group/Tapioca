@@ -67,7 +67,7 @@ public class MaxDurationCheckingThread implements Runnable {
             // At this point, we are allowed to use this deprecated method, since this test seemed to fail and we want
             // to stop the whole system. Thus, the reason that led to the deprecation of this method is no problem for
             // us.
-            watchedThread.stop(e);
+            watchedThread.stop();
             throw e;
         }
     }

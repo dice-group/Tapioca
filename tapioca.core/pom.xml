@@ -87,5 +87,11 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>${org.apache.commons.commons-lang3.version}</version>
 		</dependency>
+		<!-- LODCat label service -->
+        <dependency>
+            <groupId>org.dice_research</groupId>
+            <artifactId>lodcat.api-java</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
 	</dependencies>
 </project>
