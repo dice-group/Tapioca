@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import org.aksw.simba.tapioca.data.StringCountMapping;
+import org.apache.commons.io.IOUtils;
 import org.dice_research.topicmodeling.concurrent.overseers.pool.DefeatableOverseer;
 import org.dice_research.topicmodeling.concurrent.overseers.pool.ExecutorBasedOverseer;
 import org.dice_research.topicmodeling.concurrent.reporter.LogReporter;
@@ -54,6 +55,7 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator
     private final DefeatableOverseer overseer;
     @SuppressWarnings("unused")
     private final Reporter reporter;
+    private RDFClientLabelRetriever retrieverClient;
 
     public WorkerBasedLabelRetrievingDocumentSupplierDecorator(DocumentSupplier documentSource, File chacheFiles[],
             TokenizedLabelRetriever localLabelTokenizers[], int numberOfWorkers) {
@@ -62,8 +64,8 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator
         overseer = new ExecutorBasedOverseer(numberOfWorkers);
         reporter = new LogReporter(overseer);
         // fileBasedLabelTokenizer = FileBasedTokenizedLabelRetriever.create();
-        clientLabelTokenizer = ThreadSafeCachingLabelTokenizerDecorator.create(new RDFClientLabelRetriever(),
-                chacheFiles);
+        retrieverClient = new RDFClientLabelRetriever();
+        clientLabelTokenizer = ThreadSafeCachingLabelTokenizerDecorator.create(retrieverClient, chacheFiles);
         this.localLabelTokenizers = localLabelTokenizers;
         // new WaitingThreadInterrupter(overseer, MAXIMUM_WAITING_TIME);
     }
@@ -261,5 +263,6 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator
     @Override
     public void close() {
         overseer.shutdown();
+        IOUtils.closeQuietly(retrieverClient);
     }
 }

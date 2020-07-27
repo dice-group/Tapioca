@@ -17,26 +17,39 @@
  */
 package org.aksw.simba.tapioca.preprocessing.labelretrieving;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.LaxRedirectStrategy;
+import org.apache.http.message.BasicHeader;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
-import org.apache.jena.rdf.model.RDFReader;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.Statement;
 import org.apache.jena.rdf.model.StmtIterator;
-import org.apache.jena.riot.adapters.RDFReaderRIOT;
+import org.apache.jena.riot.RDFParser;
+import org.apache.jena.riot.WebContent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RDFClientLabelRetriever extends AbstractTokenizedLabelRetriever {
+public class RDFClientLabelRetriever extends AbstractTokenizedLabelRetriever implements Closeable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RDFClientLabelRetriever.class);
+    
+    /**
+     * timeout for a single HTTP request (in seconds).
+     */
+    private static final int REQUEST_TIMEOUT = 15;
 
-    private RDFReader reader = new RDFReaderRIOT();
+    private CloseableHttpClient httpClient;
     
     public static final String NAMING_PROPERTIES[] = { "http://www.w3.org/2000/01/rdf-schema#label",
             "http://xmlns.com/foaf/0.1/nick",
@@ -74,12 +87,36 @@ public class RDFClientLabelRetriever extends AbstractTokenizedLabelRetriever {
             "http://creativecommons.org/ns#attributionName",
             "http://www.aktors.org/ontology/portal#family-name",
             "http://www.aktors.org/ontology/portal#full-name" };
+    
+    public RDFClientLabelRetriever() {
+        // max connections part taken from org.apache.jena.riot.web.HttpOp
+        String s = System.getProperty("http.maxConnections", "5");
+        int max = Integer.parseInt(s);
+        httpClient =  HttpClientBuilder.create()
+            .useSystemProperties()
+            .setRedirectStrategy(new LaxRedirectStrategy())
+            .setMaxConnPerRoute(max)
+            .setMaxConnTotal(10 * max)
+            .setDefaultRequestConfig(
+                    RequestConfig.custom()
+                    .setConnectTimeout(REQUEST_TIMEOUT * 1000)
+                    .setConnectionRequestTimeout(REQUEST_TIMEOUT * 1000)
+                    .setSocketTimeout(REQUEST_TIMEOUT * 1000)
+                    .build())
+            .setDefaultHeaders(Arrays.asList(new  BasicHeader("Accept", WebContent.defaultRDFAcceptHeader)))
+            .build();
+    }
 
     @Override
     public List<String> getTokenizedLabel(String uri, String namespace) {
         Model model = ModelFactory.createDefaultModel();
         try {
-            reader.read(model, uri);
+            RDFParser.create()
+                .source(uri)
+                .base(uri)
+                .httpClient(httpClient)
+                .parse(model);
+            //reader.read(model, uri);
         } catch (Exception e) {
             return null;
         }
@@ -143,5 +180,10 @@ public class RDFClientLabelRetriever extends AbstractTokenizedLabelRetriever {
     // return null;
     // }
     // }
+    
+    @Override
+    public void close() throws IOException {
+        httpClient.close();
+    }
 
 }
