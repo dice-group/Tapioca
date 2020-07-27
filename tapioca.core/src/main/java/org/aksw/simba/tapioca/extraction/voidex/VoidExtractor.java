@@ -173,10 +173,10 @@ public class VoidExtractor extends AbstractExtractor {
         Node subject = triple.getSubject();
         Node predicate = triple.getPredicate();
         Node object = triple.getObject();
-        if (predicate.equals(RDF.type.asNode()) && !(object.isBlank())) {
+        if (predicate.equals(RDF.type.asNode()) && (object.isURI())) {
             // TODO add test case in which the subject is a blank node but is
             // defined as a class or a property
-            if (!subject.isBlank()) {
+            if (subject.isURI()) {
                 if (CLASS_RESOURCES.contains(object)) {
                     countedClasses.putOrAdd(subject.getURI(), 0, 0);
                 } else if (PROPERTY_RESOURCES.contains(object)) {
@@ -186,18 +186,18 @@ public class VoidExtractor extends AbstractExtractor {
             countedClasses.putOrAdd(object.getURI(), 1, 1);
         } else if (predicate.equals(RDFS.subClassOf.asNode())) {
             // TODO add a test case for this
-            if (!subject.isBlank()) {
+            if (subject.isURI()) {
                 countedClasses.putOrAdd(subject.getURI(), 0, 0);
             }
-            if (!object.isBlank()) {
+            if (object.isURI()) {
                 countedClasses.putOrAdd(object.getURI(), 0, 0);
             }
         } else if (predicate.equals(RDFS.subPropertyOf.asNode())) {
             // TODO add a test case for this
-            if (!subject.isBlank()) {
+            if (subject.isURI()) {
                 countedProperties.putOrAdd(subject.getURI(), 0, 0);
             }
-            if (!object.isBlank()) {
+            if (object.isURI()) {
                 countedProperties.putOrAdd(object.getURI(), 0, 0);
             }
         }
