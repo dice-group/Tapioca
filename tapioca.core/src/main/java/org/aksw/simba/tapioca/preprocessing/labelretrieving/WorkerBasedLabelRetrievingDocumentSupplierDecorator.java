@@ -49,39 +49,37 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator
     private LocalLabelTokenizer localTokenizer = new LocalLabelTokenizer();
     private TokenizedLabelRetriever localLabelTokenizers[];
     private ThreadSafeCachingLabelTokenizerDecorator clientLabelTokenizer;
-    private Semaphore activeWorkers = new Semaphore(MAX_NUMBER_OF_WORKERS);
+    private final Semaphore activeWorkers;
     private ObjectLongOpenHashMap<String> countedTokens;
-    private DefeatableOverseer overseer = new ExecutorBasedOverseer(MAX_NUMBER_OF_WORKERS);
+    private final DefeatableOverseer overseer;
     @SuppressWarnings("unused")
-    private Reporter reporter = new LogReporter(overseer);
+    private final Reporter reporter;
 
-    public WorkerBasedLabelRetrievingDocumentSupplierDecorator(DocumentSupplier documentSource, File chacheFiles[]) {
+    public WorkerBasedLabelRetrievingDocumentSupplierDecorator(DocumentSupplier documentSource, File chacheFiles[],
+            TokenizedLabelRetriever localLabelTokenizers[], int numberOfWorkers) {
         super(documentSource, StringCountMapping.class);
+        activeWorkers = new Semaphore(numberOfWorkers);
+        overseer = new ExecutorBasedOverseer(numberOfWorkers);
+        reporter = new LogReporter(overseer);
         // fileBasedLabelTokenizer = FileBasedTokenizedLabelRetriever.create();
         clientLabelTokenizer = ThreadSafeCachingLabelTokenizerDecorator.create(new RDFClientLabelRetriever(),
                 chacheFiles);
-        localLabelTokenizers = new FileBasedTokenizedLabelRetriever[0];
+        this.localLabelTokenizers = localLabelTokenizers;
         // new WaitingThreadInterrupter(overseer, MAXIMUM_WAITING_TIME);
-    }
-
-    public WorkerBasedLabelRetrievingDocumentSupplierDecorator(DocumentSupplier documentSource, File chacheFiles[],
-            File... labelFiles) {
-        this(documentSource, chacheFiles, createFileBasedTokenizers(labelFiles));
-    }
-
-    public WorkerBasedLabelRetrievingDocumentSupplierDecorator(DocumentSupplier documentSource, File chacheFiles[],
-            List<TokenizedLabelRetriever> localLabelTokenizers) {
-        this(documentSource, chacheFiles,
-                localLabelTokenizers.toArray(new TokenizedLabelRetriever[localLabelTokenizers.size()]));
     }
 
     public WorkerBasedLabelRetrievingDocumentSupplierDecorator(DocumentSupplier documentSource, File chacheFiles[],
             TokenizedLabelRetriever localLabelTokenizers[]) {
-        super(documentSource, StringCountMapping.class);
-        this.localLabelTokenizers = localLabelTokenizers;
-        clientLabelTokenizer = ThreadSafeCachingLabelTokenizerDecorator.create(new RDFClientLabelRetriever(),
-                chacheFiles);
-        // new WaitingThreadInterrupter(overseer, MAXIMUM_WAITING_TIME);
+        this(documentSource, chacheFiles, localLabelTokenizers, MAX_NUMBER_OF_WORKERS);
+    }
+
+    public WorkerBasedLabelRetrievingDocumentSupplierDecorator(DocumentSupplier documentSource, File chacheFiles[],
+            File... labelFiles) {
+        this(documentSource, chacheFiles, createFileBasedTokenizers(labelFiles), MAX_NUMBER_OF_WORKERS);
+    }
+
+    public WorkerBasedLabelRetrievingDocumentSupplierDecorator(DocumentSupplier documentSource, File chacheFiles[]) {
+        this(documentSource, chacheFiles, new FileBasedTokenizedLabelRetriever[0], MAX_NUMBER_OF_WORKERS);
     }
 
     @Deprecated
@@ -135,7 +133,7 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator
         activeWorkers.release();
     }
 
-    private static List<TokenizedLabelRetriever> createFileBasedTokenizers(File[] labelFiles) {
+    private static TokenizedLabelRetriever[] createFileBasedTokenizers(File[] labelFiles) {
         List<TokenizedLabelRetriever> tempRetrievers = new ArrayList<>();
         TokenizedLabelRetriever tempRetriever;
         for (int i = 0; i < labelFiles.length; ++i) {
@@ -146,7 +144,7 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator
                 tempRetrievers.add(tempRetriever);
             }
         }
-        return tempRetrievers;
+        return tempRetrievers.toArray(new TokenizedLabelRetriever[tempRetrievers.size()]);
     }
 
     protected static class Worker extends AbstractWaitingTask {

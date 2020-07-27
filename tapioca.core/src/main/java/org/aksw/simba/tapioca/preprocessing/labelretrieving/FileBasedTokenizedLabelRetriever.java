@@ -48,7 +48,11 @@ public class FileBasedTokenizedLabelRetriever extends AbstractTokenizedLabelRetr
     public static FileBasedTokenizedLabelRetriever create(String file, boolean alreadyTokenized) {
         String uriToLabel[][] = StorageHelper.readFromFileSavely(file);
         if (uriToLabel == null) {
-            LOGGER.error("Couldn't load labels from file. Returning null.");
+            LOGGER.error("Couldn't load labels from file (\"" + file + "\"). Returning null.");
+            return null;
+        }
+        if (uriToLabel.length == 0) {
+            LOGGER.warn("Couldn't find any labels in file (\"" + file + "\"). Returning null.");
             return null;
         }
         ObjectObjectOpenHashMap<String, String[]> tokenizedLabels = new ObjectObjectOpenHashMap<String, String[]>(

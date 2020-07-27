@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.aksw.simba.tapioca.data.DatasetClassInfo;
 import org.aksw.simba.tapioca.data.DatasetPropertyInfo;
@@ -60,8 +61,15 @@ import org.aksw.simba.tapioca.preprocessing.labelretrieving.LODCatLabelServiceBa
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.MongoDBBasedTokenizedLabelRetriever;
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.TokenizedLabelRetriever;
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.WorkerBasedLabelRetrievingDocumentSupplierDecorator;
-import org.dice_research.topicmodeling.io.java.CorpusObjectWriter;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.dice_research.topicmodeling.io.gzip.GZipCorpusObjectWriter;
+import org.dice_research.topicmodeling.io.java.CorpusObjectWriter;
 import org.dice_research.topicmodeling.io.xml.XmlWritingDocumentConsumer;
 import org.dice_research.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier;
 import org.dice_research.topicmodeling.lang.postagging.StandardEnglishPosTaggingTermFilter;
@@ -81,13 +89,6 @@ import org.dice_research.topicmodeling.utils.doc.DocumentProperty;
 import org.dice_research.topicmodeling.utils.doc.DocumentURI;
 import org.dice_research.topicmodeling.utils.vocabulary.SimpleVocabulary;
 import org.dice_research.topicmodeling.utils.vocabulary.Vocabulary;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,8 +123,8 @@ public class LDACorpusCreation {
                 "the host name of a MongoDB instance containing URI to label mappings");
         options.addOption("p", "mongo-db-port", true,
                 "the port of a MongoDB instance containing URI to label mappings");
-        options.addOption("s", "label-service", true,
-                "the URL of a label retrieval service");
+        options.addOption("s", "label-service", true, "the URL of a label retrieval service");
+        options.addOption("w", "workers", true, "number of workers used for retrieving labels");
         options.addOption("x", "export-xml", false, "export the corpus as XML");
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = null;
@@ -164,17 +165,18 @@ public class LDACorpusCreation {
                             Integer.parseInt(cmd.getOptionValue("p")));
                     retrievers.add(mongoRetriever);
                 } else {
-                    LOGGER.error("If one of the options h or p is defined, the other option has to be defined as well.");
+                    LOGGER.error(
+                            "If one of the options h or p is defined, the other option has to be defined as well.");
                     return;
+                }
+            }
+            if (cmd.hasOption("l")) {
+                for (String file : cmd.getOptionValues("l")) {
+                    initFileBasedRetriever(retrievers, file);
                 }
             }
             if (cmd.hasOption("s")) {
                 retrievers.add(new LODCatLabelServiceBasedRetriever(cmd.getOptionValue("s")));
-            }
-            if (cmd.hasOption("l")) {
-                for (String file : cmd.getOptionValues("l")) {
-                    retrievers.add(FileBasedTokenizedLabelRetriever.create(file));
-                }
             }
             File cacheFiles[] = null;
             if (cmd.hasOption("c")) {
@@ -186,8 +188,25 @@ public class LDACorpusCreation {
             } else {
                 cacheFiles = new File[0];
             }
-            cachingLabelRetriever = new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, cacheFiles,
-                    retrievers);
+            int numberOfWorkers = -1;
+            if (cmd.hasOption('w')) {
+                try {
+                    numberOfWorkers = Integer.parseInt(cmd.getOptionValue('w'));
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Couldn't parse given number of workers.", e);
+                }
+                if (numberOfWorkers < 1) {
+                    throw new IllegalArgumentException("\"" + numberOfWorkers
+                            + "\" is not a valid number of workers. The numbers is expected to be >= 1.");
+                }
+            }
+            if(numberOfWorkers > 0) {
+                cachingLabelRetriever = new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, cacheFiles,
+                        retrievers.stream().filter(r -> r != null).toArray(TokenizedLabelRetriever[]::new), numberOfWorkers);
+            } else {
+                cachingLabelRetriever = new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, cacheFiles,
+                        retrievers.stream().filter(r -> r != null).toArray(TokenizedLabelRetriever[]::new));
+            }
             // LabelRetrievingDocumentSupplierDecorator cachingLabelRetriever;
             // cachingLabelRetriever = new
             // LabelRetrievingDocumentSupplierDecorator(null, false, labelsFiles);
@@ -195,8 +214,8 @@ public class LDACorpusCreation {
             LDACorpusCreation corpusCreation;
             for (int i = 0; i < uriUsages.length; ++i) {
                 for (int j = 0; j < wordOccurences.length; ++j) {
-                    System.out.println("Starting corpus \"" + inputFile + "\" with " + uriUsages[i] + " and "
-                            + wordOccurences[j]);
+                    System.out.println(
+                            "Starting corpus \"" + inputFile + "\" with " + uriUsages[i] + " and " + wordOccurences[j]);
                     corpusCreation = new LDACorpusCreation(inputFile, uriUsages[i], wordOccurences[j], outputFile);
                     corpusCreation.run(cachingLabelRetriever);
                 }
@@ -218,6 +237,17 @@ public class LDACorpusCreation {
 
     }
 
+    private static void initFileBasedRetriever(List<TokenizedLabelRetriever> retrievers, String file) {
+        File f = new File(file);
+        if (f.isDirectory()) {
+            for (File f2 : f.listFiles()) {
+                initFileBasedRetriever(retrievers, f2.getAbsolutePath());
+            }
+        } else {
+            retrievers.add(FileBasedTokenizedLabelRetriever.create(file));
+        }
+    }
+
     protected final String inputFile;
     protected final String outputFile;
     protected final UriUsage uriUsage;
@@ -228,8 +258,8 @@ public class LDACorpusCreation {
         this(inputFile, uriUsage, wordOccurence, outputFile, false);
     }
 
-    public LDACorpusCreation(String inputFile, UriUsage uriUsage, WordOccurence wordOccurence,
-            String outputFile , boolean exportCorpusAsXml) {
+    public LDACorpusCreation(String inputFile, UriUsage uriUsage, WordOccurence wordOccurence, String outputFile,
+            boolean exportCorpusAsXml) {
         this.inputFile = inputFile;
         this.outputFile = outputFile;
         this.uriUsage = uriUsage;
@@ -238,7 +268,7 @@ public class LDACorpusCreation {
     }
 
     public void run(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
-        //String corpusName = generateCorpusName();
+        // String corpusName = generateCorpusName();
 
         XmlWritingDocumentConsumer consumer = null;
         if (exportCorpusAsXml) {
@@ -289,31 +319,35 @@ public class LDACorpusCreation {
      * @return
      */
     protected DocumentSupplier useWhiteListFilter(DocumentSupplier supplier) {
-        File whitelistFile = new File(inputFile.replace(".corpus", "_whitelist.txt"));
-        if (whitelistFile.exists()) {
-            try {
-                final Set<String> whitelist = new HashSet<String>(FileUtils.readLines(whitelistFile));
-                supplier = new DocumentFilteringSupplierDecorator(supplier, new DocumentFilter() {
-                    public boolean isDocumentGood(Document document) {
-                        DocumentName docName = document.getProperty(DocumentName.class);
-                        if (docName != null) {
-                            String name = docName.get();
-                            if (name.endsWith(".ttl")) {
-                                name = name.substring(0, name.length() - 4);
+        if (inputFile.contains(".corpus")) {
+            File whitelistFile = new File(inputFile.replace(".corpus", "_whitelist.txt"));
+            if (whitelistFile.exists()) {
+                try {
+                    final Set<String> whitelist = new HashSet<String>(FileUtils.readLines(whitelistFile));
+                    supplier = new DocumentFilteringSupplierDecorator(supplier, new DocumentFilter() {
+                        public boolean isDocumentGood(Document document) {
+                            DocumentName docName = document.getProperty(DocumentName.class);
+                            if (docName != null) {
+                                String name = docName.get();
+                                if (name.endsWith(".ttl")) {
+                                    name = name.substring(0, name.length() - 4);
+                                }
+                                DocumentURI uri = document.getProperty(DocumentURI.class);
+                                return whitelist.contains(name) || ((uri != null) && (whitelist.contains(uri.get())));
+                            } else {
+                                return false;
                             }
-                            DocumentURI uri = document.getProperty(DocumentURI.class);
-                            return whitelist.contains(name) || ((uri != null) && (whitelist.contains(uri.get())));
-                        } else {
-                            return false;
                         }
-                    }
-                });
-                LOGGER.info("Using whitelistfile \"{}\".", whitelistFile);
-            } catch (IOException e) {
-                LOGGER.error("Error while reading whitelist \"" + whitelistFile + "\".", e);
+                    });
+                    LOGGER.info("Using whitelistfile \"{}\".", whitelistFile);
+                } catch (IOException e) {
+                    LOGGER.error("Error while reading whitelist \"" + whitelistFile + "\".", e);
+                }
+            } else {
+                LOGGER.info("Can't use whitelistfile \"{}\".", whitelistFile);
             }
         } else {
-            LOGGER.info("Can't use whitelistfile \"{}\".", whitelistFile);
+            LOGGER.info("No whitelistfile given");
         }
         return supplier;
     }

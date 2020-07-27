@@ -186,7 +186,7 @@ public class StreamingLDACorpusCreation {
                 cacheFiles = new File[0];
             }
             cachingLabelRetriever = new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, cacheFiles,
-                    retrievers);
+                    retrievers.stream().filter(r -> r != null).toArray(TokenizedLabelRetriever[]::new));
             // LabelRetrievingDocumentSupplierDecorator cachingLabelRetriever;
             // cachingLabelRetriever = new
             // LabelRetrievingDocumentSupplierDecorator(null, false, labelsFiles);
