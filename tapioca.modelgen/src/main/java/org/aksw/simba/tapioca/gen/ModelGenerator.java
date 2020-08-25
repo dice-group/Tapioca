@@ -35,12 +35,18 @@ package org.aksw.simba.tapioca.gen;
 
 import java.io.File;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.dice_research.topicmodeling.algorithm.mallet.MalletLdaWrapper;
 import org.dice_research.topicmodeling.algorithms.ModelingAlgorithm;
 import org.dice_research.topicmodeling.algorithms.ProbTopicModelingAlgorithmStateSupplier;
 import org.dice_research.topicmodeling.io.CorpusReader;
-import org.dice_research.topicmodeling.io.gzip.GZipCorpusObjectReader;
+import org.dice_research.topicmodeling.io.gzip.GZipCorpusReaderDecorator;
 import org.dice_research.topicmodeling.io.gzip.GZipProbTopicModelingAlgorithmStateWriter;
+import org.dice_research.topicmodeling.io.java.CorpusObjectReader;
 import org.dice_research.topicmodeling.utils.corpus.Corpus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,27 +55,57 @@ public class ModelGenerator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ModelGenerator.class);
 
-    private static final int NUMBER_OF_TOPICS = 1000;
-    private static final int NUMBER_OF_STEPS = 1040;
-    private static final String MODEL_FOLDER = "/home/mroeder/tapioca/model";
-    private static final String MODEL_OBJECT_FILE = MODEL_FOLDER + File.separator + "probAlgState.object";
-    private static final String CORPUS_FILE = "/home/mroeder/tapioca/lodStats_all_log.object";
+    private static final int DEFAULT_NUMBER_OF_STEPS = 1040;
+    private static final String DEFAULT_MODEL_OBJECT_FILE_NAME = "probAlgState.object";
 
     public static void main(String[] args) {
-        File outputFolder = new File(MODEL_FOLDER);
+        // create CLI Options object
+        Options options = new Options();
+        options.addOption("t", "topics", true, "the number of topics");
+        options.addOption("i", "iterations", true, "the number of iterations used for generating the model");
+        options.addOption("o", "output-folder", true, "the folder to which the output will be written to");
+        options.addOption("c", "corpus", true, "the corpus file");
+        CommandLineParser parser = new DefaultParser();
+        CommandLine cmd = null;
+        try {
+            cmd = parser.parse(options, args);
+        } catch (ParseException e) {
+            LOGGER.error("Couldn't parse commands. Aborting.", e);
+            return;
+        }
+        if (!cmd.hasOption("c")) {
+            LOGGER.error("The input corpus file is not defined. Please provide a corpus file.");
+            return;
+        }
+        String inputFile = cmd.getOptionValue("c");
+        if (!cmd.hasOption("o")) {
+            LOGGER.error("Output file is not defined. Please provide an output directory.");
+            return;
+        }
+        File outputFolder = new File(cmd.getOptionValue("o"));
+        if (!cmd.hasOption("t")) {
+            LOGGER.error("The number of topics is not defined. Please provide it.");
+            return;
+        }
+        int numberOfTopics = Integer.parseInt(cmd.getOptionValue("t"));
+        int iterations = DEFAULT_NUMBER_OF_STEPS;
+        if (!cmd.hasOption("i")) {
+            LOGGER.info("The number of iterations is not defined. The default value {} will be used", iterations);
+        } else {
+            iterations = Integer.parseInt(cmd.getOptionValue("i"));
+        }
+        
         if (!outputFolder.exists()) {
             outputFolder.mkdirs();
         }
-        ModelGenerator generator = new ModelGenerator();
-        generator.run(CORPUS_FILE, MODEL_OBJECT_FILE);
+        String modelObjFile = outputFolder.getAbsolutePath() + File.separator + DEFAULT_MODEL_OBJECT_FILE_NAME;
+        
+        ModelGenerator generator = new ModelGenerator(numberOfTopics, iterations);
+        generator.run(inputFile, modelObjFile);
     }
 
     private int numberOfTopics;
     private int numberOfSteps;
-
-    public ModelGenerator() {
-        this(NUMBER_OF_TOPICS, NUMBER_OF_STEPS);
-    }
 
     public ModelGenerator(int numberOfTopics, int numberOfSteps) {
         this.numberOfTopics = numberOfTopics;
@@ -77,7 +113,8 @@ public class ModelGenerator {
     }
 
     public void run(String corpusFile, String modelFile) {
-        CorpusReader reader = new GZipCorpusObjectReader(new File(corpusFile));
+        CorpusReader reader = new GZipCorpusReaderDecorator(new CorpusObjectReader());
+        reader.readCorpus(new File(corpusFile));
         Corpus corpus = reader.getCorpus();
         if (corpus == null) {
             LOGGER.error("Couldn't load corpus from file. Aborting.");

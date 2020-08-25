@@ -59,7 +59,7 @@
 		<org.apache.jena.version>3.9.0</org.apache.jena.version>
 		<org.aksw.jena-sparql-api.version>${org.apache.jena.version}-1</org.aksw.jena-sparql-api.version>
 		<org.openrdf.sesame.version>2.7.0-beta1</org.openrdf.sesame.version>
-		<slf4j.version>1.7.10</slf4j.version>
+		<slf4j.version>1.7.25</slf4j.version>
 		<spring.version>3.2.10.RELEASE</spring.version>
 		<jackson.version>2.10.1</jackson.version>
 	</properties>
