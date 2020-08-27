@@ -35,22 +35,20 @@ package org.aksw.simba.tapioca.server;
 
 import java.io.StringWriter;
 
-import org.dice_research.topicmodeling.commons.collections.TopDoubleObjectCollection;
-import org.dice_research.topicmodeling.preprocessing.SingleDocumentPreprocessor;
-import org.dice_research.topicmodeling.utils.doc.Document;
-import org.dice_research.topicmodeling.utils.doc.DocumentText;
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.riot.RDFDataMgr;
-import org.apache.jena.riot.RDFFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.StmtIterator;
+import org.apache.jena.riot.RDFDataMgr;
+import org.apache.jena.riot.RDFFormat;
+import org.dice_research.topicmodeling.commons.collections.TopDoubleObjectCollection;
+import org.dice_research.topicmodeling.preprocessing.SingleDocumentPreprocessor;
+import org.dice_research.topicmodeling.utils.doc.Document;
+import org.dice_research.topicmodeling.utils.doc.DocumentText;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class AbstractEngine implements Engine {
 

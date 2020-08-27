@@ -47,8 +47,8 @@ import org.aksw.simba.tapioca.gen.data.DatasetURIs;
 import org.aksw.simba.tapioca.gen.preprocessing.DatasetURIsSummarizingSupplierDecorator;
 import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSupplierDecorator;
 import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSupplierDecorator.UriUsage;
-import org.dice_research.topicmodeling.io.java.CorpusObjectWriter;
 import org.dice_research.topicmodeling.io.gzip.GZipCorpusObjectWriter;
+import org.dice_research.topicmodeling.io.java.CorpusObjectWriter;
 import org.dice_research.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier;
 import org.dice_research.topicmodeling.preprocessing.ListCorpusCreator;
 import org.dice_research.topicmodeling.preprocessing.docsupplier.DocumentSupplier;
@@ -63,102 +63,107 @@ import org.slf4j.LoggerFactory;
 
 public class URIBasedIndexGenerator {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(URIBasedIndexGenerator.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(URIBasedIndexGenerator.class);
 
-    public static final String BL_CORPUS_FILE = TMBasedIndexGenerator.TAPIOCA_FOLDER
-            + TMBasedIndexGenerator.CORPUS_NAME + "_BL.object";
+	public static final String BL_CORPUS_FILE = TMBasedIndexGenerator.TAPIOCA_FOLDER + TMBasedIndexGenerator.CORPUS_NAME
+			+ "_BL.object";
 
-    public static final String FINAL_CORPUS_FILE = TMBasedIndexGenerator.CORPUS_NAME + "_BL_final.corpus";
+	public static final String FINAL_CORPUS_FILE = TMBasedIndexGenerator.CORPUS_NAME + "_BL_final.corpus";
 
-    public static void main(String[] args) {
-        URIBasedIndexGenerator generator = new URIBasedIndexGenerator();
-        generator.run();
-    }
+	public static void main(String[] args) {
+		URIBasedIndexGenerator generator = new URIBasedIndexGenerator();
+		generator.run();
+	}
 
-    public void run() {
-        File outputFolder = new File(TMBasedIndexGenerator.OUTPUT_FOLDER);
-        if (!outputFolder.exists()) {
-            outputFolder.mkdirs();
-        }
+	public void run() {
+		File outputFolder = new File(TMBasedIndexGenerator.OUTPUT_FOLDER);
+		if (!outputFolder.exists()) {
+			outputFolder.mkdirs();
+		}
 
-        File datasetDescriptionsFile = new File(TMBasedIndexGenerator.OUTPUT_FOLDER + File.separator
-                + FINAL_CORPUS_FILE);
-        if (datasetDescriptionsFile.exists()) {
-            LOGGER.info("The final corpus file is already existing.");
-        } else {
-            generateFinalCorpusFile();
-        }
-    }
+		File datasetDescriptionsFile = new File(
+				TMBasedIndexGenerator.OUTPUT_FOLDER + File.separator + FINAL_CORPUS_FILE);
+		if (datasetDescriptionsFile.exists()) {
+			LOGGER.info("The final corpus file is already existing.");
+		} else {
+			generateFinalCorpusFile();
+		}
+	}
 
-    protected void generateFinalCorpusFile() {
-        if (checkBLCorpusExistence()) {
-            MetaDataInformationCollector collector = new MetaDataInformationCollector();
-            LOGGER.info("Generating final corpus file...");
-            collector.run(TMBasedIndexGenerator.META_DATA_FILE, BL_CORPUS_FILE, TMBasedIndexGenerator.STAT_RESULT_FILE,
-                    TMBasedIndexGenerator.OUTPUT_FOLDER + File.separator + FINAL_CORPUS_FILE,
-                    TMBasedIndexGenerator.OUTPUT_FOLDER + File.separator + TMBasedIndexGenerator.MODEL_META_DATA_FILE);
-        }
-    }
+	protected void generateFinalCorpusFile() {
+		if (checkBLCorpusExistence()) {
+			MetaDataInformationCollector collector = new MetaDataInformationCollector();
+			LOGGER.info("Generating final corpus file...");
+			collector.run(TMBasedIndexGenerator.META_DATA_FILE, BL_CORPUS_FILE, TMBasedIndexGenerator.STAT_RESULT_FILE,
+					TMBasedIndexGenerator.OUTPUT_FOLDER + File.separator + FINAL_CORPUS_FILE,
+					TMBasedIndexGenerator.OUTPUT_FOLDER + File.separator + TMBasedIndexGenerator.MODEL_META_DATA_FILE);
+		}
+	}
 
-    protected boolean checkBLCorpusExistence() {
-        File blCorpusFile = new File(BL_CORPUS_FILE);
-        if (!blCorpusFile.exists()) {
-            LOGGER.warn("The BL corpus file is not existing. Trying to generate it...");
-            generateBLCorpusFile();
-            if (!blCorpusFile.exists()) {
-                LOGGER.error("The BL corpus file is not existing and couldn't be generated.");
-                return false;
-            }
-        }
-        return true;
-    }
+	protected boolean checkBLCorpusExistence() {
+		File blCorpusFile = new File(BL_CORPUS_FILE);
+		if (!blCorpusFile.exists()) {
+			LOGGER.warn("The BL corpus file is not existing. Trying to generate it...");
+			generateBLCorpusFile();
+			if (!blCorpusFile.exists()) {
+				LOGGER.error("The BL corpus file is not existing and couldn't be generated.");
+				return false;
+			}
+		}
+		return true;
+	}
 
-    protected void generateBLCorpusFile() {
-        DocumentSupplier supplier = StreamBasedXmlDocumentSupplier.createReader(new File(
-                TMBasedIndexGenerator.CORPUS_FILE), true);
-        StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetClassInfo.class);
-        StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetSpecialClassesInfo.class);
-        StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetPropertyInfo.class);
-        StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetVocabularies.class);
-        // Count the URIs
-        supplier = new UriCountMappingCreatingDocumentSupplierDecorator(supplier, UriUsage.CLASSES_AND_PROPERTIES);
+	public static DocumentSupplier createBLPreprocessing(File inputFile) {
+		DocumentSupplier supplier = StreamBasedXmlDocumentSupplier.createReader(inputFile, true);
+		StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetClassInfo.class);
+		StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetSpecialClassesInfo.class);
+		StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetPropertyInfo.class);
+		StreamBasedXmlDocumentSupplier.registerParseableDocumentProperty(DatasetVocabularies.class);
+		// Count the URIs
+		supplier = new UriCountMappingCreatingDocumentSupplierDecorator(supplier, UriUsage.CLASSES_AND_PROPERTIES);
 
-        supplier = new DatasetURIsSummarizingSupplierDecorator(supplier);
+		supplier = new DatasetURIsSummarizingSupplierDecorator(supplier);
 
-        supplier = new DocumentFilteringSupplierDecorator(supplier, new DocumentFilter() {
-            public boolean isDocumentGood(Document document) {
-                DatasetURIs uris = document.getProperty(DatasetURIs.class);
-                return (uris != null) && (uris.get().size() > 0);
-            }
-        });
+		supplier = new DocumentFilteringSupplierDecorator(supplier, new DocumentFilter() {
+			public boolean isDocumentGood(Document document) {
+				DatasetURIs uris = document.getProperty(DatasetURIs.class);
+				return (uris != null) && (uris.get().size() > 0);
+			}
+		});
 
-        // final Set<String> whiteList = generateDocumentNameWhiteList();
-        // if (whiteList != null) {
-        // supplier = new DocumentFilteringSupplierDecorator(supplier, new
-        // DocumentFilter() {
-        // public boolean isDocumentGood(Document document) {
-        // DocumentName name = document.getProperty(DocumentName.class);
-        // return (name != null) && (whiteList.contains(name.get()));
-        // }
-        // });
-        // }
+		// final Set<String> whiteList = generateDocumentNameWhiteList();
+		// if (whiteList != null) {
+		// supplier = new DocumentFilteringSupplierDecorator(supplier, new
+		// DocumentFilter() {
+		// public boolean isDocumentGood(Document document) {
+		// DocumentName name = document.getProperty(DocumentName.class);
+		// return (name != null) && (whiteList.contains(name.get()));
+		// }
+		// });
+		// }
 
-        // Since this property is not serializeable we have to remove it
-        List<Class<? extends DocumentProperty>> propertiesToRemove = new ArrayList<Class<? extends DocumentProperty>>();
-        propertiesToRemove.add(DatasetVocabularies.class);
-        propertiesToRemove.add(DatasetPropertyInfo.class);
-        propertiesToRemove.add(DatasetSpecialClassesInfo.class);
-        propertiesToRemove.add(DatasetClassInfo.class);
-        propertiesToRemove.add(StringCountMapping.class);
-        propertiesToRemove.add(SimpleTokenizedText.class);
-        supplier = new PropertyRemovingSupplierDecorator(supplier, propertiesToRemove);
+		return supplier;
+	}
 
-        ListCorpusCreator<List<Document>> preprocessor = new ListCorpusCreator<List<Document>>(supplier,
-                new DocumentListCorpus<List<Document>>(new ArrayList<Document>()));
+	protected void generateBLCorpusFile() {
+		DocumentSupplier supplier = createBLPreprocessing(new File(TMBasedIndexGenerator.CORPUS_FILE));
 
-        CorpusObjectWriter writer = new GZipCorpusObjectWriter(new File(BL_CORPUS_FILE));
-        writer.writeCorpus(preprocessor.getCorpus());
-    }
+		// Since this property is not serializeable we have to remove it
+		List<Class<? extends DocumentProperty>> propertiesToRemove = new ArrayList<Class<? extends DocumentProperty>>();
+		propertiesToRemove.add(DatasetVocabularies.class);
+		propertiesToRemove.add(DatasetPropertyInfo.class);
+		propertiesToRemove.add(DatasetSpecialClassesInfo.class);
+		propertiesToRemove.add(DatasetClassInfo.class);
+		propertiesToRemove.add(StringCountMapping.class);
+		propertiesToRemove.add(SimpleTokenizedText.class);
+		supplier = new PropertyRemovingSupplierDecorator(supplier, propertiesToRemove);
+
+		ListCorpusCreator<List<Document>> preprocessor = new ListCorpusCreator<List<Document>>(supplier,
+				new DocumentListCorpus<List<Document>>(new ArrayList<Document>()));
+
+		CorpusObjectWriter writer = new GZipCorpusObjectWriter(new File(BL_CORPUS_FILE));
+		writer.writeCorpus(preprocessor.getCorpus());
+	}
 
 //    protected Set<String> generateDocumentNameWhiteList() {
 //        File finalLDACorpusFile = new File(TMBasedIndexGenerator.LDA_CORPUS_FILE);

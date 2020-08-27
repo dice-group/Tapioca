@@ -120,6 +120,10 @@ public class ModelGenerator {
             LOGGER.error("Couldn't load corpus from file. Aborting.");
             return;
         }
+        run(corpus, modelFile);
+    }
+
+    public void run(Corpus corpus, String modelFile) {
         ModelingAlgorithm algorithm = new MalletLdaWrapper(numberOfTopics);
         algorithm.initialize(corpus);
         for (int i = 0; i < numberOfSteps; ++i) {
