@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.aksw.simba.tapioca.data.DatasetClassInfo;
 import org.aksw.simba.tapioca.data.DatasetPropertyInfo;
@@ -115,17 +114,20 @@ public class LDACorpusCreation {
     public static void main(String[] args) {
         // create CLI Options object
         Options options = new Options();
-        options.addOption("n", "input-file", true, "the input corpus file");
-        options.addOption("o", "output-file", true, "the output corpus file");
-        options.addOption("l", "label-file", true, "a label file that should be used to retrieve labels");
         options.addOption("c", "cache-file", true, "a cache file that can be used to cache labels retrieved via HTTP");
+        options.addOption("f", "word-frequency", true, "either \"u\" for unique or \"l\" for log. \"l\" is default.");
         options.addOption("h", "mongo-db-host", true,
                 "the host name of a MongoDB instance containing URI to label mappings");
+        options.addOption("l", "label-file", true, "a label file that should be used to retrieve labels");
+        options.addOption("n", "input-file", true, "the input corpus file");
+        options.addOption("o", "output-file", true, "the output corpus file");
         options.addOption("p", "mongo-db-port", true,
                 "the port of a MongoDB instance containing URI to label mappings");
         options.addOption("s", "label-service", true, "the URL of a label retrieval service");
         options.addOption("w", "workers", true, "number of workers used for retrieving labels");
         options.addOption("x", "export-xml", false, "export the corpus as XML");
+        options.addOption("u", "uri-type", true,
+                "either \"c\" for classes, \"p\" for properties or \"a\" for all. \"p\" is default.");
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = null;
         try {
@@ -145,9 +147,54 @@ public class LDACorpusCreation {
         }
         String outputFile = cmd.getOptionValue("o");
 
-        // UriUsage uriUsages[] = UriUsage.values();
-        UriUsage uriUsages[] = new UriUsage[] { UriUsage.CLASSES_AND_PROPERTIES };
-        WordOccurence wordOccurences[] = new WordOccurence[] { /* WordOccurence.UNIQUE, */WordOccurence.LOG };
+        WordOccurence wordOccurence = null;
+        if (cmd.hasOption("f")) {
+            String value = cmd.getOptionValue("f");
+            switch (value) {
+            case "l": {
+                wordOccurence = WordOccurence.LOG;
+                break;
+            }
+            case "u": {
+                wordOccurence = WordOccurence.UNIQUE;
+                break;
+            }
+            default: {
+                LOGGER.error("Got an unkown value for the uri-type: \"" + value + "\"");
+                return;
+            }
+            }
+        } else {
+            wordOccurence = WordOccurence.UNIQUE;
+        }
+
+        UriUsage uriUsage = null;
+        if (cmd.hasOption("u")) {
+            String value = cmd.getOptionValue("u");
+            switch (value) {
+            case "a": {
+                uriUsage = UriUsage.CLASSES_AND_PROPERTIES;
+                break;
+            }
+            case "c": {
+                uriUsage = UriUsage.CLASSES;
+                break;
+            }
+            case "p": {
+                uriUsage = UriUsage.PROPERTIES;
+                break;
+            }
+            default: {
+                LOGGER.error("Got an unkown value for the uri-type: \"" + value + "\"");
+                return;
+            }
+            }
+        } else {
+            uriUsage = UriUsage.PROPERTIES;
+        }
+        // UriUsage uriUsages[] = new UriUsage[] { UriUsage.CLASSES_AND_PROPERTIES };
+        // WordOccurence wordOccurences[] = new WordOccurence[] { /*
+        // WordOccurence.UNIQUE, */WordOccurence.LOG };
 
 //        String corpusName = CORPUS_NAME;
 
@@ -200,9 +247,10 @@ public class LDACorpusCreation {
                             + "\" is not a valid number of workers. The numbers is expected to be >= 1.");
                 }
             }
-            if(numberOfWorkers > 0) {
+            if (numberOfWorkers > 0) {
                 cachingLabelRetriever = new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, cacheFiles,
-                        retrievers.stream().filter(r -> r != null).toArray(TokenizedLabelRetriever[]::new), numberOfWorkers);
+                        retrievers.stream().filter(r -> r != null).toArray(TokenizedLabelRetriever[]::new),
+                        numberOfWorkers);
             } else {
                 cachingLabelRetriever = new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, cacheFiles,
                         retrievers.stream().filter(r -> r != null).toArray(TokenizedLabelRetriever[]::new));
@@ -212,14 +260,16 @@ public class LDACorpusCreation {
             // LabelRetrievingDocumentSupplierDecorator(null, false, labelsFiles);
 
             LDACorpusCreation corpusCreation;
-            for (int i = 0; i < uriUsages.length; ++i) {
-                for (int j = 0; j < wordOccurences.length; ++j) {
-                    System.out.println(
-                            "Starting corpus \"" + inputFile + "\" with " + uriUsages[i] + " and " + wordOccurences[j]);
-                    corpusCreation = new LDACorpusCreation(inputFile, uriUsages[i], wordOccurences[j], outputFile);
-                    corpusCreation.run(cachingLabelRetriever);
-                }
-            }
+//            for (int i = 0; i < uriUsages.length; ++i) {
+//                for (int j = 0; j < wordOccurences.length; ++j) {
+//                    System.out.println(
+//                            "Starting corpus \"" + inputFile + "\" with " + uriUsages[i] + " and " + wordOccurences[j]);
+//                    corpusCreation = new LDACorpusCreation(inputFile, uriUsages[i], wordOccurences[j], outputFile);
+            System.out.println("Starting corpus \"" + inputFile + "\" with " + uriUsage + " and " + wordOccurence);
+            corpusCreation = new LDACorpusCreation(inputFile, uriUsage, wordOccurence, outputFile);
+            corpusCreation.run(cachingLabelRetriever);
+//                }
+//            }
         } finally {
             if (mongoRetriever != null) {
                 try {
