@@ -35,6 +35,8 @@ package org.aksw.simba.tapioca.server;
 
 import java.io.File;
 
+import org.aksw.simba.tapioca.preprocessing.StringCountToSimpleTokenizedTextConvertingDocumentSupplierDecorator.WordOccurence;
+import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSupplierDecorator.UriUsage;
 import org.aksw.simba.tapioca.preprocessing.labelretrieving.WorkerBasedLabelRetrievingDocumentSupplierDecorator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -74,12 +76,12 @@ public class Config extends WebMvcConfigurerAdapter {
     public static @Bean TMEngine createEngine(Environment env,
             WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
         return TMEngine.createEngine(cachingLabelRetriever, new File(env.getProperty(MODEL_FOLDER_PROPERTY_KEY)),
-                new File(env.getProperty(META_DATA_FILE_PROEPRTY_KEY)));
+                new File(env.getProperty(META_DATA_FILE_PROEPRTY_KEY)), UriUsage.CLASSES_AND_PROPERTIES, WordOccurence.LOG);
     }
 
     public static @Bean BLEngine createBLEngine(Environment env) {
         return BLEngine.createEngine(new File(env.getProperty(MODEL_FOLDER_PROPERTY_KEY)),
-                new File(env.getProperty(META_DATA_FILE_PROEPRTY_KEY)));
+                new File(env.getProperty(META_DATA_FILE_PROEPRTY_KEY)), UriUsage.CLASSES_AND_PROPERTIES);
     }
 
     @Override

@@ -98,7 +98,7 @@ public class TMEngine extends AbstractEngine {
 	public static final String CORPUS_FILE_NAME = "lodStats_final.corpus";
 
 	public static TMEngine createEngine(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever,
-			File inputFolder, File metaDataFile) {
+			File inputFolder, File metaDataFile, UriUsage uriUsage, WordOccurence wordOcc) {
 		CorpusReader reader = new GZipCorpusReaderDecorator(new CorpusObjectReader());
 		reader.readCorpus(new File(inputFolder.getAbsolutePath() + File.separator + CORPUS_FILE_NAME));
 		Corpus corpus = reader.getCorpus();
@@ -106,11 +106,11 @@ public class TMEngine extends AbstractEngine {
 			LOGGER.error("Couldn't read corpus. Returning null.");
 			return null;
 		}
-		return createEngine(cachingLabelRetriever, corpus, inputFolder, metaDataFile);
+		return createEngine(cachingLabelRetriever, corpus, inputFolder, metaDataFile, uriUsage, wordOcc);
 	}
 
 	public static TMEngine createEngine(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever,
-			Corpus corpus, File inputFolder, File metaDataFile) {
+			Corpus corpus, File inputFolder, File metaDataFile, UriUsage uriUsage, WordOccurence wordOcc) {
 		LOGGER.info("Loading model from \"" + inputFolder.getAbsolutePath() + "\".");
 		// read probabilistic word topic Model from file
 		GZipProbTopicModelingAlgorithmStateReader modelReader = new GZipProbTopicModelingAlgorithmStateReader();
@@ -136,7 +136,7 @@ public class TMEngine extends AbstractEngine {
 			knownDatasets.put(getUri(corpus.getDocument(i)), new SimpleVector((double[]) probModel
 					.getClassificationForDocument(tempPreProc.processDocument(corpus.getDocument(i))).getValue()));
 		}
-		SingleDocumentPreprocessor preprocessor = createPreprocessing(cachingLabelRetriever, model.getVocabulary());
+		SingleDocumentPreprocessor preprocessor = createPreprocessing(cachingLabelRetriever, model.getVocabulary(), uriUsage, wordOcc);
 		if (preprocessor == null) {
 			LOGGER.error("Couldn't create preprocessor. Returning null.");
 			return null;
@@ -197,7 +197,7 @@ public class TMEngine extends AbstractEngine {
 	}
 
 	protected static SingleDocumentPreprocessor createPreprocessing(
-			WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever, Vocabulary vocabulary) {
+			WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever, Vocabulary vocabulary, UriUsage uriUsage, WordOccurence wordOcc) {
 		SingleDocumentPreprocessor preprocessor = new SingleDocumentPreprocessor();
 		DocumentSupplier supplier = preprocessor;
 		// parse VOID
@@ -217,7 +217,7 @@ public class TMEngine extends AbstractEngine {
 				DatasetSpecialClassesInfo.class);
 
 		// Count the URIs
-		supplier = new UriCountMappingCreatingDocumentSupplierDecorator(supplier, UriUsage.CLASSES_AND_PROPERTIES);
+		supplier = new UriCountMappingCreatingDocumentSupplierDecorator(supplier, uriUsage);
 
 		// retrieve labels
 		// Check whether there is a file containing labels
@@ -225,7 +225,7 @@ public class TMEngine extends AbstractEngine {
 		supplier = cachingLabelRetriever;
 		// supplier = new ExceptionCatchingDocumentSupplierDecorator(supplier);
 		// Convert the counted tokens into tokenized text
-		supplier = new StringCountToSimpleTokenizedTextConvertingDocumentSupplierDecorator(supplier, WordOccurence.LOG);
+		supplier = new StringCountToSimpleTokenizedTextConvertingDocumentSupplierDecorator(supplier, wordOcc);
 		// Filter the stop words
 		supplier = new SimpleTokenizedTextTermFilter(supplier, StandardEnglishPosTaggingTermFilter.getInstance());
 		// Filter empty documents

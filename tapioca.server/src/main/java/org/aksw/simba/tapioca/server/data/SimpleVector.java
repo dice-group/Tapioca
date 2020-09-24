@@ -33,13 +33,15 @@
  */
 package org.aksw.simba.tapioca.server.data;
 
+import org.apache.commons.math3.stat.StatUtils;
+
 public class SimpleVector {
 
     public double length;
     public double values[];
 
     public SimpleVector(double[] values) {
-        this.length = getLength(values);
+        this.length = Math.sqrt(StatUtils.sumSq(values));
         this.values = values;
     }
 
@@ -64,11 +66,4 @@ public class SimpleVector {
         this.values = values;
     }
 
-    public static double getLength(double vector[]) {
-        double length = 0;
-        for (int i = 0; i < vector.length; ++i) {
-            length += vector[i] * vector[i];
-        }
-        return Math.sqrt(length);
-    }
 }

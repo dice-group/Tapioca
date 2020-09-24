@@ -75,7 +75,7 @@ public class BLEngine extends AbstractEngine {
 	private static final int DEFAULT_NUMBER_OF_RESULTS = 20;
 	public static final String CORPUS_FILE_NAME = "lodStats_BL_final.corpus";
 
-	public static BLEngine createEngine(File inputFolder, File metaDataFile) {
+	public static BLEngine createEngine(File inputFolder, File metaDataFile, UriUsage uriUsage) {
 		CorpusReader reader = new GZipCorpusReaderDecorator(new CorpusObjectReader());
 		reader.readCorpus(new File(inputFolder.getAbsolutePath() + File.separator + CORPUS_FILE_NAME));
 		Corpus corpus = reader.getCorpus();
@@ -83,10 +83,10 @@ public class BLEngine extends AbstractEngine {
 			LOGGER.error("Couldn't read corpus. Returning null.");
 			return null;
 		}
-		return createEngine(corpus, metaDataFile);
+		return createEngine(corpus, metaDataFile, uriUsage);
 	}
 
-	public static BLEngine createEngine(Corpus corpus, File metaDataFile) {
+	public static BLEngine createEngine(Corpus corpus, File metaDataFile, UriUsage uriUsage) {
 		ObjectObjectOpenHashMap<String, ObjectOpenHashSet<String>> knownDatasets = new ObjectObjectOpenHashMap<String, ObjectOpenHashSet<String>>(
 				corpus.getNumberOfDocuments());
 		// generate a URI set for each document
@@ -99,7 +99,7 @@ public class BLEngine extends AbstractEngine {
 				knownDatasets.put(getUri(document), uris.get());
 			}
 		}
-		SingleDocumentPreprocessor preprocessor = createPreprocessing();
+		SingleDocumentPreprocessor preprocessor = createPreprocessing(uriUsage);
 		if (preprocessor == null) {
 			LOGGER.error("Couldn't create preprocessor. Returning null.");
 			return null;
@@ -159,14 +159,14 @@ public class BLEngine extends AbstractEngine {
 		return new SimpleVector(vector);
 	}
 
-	protected static SingleDocumentPreprocessor createPreprocessing() {
+	protected static SingleDocumentPreprocessor createPreprocessing(UriUsage uriUsage) {
 		SingleDocumentPreprocessor preprocessor = new SingleDocumentPreprocessor();
 		DocumentSupplier supplier = preprocessor;
 		// parse VOID
 		supplier = new JenaBasedVoidParsingSupplierDecorator(supplier);
 
 		// Count the URIs
-		supplier = new UriCountMappingCreatingDocumentSupplierDecorator(supplier, UriUsage.CLASSES_AND_PROPERTIES);
+		supplier = new UriCountMappingCreatingDocumentSupplierDecorator(supplier, uriUsage);
 
 		preprocessor.setDocumentSupplier(supplier);
 		return preprocessor;
