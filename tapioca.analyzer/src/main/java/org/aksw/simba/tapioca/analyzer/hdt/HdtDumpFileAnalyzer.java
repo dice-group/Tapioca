@@ -149,7 +149,7 @@ public class HdtDumpFileAnalyzer extends AbstractDumpExtractorApplier {
             LOGGER.error("Couldn't parse predicate of \"" + t.toString() + "\". Returning null.");
             return null;
         }
-        temp = t.getSubject().toString();
+        temp = t.getObject().toString();
         Node o = createUriNode(temp);
         if (o == null) {
             o = createAnonNode(temp);
