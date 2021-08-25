@@ -43,7 +43,7 @@ ModelGenerator -t <number-of-topics> -i 1040 -c <corpus-file> -o <output-directo
 ```
 The final model will be built and saved in the given output directory.
 
-## How use the model
+## How to use the model
 
 There are two ways to use the model.
 
@@ -80,7 +80,7 @@ Either build the project locally or include the following repository into your p
 
 Include the following code into your program
 
-```java
+```Java
 File labelFiles[] = {}; // TODO add label files
 WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever = new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, null, labelFiles, false);
 
