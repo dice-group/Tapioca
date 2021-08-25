@@ -34,6 +34,7 @@
 package org.aksw.simba.tapioca.gen;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.aksw.simba.tapioca.preprocessing.StringCountToSimpleTokenizedTextConvertingDocumentSupplierDecorator.WordOccurence;
 import org.aksw.simba.tapioca.preprocessing.UriCountMappingCreatingDocumentSupplierDecorator.UriUsage;
@@ -112,16 +113,22 @@ public class TMBasedIndexGenerator {
                 WordOccurence.LOG, null);
         WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever;
         cachingLabelRetriever = new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, CACHE_FILES, new File[0]);
-        creation.run(cachingLabelRetriever);
-        cachingLabelRetriever.close();
+        try {
+            creation.run(cachingLabelRetriever);
+        } catch (IOException e) {
+            LOGGER.error("Exception while generating LDA corpus.", e);
+        } finally {
+            cachingLabelRetriever.close();
+        }
     }
 
     protected void generateFinalCorpusFile() {
         if (checkLDACorpusExistence()) {
             MetaDataInformationCollector collector = new MetaDataInformationCollector();
             LOGGER.info("Generating final corpus file...");
-            collector.run(META_DATA_FILE, LDA_CORPUS_FILE, STAT_RESULT_FILE, OUTPUT_FOLDER + File.separator
-                    + FINAL_CORPUS_FILE, OUTPUT_FOLDER + File.separator + MODEL_META_DATA_FILE);
+            collector.run(META_DATA_FILE, LDA_CORPUS_FILE, STAT_RESULT_FILE,
+                    OUTPUT_FOLDER + File.separator + FINAL_CORPUS_FILE,
+                    OUTPUT_FOLDER + File.separator + MODEL_META_DATA_FILE);
         }
     }
 
@@ -129,8 +136,8 @@ public class TMBasedIndexGenerator {
         if (checkLDACorpusExistence()) {
             ModelGenerator generator = new ModelGenerator(1000, 1040);
             LOGGER.info("Generating Model file...");
-            generator.run(OUTPUT_FOLDER + File.separator + FINAL_CORPUS_FILE, OUTPUT_FOLDER + File.separator
-                    + MODEL_FILE);
+            generator.run(OUTPUT_FOLDER + File.separator + FINAL_CORPUS_FILE,
+                    OUTPUT_FOLDER + File.separator + MODEL_FILE);
         }
     }
 

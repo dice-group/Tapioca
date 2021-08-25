@@ -33,8 +33,11 @@
  */
 package org.aksw.simba.tapioca.gen;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -67,7 +70,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.dice_research.topicmodeling.io.gzip.GZipCorpusObjectWriter;
+import org.dice_research.topicmodeling.io.CorpusWriter;
+import org.dice_research.topicmodeling.io.gzip.GZipCorpusWriterDecorator;
 import org.dice_research.topicmodeling.io.java.CorpusObjectWriter;
 import org.dice_research.topicmodeling.io.xml.XmlWritingDocumentConsumer;
 import org.dice_research.topicmodeling.io.xml.stream.StreamBasedXmlDocumentSupplier;
@@ -95,6 +99,7 @@ public class LDACorpusCreation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LDACorpusCreation.class);
 
+    @Deprecated
     public static final File CACHE_FILES[] = new File[] { new File("C:/Daten/tapioca/cache/uriToLabelCache_1.object"),
             new File("C:/Daten/tapioca/cache/uriToLabelCache_2.object"),
             new File("C:/Daten/tapioca/cache/uriToLabelCache_3.object") };
@@ -111,10 +116,11 @@ public class LDACorpusCreation {
 //    @Deprecated
 //    private static final boolean EXPORT_CORPUS_AS_XML = false;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // create CLI Options object
         Options options = new Options();
-        options.addOption("c", "cache-file", true, "a cache file that can be used to cache labels retrieved via HTTP");
+        options.addOption("c", "cache-file", true,
+                "a cache file that can be used to cache labels retrieved via HTTP. Only used in combination with -y.");
         options.addOption("f", "word-frequency", true, "either \"u\" for unique or \"l\" for log. \"l\" is default.");
         options.addOption("h", "mongo-db-host", true,
                 "the host name of a MongoDB instance containing URI to label mappings");
@@ -124,10 +130,12 @@ public class LDACorpusCreation {
         options.addOption("p", "mongo-db-port", true,
                 "the port of a MongoDB instance containing URI to label mappings");
         options.addOption("s", "label-service", true, "the URL of a label retrieval service");
-        options.addOption("w", "workers", true, "number of workers used for retrieving labels");
-        options.addOption("x", "export-xml", false, "export the corpus as XML");
         options.addOption("u", "uri-type", true,
                 "either \"c\" for classes, \"p\" for properties or \"a\" for all. \"p\" is default.");
+        options.addOption("w", "workers", true, "number of workers used for retrieving labels");
+        options.addOption("x", "export-xml", false, "export the corpus as XML");
+        options.addOption("y", "http-client", false,
+                "if set, labels for URIs are retrieved via HTTP. Note that this make take a lot of time!");
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = null;
         try {
@@ -225,6 +233,7 @@ public class LDACorpusCreation {
             if (cmd.hasOption("s")) {
                 retrievers.add(new LODCatLabelServiceBasedRetriever(cmd.getOptionValue("s")));
             }
+            boolean useHttpClient = cmd.hasOption('y');
             File cacheFiles[] = null;
             if (cmd.hasOption("c")) {
                 String fileNames[] = cmd.getOptionValues("c");
@@ -250,10 +259,11 @@ public class LDACorpusCreation {
             if (numberOfWorkers > 0) {
                 cachingLabelRetriever = new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, cacheFiles,
                         retrievers.stream().filter(r -> r != null).toArray(TokenizedLabelRetriever[]::new),
-                        numberOfWorkers);
+                        numberOfWorkers, useHttpClient);
             } else {
                 cachingLabelRetriever = new WorkerBasedLabelRetrievingDocumentSupplierDecorator(null, cacheFiles,
-                        retrievers.stream().filter(r -> r != null).toArray(TokenizedLabelRetriever[]::new));
+                        retrievers.stream().filter(r -> r != null).toArray(TokenizedLabelRetriever[]::new),
+                        useHttpClient);
             }
             // LabelRetrievingDocumentSupplierDecorator cachingLabelRetriever;
             // cachingLabelRetriever = new
@@ -317,7 +327,7 @@ public class LDACorpusCreation {
         this.exportCorpusAsXml = exportCorpusAsXml;
     }
 
-    public void run(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) {
+    public void run(WorkerBasedLabelRetrievingDocumentSupplierDecorator cachingLabelRetriever) throws IOException {
         // String corpusName = generateCorpusName();
 
         XmlWritingDocumentConsumer consumer = null;
@@ -332,8 +342,10 @@ public class LDACorpusCreation {
             IOUtils.closeQuietly(consumer);
         }
 
-        CorpusObjectWriter writer = new GZipCorpusObjectWriter(new File(outputFile));
-        writer.writeCorpus(corpus);
+        try (OutputStream out = new BufferedOutputStream(new FileOutputStream(new File(outputFile)))) {
+            CorpusWriter writer = new GZipCorpusWriterDecorator(new CorpusObjectWriter());
+            writer.writeCorpus(corpus, out);
+        }
     }
 
     /**

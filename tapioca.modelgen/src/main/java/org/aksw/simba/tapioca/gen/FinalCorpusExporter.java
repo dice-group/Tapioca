@@ -33,30 +33,30 @@
  */
 package org.aksw.simba.tapioca.gen;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
-import org.dice_research.topicmodeling.io.gzip.GZipCorpusObjectReader;
-import org.dice_research.topicmodeling.utils.corpus.Corpus;
-import org.dice_research.topicmodeling.utils.doc.Document;
-import org.dice_research.topicmodeling.utils.doc.DocumentURI;
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.n3.turtle.TurtleReader;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.RDFReader;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.impl.ResourceImpl;
 import org.apache.jena.riot.RDFDataMgr;
 import org.apache.jena.riot.RDFFormat;
+import org.dice_research.topicmodeling.io.gzip.GZipCorpusObjectReader;
+import org.dice_research.topicmodeling.utils.corpus.Corpus;
+import org.dice_research.topicmodeling.utils.doc.Document;
+import org.dice_research.topicmodeling.utils.doc.DocumentURI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FinalCorpusExporter {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FinalCorpusExporter.class);
 
     private static final String LOD_STATS_DOC_BASE_URI = "http://lodstats.aksw.org/rdfdocs/";
@@ -64,8 +64,8 @@ public class FinalCorpusExporter {
     public static void main(String[] args) {
         FinalCorpusExporter exporter = new FinalCorpusExporter();
         exporter.run(TMBasedIndexGenerator.OUTPUT_FOLDER + File.separator + TMBasedIndexGenerator.FINAL_CORPUS_FILE,
-                "/Daten/tapioca/export.nt", TMBasedIndexGenerator.OUTPUT_FOLDER + File.separator
-                        + TMBasedIndexGenerator.MODEL_META_DATA_FILE);
+                "/Daten/tapioca/export.nt",
+                TMBasedIndexGenerator.OUTPUT_FOLDER + File.separator + TMBasedIndexGenerator.MODEL_META_DATA_FILE);
     }
 
     public void run(String corpusFile, String outputFile, String metaDataModelFile) {
@@ -102,17 +102,12 @@ public class FinalCorpusExporter {
     }
 
     protected Model readModel(String metaDataModelFile) {
-        RDFReader reader = new TurtleReader();
         Model model = ModelFactory.createDefaultModel();
-        FileInputStream fin = null;
-        try {
-            fin = new FileInputStream(metaDataModelFile);
-            reader.read(model, fin, LOD_STATS_DOC_BASE_URI);
-        } catch (FileNotFoundException e) {
+        try (InputStream in = new BufferedInputStream(new FileInputStream(metaDataModelFile))) {
+            model.read(in, LOD_STATS_DOC_BASE_URI, "Turtle");
+        } catch (IOException e) {
             LOGGER.error("Couldn't read model with additional meta data from file. Ignoring this file.", e);
             return null;
-        } finally {
-            IOUtils.closeQuietly(fin);
         }
         return model;
     }

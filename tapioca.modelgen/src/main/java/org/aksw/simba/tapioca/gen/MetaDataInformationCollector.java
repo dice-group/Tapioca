@@ -33,9 +33,11 @@
  */
 package org.aksw.simba.tapioca.gen;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,6 +46,18 @@ import org.aksw.simba.tapioca.extraction.RDF2ExtractionStreamer;
 import org.aksw.simba.tapioca.extraction.voidex.DatasetDescription;
 import org.aksw.simba.tapioca.gen.data.StatResult;
 import org.aksw.simba.tapioca.gen.preprocessing.StatResultsReader;
+import org.apache.commons.io.IOUtils;
+import org.apache.jena.graph.Node;
+import org.apache.jena.graph.Triple;
+import org.apache.jena.rdf.model.Model;
+import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.RDFNode;
+import org.apache.jena.rdf.model.Resource;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.impl.ResourceImpl;
+import org.apache.jena.riot.Lang;
+import org.apache.jena.vocabulary.DC;
+import org.apache.jena.vocabulary.OWL;
 import org.dice_research.topicmodeling.io.CorpusReader;
 import org.dice_research.topicmodeling.io.gzip.GZipCorpusObjectReader;
 import org.dice_research.topicmodeling.io.gzip.GZipCorpusObjectWriter;
@@ -59,20 +73,6 @@ import org.dice_research.topicmodeling.utils.doc.Document;
 import org.dice_research.topicmodeling.utils.doc.DocumentDescription;
 import org.dice_research.topicmodeling.utils.doc.DocumentName;
 import org.dice_research.topicmodeling.utils.doc.DocumentURI;
-import org.apache.commons.io.IOUtils;
-import org.apache.jena.graph.Node;
-import org.apache.jena.graph.Triple;
-import org.apache.jena.n3.turtle.TurtleReader;
-import org.apache.jena.rdf.model.Model;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.RDFNode;
-import org.apache.jena.rdf.model.RDFReader;
-import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.Statement;
-import org.apache.jena.rdf.model.impl.ResourceImpl;
-import org.apache.jena.riot.Lang;
-import org.apache.jena.vocabulary.DC;
-import org.apache.jena.vocabulary.OWL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -158,17 +158,12 @@ public class MetaDataInformationCollector {
 
 	protected void enricheMetaData(String additionalMetaDataFile, IntObjectOpenHashMap<DatasetDescription> descriptions) {
 		// Read additional meta data
-		RDFReader reader = new TurtleReader();
 		Model model = ModelFactory.createDefaultModel();
-		FileInputStream fin = null;
-		try {
-			fin = new FileInputStream(additionalMetaDataFile);
-			reader.read(model, fin, LOD_STATS_DOC_BASE_URI);
-		} catch (FileNotFoundException e) {
+        try (InputStream in = new BufferedInputStream(new FileInputStream(additionalMetaDataFile))) {
+            model.read(in, LOD_STATS_DOC_BASE_URI, "Turtle");
+		} catch (IOException e) {
 			LOGGER.error("Couldn't read model with additional meta data from file. Ignoring this file.", e);
 			return;
-		} finally {
-			IOUtils.closeQuietly(fin);
 		}
 		DatasetDescription description;
 		Resource datasetResource;

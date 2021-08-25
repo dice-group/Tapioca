@@ -59,13 +59,20 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator
 
     public WorkerBasedLabelRetrievingDocumentSupplierDecorator(DocumentSupplier documentSource, File chacheFiles[],
             TokenizedLabelRetriever localLabelTokenizers[], int numberOfWorkers) {
+        this(documentSource, chacheFiles, localLabelTokenizers, numberOfWorkers, true);
+    }
+
+    public WorkerBasedLabelRetrievingDocumentSupplierDecorator(DocumentSupplier documentSource, File chacheFiles[],
+            TokenizedLabelRetriever localLabelTokenizers[], int numberOfWorkers, boolean useRdfClient) {
         super(documentSource, StringCountMapping.class);
         activeWorkers = new Semaphore(numberOfWorkers);
         overseer = new ExecutorBasedOverseer(numberOfWorkers);
         reporter = new LogReporter(overseer);
         // fileBasedLabelTokenizer = FileBasedTokenizedLabelRetriever.create();
-        retrieverClient = new RDFClientLabelRetriever();
-        clientLabelTokenizer = ThreadSafeCachingLabelTokenizerDecorator.create(retrieverClient, chacheFiles);
+        if (useRdfClient) {
+            retrieverClient = new RDFClientLabelRetriever();
+            clientLabelTokenizer = ThreadSafeCachingLabelTokenizerDecorator.create(retrieverClient, chacheFiles);
+        }
         this.localLabelTokenizers = localLabelTokenizers;
         // new WaitingThreadInterrupter(overseer, MAXIMUM_WAITING_TIME);
     }
@@ -73,6 +80,11 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator
     public WorkerBasedLabelRetrievingDocumentSupplierDecorator(DocumentSupplier documentSource, File chacheFiles[],
             TokenizedLabelRetriever localLabelTokenizers[]) {
         this(documentSource, chacheFiles, localLabelTokenizers, MAX_NUMBER_OF_WORKERS);
+    }
+
+    public WorkerBasedLabelRetrievingDocumentSupplierDecorator(DocumentSupplier documentSource, File chacheFiles[],
+            TokenizedLabelRetriever localLabelTokenizers[], boolean useRdfClient) {
+        this(documentSource, chacheFiles, localLabelTokenizers, MAX_NUMBER_OF_WORKERS, useRdfClient);
     }
 
     public WorkerBasedLabelRetrievingDocumentSupplierDecorator(DocumentSupplier documentSource, File chacheFiles[],
@@ -125,7 +137,9 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator
     }
 
     public void storeCache() {
-        clientLabelTokenizer.storeCache();
+        if (clientLabelTokenizer != null) {
+            clientLabelTokenizer.storeCache();
+        }
     }
 
     protected synchronized void workerFinished(List<String> tokens, long count) {
@@ -181,7 +195,7 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator
                 tokens = localLabelTokenizers[i].getTokenizedLabel(uri, namespace);
             }
             // If the label couldn't be retrieved
-            if (tokens == null) {
+            if ((tokens == null) && (clientLabelTokenizer != null)) {
                 this.startWaiting();
                 tokens = clientLabelTokenizer.getTokenizedLabel(rdfClient, uri, namespace);
                 this.stopWaiting();
@@ -263,6 +277,8 @@ public class WorkerBasedLabelRetrievingDocumentSupplierDecorator
     @Override
     public void close() {
         overseer.shutdown();
-        IOUtils.closeQuietly(retrieverClient);
+        if (retrieverClient != null) {
+            IOUtils.closeQuietly(retrieverClient);
+        }
     }
 }
